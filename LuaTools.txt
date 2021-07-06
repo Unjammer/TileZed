@@ -39,3 +39,10 @@ tool
     dialog-title = Street Stuff
 }
 
+tool
+{
+    label = Random Houseplant
+    icon = tool-random-houseplant.png
+    script = tool-random-houseplant.lua
+}
+

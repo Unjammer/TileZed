@@ -1492,3 +1492,65 @@ property
     Max = 3
     Default = 1
 }
+
+separator
+{
+}
+
+property
+{
+    Type = Enum
+    Name = CurtainSound
+    ShortName = 
+    Enums
+    {
+        None =
+        Shade = Shade
+        Sheet = Sheet
+        Long = Long
+        Short = Short
+    }
+    Default = None
+    ValueAsPropertyName = false
+}
+
+property
+{
+    Type = Enum
+    Name = DoorSound
+    ShortName = 
+    Enums
+    {
+        None =
+        Garage Door = GarageDoor
+        Metal Door = MetalDoor
+        Metal Gate = MetalGate
+        Wood Door = WoodDoor
+        Wood Gate = WoodGate
+    }
+    Default = None
+    ValueAsPropertyName = false
+}
+
+property
+{
+    Type = Enum
+    Name = FootstepMaterial
+    ShortName = 
+    Enums
+    {
+        None =
+        Concrete = Concrete
+        Grass = Grass
+        Gravel = Gravel
+        Wood = Wood
+        Carpet = Carpet
+        Dirt = Dirt
+        Sand = Sand
+        Ceramic = Ceramic
+        Metal = Metal
+    }
+    Default = None
+    ValueAsPropertyName = false
+}
+
