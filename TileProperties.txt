@@ -1058,6 +1058,28 @@ property
 property
 {
     Type = Boolean
+    Name = SpearOnlyAttackThrough
+    ShortName =
+    Default = false
+    ReverseLogic = false
+}      
+property
+{
+    Type = Enum
+    Name = CutawayStyle
+    ShortName =
+    Enums
+    {
+        None =
+        cutW = cutW
+        cutN = cutN
+    }
+    Default = None
+    ValueAsPropertyName = true
+}
+property
+{
+    Type = Boolean
     Name = CantClimb
     ShortName =
     Default = false
@@ -1527,6 +1549,39 @@ property
         Metal Gate = MetalGate
         Wood Door = WoodDoor
         Wood Gate = WoodGate
+    }
+    Default = None
+    ValueAsPropertyName = false
+}
+
+property
+{
+    Type = Enum
+    Name = FenceTypeHigh
+    ShortName = 
+    Enums
+    {
+        None =
+        Wood =
+        Metal =
+    }
+    Default = None
+    ValueAsPropertyName = false
+}
+
+property
+{
+    Type = Enum
+    Name = FenceTypeLow
+    ShortName = 
+    Enums
+    {
+        None =
+        Wood =
+        Metal =
+        Sandbag =
+        Gravelbag =
+        Barbwire =
     }
     Default = None
     ValueAsPropertyName = false
