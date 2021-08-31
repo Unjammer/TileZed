@@ -113,6 +113,9 @@ private slots:
 
     void tilesetChanged(Tileset *tileset);
 
+    void tilesetFilterEdited(const QString &text);
+    void propertyFilterEdited(const QString &text);
+
     void tilesetBackgroundColorChanged(const QColor& color);
 
     void updateUI();
@@ -150,6 +153,8 @@ private:
     void restoreSplitterSizes(QSplitter *splitter);
 
     void updateWindowTitle();
+
+    void selectCurrentVisibleTileset();
 
 private:
     static TileDefDialog *mInstance;

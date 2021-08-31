@@ -344,6 +344,14 @@ TileDefDialog::TileDefDialog(QWidget *parent) :
     ui->menuEdit->insertAction(a, undoAction);
     ui->menuEdit->insertAction(a, redoAction);
 
+    ui->tilesetFilter->setClearButtonEnabled(true);
+    ui->tilesetFilter->setEnabled(false);
+    connect(ui->tilesetFilter, &QLineEdit::textEdited, this, &TileDefDialog::tilesetFilterEdited);
+
+    ui->propertyFilter->setClearButtonEnabled(true);
+    ui->propertyFilter->setEnabled(false);
+    connect(ui->propertyFilter, &QLineEdit::textEdited, this, &TileDefDialog::propertyFilterEdited);
+
     ui->splitter->setStretchFactor(0, 1);
 
     mZoomable->setScale(0.5);
@@ -981,6 +989,81 @@ void TileDefDialog::tilesetChanged(Tileset *tileset)
         setTilesList();
 }
 
+void TileDefDialog::tilesetFilterEdited(const QString &text)
+{
+    const QString trimmed = text.trimmed();
+
+    for (int row = 0; row < ui->tilesets->count(); row++) {
+        QListWidgetItem* item = ui->tilesets->item(row);
+        item->setHidden(trimmed.isEmpty() ? false : !item->text().contains(text));
+    }
+
+    selectCurrentVisibleTileset();
+}
+
+void TileDefDialog::propertyFilterEdited(const QString &text)
+{
+    selectCurrentVisibleTileset();
+
+    const QString trimmed = text.trimmed();
+
+    for (int row = 0; row < ui->tilesets->count(); row++) {
+        QListWidgetItem* item = ui->tilesets->item(row);
+        bool bVisible = trimmed.isEmpty();
+        if (bVisible == false) {
+            QString tilesetName = item->data(Qt::UserRole).toString();
+            if (TileDefTileset *tdts = mTileDefFile->tileset(tilesetName)) {
+                for (TileDefTile *tdt : qAsConst(tdts->mTiles)) {
+                    for (auto it = tdt->mProperties.cbegin(); it != tdt->mProperties.cend(); it++) {
+                        if (it.key().contains(trimmed, Qt::CaseInsensitive) || it.value().contains(trimmed, Qt::CaseInsensitive)) {
+                            bVisible = true;
+                            break;
+                        }
+                    }
+                    if (bVisible)
+                        break;
+                }
+            }
+        }
+        item->setHidden(bVisible == false);
+    }
+}
+
+void TileDefDialog::selectCurrentVisibleTileset()
+{
+    QListWidgetItem* current = ui->tilesets->currentItem();
+    if (current != nullptr && current->isHidden()) {
+        // Select previous visible row.
+        int row = ui->tilesets->row(current) - 1;
+        while (row >= 0 && ui->tilesets->item(row)->isHidden())
+            row--;
+        if (row >= 0) {
+            current = ui->tilesets->item(row);
+            ui->tilesets->setCurrentItem(current);
+            ui->tilesets->scrollToItem(current);
+            return;
+        }
+
+        // Select next visible row.
+        row = ui->tilesets->row(current) + 1;
+        while (row < ui->tilesets->count() && ui->tilesets->item(row)->isHidden())
+            row++;
+        if (row < ui->tilesets->count()) {
+            current = ui->tilesets->item(row);
+            ui->tilesets->setCurrentItem(current);
+            ui->tilesets->scrollToItem(current);
+            return;
+        }
+
+        // All items hidden
+        ui->tilesets->setCurrentItem(nullptr);
+    }
+
+    current = ui->tilesets->currentItem();
+    if (current != nullptr)
+        ui->tilesets->scrollToItem(current);
+}
+
 void TileDefDialog::tilesetBackgroundColorChanged(const QColor &color)
 {
     if (mCurrentTileset) {
@@ -1164,6 +1247,9 @@ void TileDefDialog::clearDocument()
     mTileDefFile = 0;
 
     ui->tilesets->clear();
+
+    ui->tilesetFilter->clear();
+    ui->propertyFilter->clear();
 }
 
 void TileDefDialog::changePropertyValues(const QList<TileDefTile *> &defTiles,
@@ -1213,15 +1299,22 @@ void TileDefDialog::setTilesetList()
     int maxWidth = 128;
 
     ui->tilesets->clear();
-    foreach (Tileset *ts, mTilesetByName.values()) {
+    for (Tileset *ts : qAsConst(mTilesetByName)) {
         QListWidgetItem *item = new QListWidgetItem(ts->name() + QString::fromLatin1(" (%1)").arg(mTileDefFile->tileset(ts->name())->mID));
         if (ts->isMissing())
             item->setForeground(Qt::red);
+        item->setData(Qt::UserRole, ts->name());
         ui->tilesets->addItem(item);
         maxWidth = qMax(maxWidth, fm.width(item->text()));
     }
     ui->tilesets->setFixedWidth(maxWidth + 16 +
         ui->tilesets->verticalScrollBar()->sizeHint().width());
+
+    ui->tilesetFilter->setFixedWidth(ui->tilesets->width());
+    ui->tilesetFilter->setEnabled(ui->tilesets->count() > 0);
+
+    ui->propertyFilter->setFixedWidth(ui->tilesets->width());
+    ui->propertyFilter->setEnabled(ui->tilesets->count() > 0);
 }
 
 void TileDefDialog::setTilesList()

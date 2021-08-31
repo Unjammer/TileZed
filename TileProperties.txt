@@ -1582,6 +1582,7 @@ property
         Sandbag =
         Gravelbag =
         Barbwire =
+        Other =
     }
     Default = None
     ValueAsPropertyName = false
