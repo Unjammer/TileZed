@@ -117,6 +117,7 @@ Translations = translations
 
 copyFile $SRC $DEST LuaTools.txt
 copyFile $SRC $DEST Rearrange.txt
+copyFile $SRC $DEST RearrangeGrid.txt
 copyFile $SRC $DEST TileProperties.txt
 copyFile $SRC $DEST Tilesets.txt
 

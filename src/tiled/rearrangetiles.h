@@ -6,12 +6,15 @@
 #include <QMainWindow>
 #include <QTableView>
 
+class SimpleFileBlock;
+
 namespace Ui {
 class RearrangeTiles;
 }
 
 namespace BuildingEditor {
 class BuildingTile;
+class FloorTileGrid;
 }
 
 namespace Tiled {
@@ -66,6 +69,15 @@ public:
     QList<RearrangeIndex> mIndexMap;
 };
 
+class RearrangeGrid
+{
+public:
+    ~RearrangeGrid();
+
+    BuildingEditor::FloorTileGrid *mOld;
+    BuildingEditor::FloorTileGrid *mNew;
+};
+
 class RearrangeFile
 {
     Q_DECLARE_TR_FUNCTIONS(RearrangeFile)
@@ -95,6 +107,41 @@ private:
 private:
     QString mError;
     QList<RearrangeTileset*> mTilesets;
+};
+
+class RearrangeGridFile
+{
+    Q_DECLARE_TR_FUNCTIONS(RearrangeGridFile)
+
+public:
+    ~RearrangeGridFile()
+    {
+        qDeleteAll(mGrids);
+    }
+
+    bool read(const QString &fileName);
+    bool write(const QString &fileName, const QList<RearrangeGrid*> &grids);
+
+    QString errorString() const {
+        return mError;
+    }
+
+    QList<RearrangeGrid*> takeGrids() {
+        QList<RearrangeGrid*> ret = mGrids;
+        mGrids.clear();
+        return ret;
+    }
+
+private:
+    BuildingEditor::FloorTileGrid *readGrid(const SimpleFileBlock& block);
+    bool parse2Ints(const QString &string, int *pa, int *pb);
+
+    void toBlock(SimpleFileBlock &block, const RearrangeGrid &grid);
+    void toBlock(SimpleFileBlock &block, const BuildingEditor::FloorTileGrid &tileGrid);
+
+private:
+    QString mError;
+    QList<RearrangeGrid*> mGrids;
 };
 
 class RearrangeTilesModel : public QAbstractListModel
@@ -225,7 +272,12 @@ public:
     RearrangeIndex rearranged(BuildingEditor::BuildingTile *btile);
     RearrangeIndex rearranged(Tile *tile);
 
+    bool isRearranged(const BuildingEditor::FloorTileGrid &tileGrid, int x, int y);
+
     void readTxtIfNeeded();
+
+    void fixBuilding(const QString &filePath, int x, int y, int z, QMainWindow *parent);
+    void fixBuilding(const QString &filePath, const QVector<int> &xyz, QMainWindow *parent);
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -253,6 +305,8 @@ private:
     QList<RearrangeTileset*> mTilesets;
     QString mCurrentTileset;
     bool bDirty;
+
+    QList<RearrangeGrid*> mGrids;
 };
 
 } // namespace Internal

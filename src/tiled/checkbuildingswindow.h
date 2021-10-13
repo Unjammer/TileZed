@@ -7,6 +7,8 @@
 #include <QSet>
 #include <QTimer>
 
+class QItemSelection;
+
 namespace BuildingEditor {
 class Building;
 class BuildingObject;
@@ -37,6 +39,8 @@ public:
 private slots:
     void browse();
     void check();
+    void fixSelected();
+    void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
     void itemActivated(QTreeWidgetItem *item, int column);
     void syncList();
     void fileChanged(const QString &fileName);
@@ -56,6 +60,7 @@ private:
             Grime,
             Sinks,
             Rearranged,
+            RearrangeGrid,
             MultipleContainers,
             DoorInWall,
         };

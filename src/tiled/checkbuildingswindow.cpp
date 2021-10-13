@@ -43,6 +43,7 @@ CheckBuildingsWindow::CheckBuildingsWindow(QWidget *parent) :
 
     connect(ui->dirBrowse, SIGNAL(clicked()), SLOT(browse()));
     connect(ui->checkNow, SIGNAL(clicked()), SLOT(check()));
+    connect(ui->buttonFixSelected, &QPushButton::clicked, this, &CheckBuildingsWindow::fixSelected);
     connect(ui->treeWidget, SIGNAL(itemActivated(QTreeWidgetItem*,int)), SLOT(itemActivated(QTreeWidgetItem*,int)));
 
     connect(ui->checkInteriorOutside, SIGNAL(clicked()), SLOT(syncList()));
@@ -51,6 +52,7 @@ CheckBuildingsWindow::CheckBuildingsWindow(QWidget *parent) :
     connect(ui->checkGrime, SIGNAL(clicked()), SLOT(syncList()));
     connect(ui->checkSink, SIGNAL(clicked()), SLOT(syncList()));
     connect(ui->check2x, SIGNAL(clicked()), SLOT(syncList()));
+    connect(ui->checkRearrangeGrid, &QCheckBox::clicked, this, QOverload<>::of(&CheckBuildingsWindow::syncList));
 
     ui->dirEdit->setText(BuildingPreferences::instance()->mapsDirectory());
 //    ui->dirEdit->setText(QLatin1Literal("C:/Users/Tim/Desktop/ProjectZomboid/Buildings"));
@@ -60,6 +62,7 @@ CheckBuildingsWindow::CheckBuildingsWindow(QWidget *parent) :
     ui->checkRoomLight->setChecked(false);
 
     ui->treeWidget->setColumnCount(1);
+    connect(ui->treeWidget->selectionModel(), &QItemSelectionModel::selectionChanged, this, &CheckBuildingsWindow::selectionChanged);
 
     connect(mFileSystemWatcher, SIGNAL(fileChanged(QString)), SLOT(fileChanged(QString)));
 
@@ -114,6 +117,80 @@ void CheckBuildingsWindow::check()
     }
 }
 
+void CheckBuildingsWindow::fixSelected()
+{
+    auto selected = ui->treeWidget->selectedItems();
+    if (selected.isEmpty())
+        return;
+    QMap<QString,QVector<int>> issues;
+    for (QTreeWidgetItem *item : selected) {
+        if (item->parent() == nullptr) {
+            int rowFile = ui->treeWidget->indexOfTopLevelItem(item);
+            IssueFile *file = mFiles[rowFile];
+            for (Issue &issue : file->issues) {
+                switch (issue.type) {
+                case Issue::Type::RearrangeGrid:
+                    issues[file->path] << issue.x << issue.y << issue.z;
+                    break;
+                default:
+                    break;
+                }
+            }
+            continue;
+        }
+        int rowFile = ui->treeWidget->indexOfTopLevelItem(item->parent());
+        int rowIssue = item->parent()->indexOfChild(item);
+        Issue &issue = mFiles[rowFile]->issues[rowIssue];
+        switch (issue.type) {
+        case Issue::Type::RearrangeGrid:
+            issues[mFiles[rowFile]->path] << issue.x << issue.y << issue.z;
+            break;
+        default:
+            break;
+        }
+    }
+
+    for (const QString& filePath : issues.keys()) {
+        RearrangeTiles::instance()->fixBuilding(filePath, issues[filePath], this);
+    }
+}
+
+void CheckBuildingsWindow::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+{
+    ui->buttonFixSelected->setEnabled(false);
+    const auto items = ui->treeWidget->selectedItems();
+    for (QTreeWidgetItem *item : items) {
+        if (item->parent() == nullptr) {
+            int rowFile = ui->treeWidget->indexOfTopLevelItem(item);
+            IssueFile *file = mFiles[rowFile];
+            for (Issue &issue : file->issues) {
+                switch (issue.type) {
+                case Issue::Type::RearrangeGrid:
+                    ui->buttonFixSelected->setEnabled(true);
+                    break;
+                default:
+                    break;
+                }
+            }
+            if (ui->buttonFixSelected->isEnabled())
+                break;
+            continue;
+        }
+        int rowFile = ui->treeWidget->indexOfTopLevelItem(item->parent());
+        int rowIssue = item->parent()->indexOfChild(item);
+        Issue &issue = mFiles[rowFile]->issues[rowIssue];
+        switch (issue.type) {
+        case Issue::Type::RearrangeGrid:
+            ui->buttonFixSelected->setEnabled(true);
+            break;
+        default:
+            break;
+        }
+        if (ui->buttonFixSelected->isEnabled())
+            break;
+    }
+}
+
 void CheckBuildingsWindow::itemActivated(QTreeWidgetItem *item, int column)
 {
     if (item->parent() == nullptr)
@@ -151,6 +228,8 @@ void CheckBuildingsWindow::syncList(IssueFile *file)
             if (issue.type == Issue::Sinks && !ui->checkSink->isChecked())
                 visible = false;
             if (issue.type == Issue::Rearranged && !ui->check2x->isChecked())
+                visible = false;
+            if (issue.type == Issue::RearrangeGrid && !ui->checkRearrangeGrid->isChecked())
                 visible = false;
             if (issue.type == Issue::MultipleContainers && !ui->checkContainers->isChecked())
                 visible = false;
@@ -275,7 +354,9 @@ void CheckBuildingsWindow::check(BuildingMap *bmap, Building *building, Map *map
         CompositeLayerGroup *layers = mc.tileLayersForLevel(floor->level());
         for (int y = 0; y < floor->height(); y++) {
             for (int x = 0; x < floor->width(); x++) {
+#if 0
                 BuildingFloor::Square &square = floor->squares[x][y];
+#endif
                 int counters = 0;
                 bool bWallW = false, bWallN = false;
                 bool bDoorW = false, bDoorN = false;
@@ -387,6 +468,18 @@ void CheckBuildingsWindow::check(BuildingMap *bmap, Building *building, Map *map
                     if (!roomPos.contains(room))
                         roomPos[room] = QPoint(x, y);
                     roomSize[room]++;
+                }
+            }
+        }
+
+        const QStringList layerNames = floor->grimeLayers();
+        for (const QString &layerName : layerNames) {
+            const FloorTileGrid *tileGrid = floor->grime()[layerName];
+            for (int y = 0; y < tileGrid->height(); y++) {
+                for (int x = 0; x < tileGrid->width(); x++) {
+                    if (RearrangeTiles::instance()->isRearranged(*tileGrid, x, y)) {
+                        issue(Issue::RearrangeGrid, tr("RearrangeGrid"), x, y, z);
+                    }
                 }
             }
         }

@@ -4,6 +4,7 @@
 #include "preferences.h"
 #include "zoomable.h"
 
+#include "BuildingEditor/buildingfloor.h"
 #include "BuildingEditor/buildingtiles.h"
 #include "BuildingEditor/simplefile.h"
 
@@ -502,10 +503,63 @@ bool RearrangeTiles::isRearranged(Tile *tile)
     return false;
 }
 
+bool RearrangeTiles::isRearranged(const BuildingEditor::FloorTileGrid &tileGrid, int x, int y)
+{
+    for (const RearrangeGrid *grid : qAsConst(mGrids)) {
+        if (tileGrid.matches(x, y, *grid->mOld)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void RearrangeTiles::readTxtIfNeeded()
 {
     if (mTilesets.isEmpty())
         readTxt();
+}
+
+#include "BuildingEditor/building.h"
+#include "BuildingEditor/buildingreader.h"
+#include "BuildingEditor/buildingwriter.h"
+using namespace BuildingEditor;
+
+void RearrangeTiles::fixBuilding(const QString &filePath, int x, int y, int z, QMainWindow *parent)
+{
+    fixBuilding(filePath, QVector<int>() << x << y << z, parent);
+}
+
+void RearrangeTiles::fixBuilding(const QString &filePath, const QVector<int> &xyz, QMainWindow *parent)
+{
+    BuildingReader reader;
+    if (Building *building = reader.read(filePath)) {
+        reader.fix(building);
+        bool fixed = false;
+        for (int i = 0; i < xyz.size(); i += 3) {
+            int x = xyz[i];
+            int y = xyz[i+1];
+            int z = xyz[i+2];
+            if (BuildingFloor *floor = building->floor(z)) {
+                const auto tileGrids = floor->grime().values();
+                for (FloorTileGrid *tileGrid : tileGrids) {
+                    for (const RearrangeGrid *grid : qAsConst(mGrids)) {
+                        if (tileGrid->matches(x, y, *grid->mOld)) {
+                            tileGrid->replace({x, y}, grid->mNew);
+                            fixed = true;
+                        }
+                    }
+                }
+            }
+        }
+        if (fixed) {
+            BuildingWriter w;
+            if (!w.write(building, filePath)) {
+                QString error = w.errorString();
+                QMessageBox::warning(parent, tr("Error saving building"), error);
+            }
+        }
+        delete building;
+    }
 }
 
 void RearrangeTiles::browse1x()
@@ -651,6 +705,23 @@ void RearrangeTiles::readTxt()
         return;
     }
     mTilesets = file.takeTilesets();
+
+    {
+        qDeleteAll(mGrids);
+        mGrids.clear();
+        QString fileName = Preferences::instance()->appConfigPath(QLatin1String("RearrangeGrid.txt"));
+        if (!QFileInfo(fileName).exists())
+            return;
+        RearrangeGridFile file;
+        if (!file.read(fileName)) {
+            QMessageBox::critical(this, tr("It's no good, Jim!"),
+                                  tr("Error while reading %1\n%2")
+                                  .arg(fileName)
+                                  .arg(file.errorString()));
+            return;
+        }
+        mGrids = file.takeGrids();
+    }
 }
 
 void RearrangeTiles::writeTxt()
@@ -816,4 +887,147 @@ bool RearrangeFile::parse2Ints(const QString &s, int *pa, int *pb)
     if (!ok) return false;
     *pa = a, *pb = b;
     return true;
+}
+
+/////
+
+#undef VERSION
+#undef VERSION_LATEST
+
+#define VERSION1 1
+#define VERSION_LATEST VERSION1
+
+bool RearrangeGridFile::read(const QString &fileName)
+{
+    SimpleFile simpleFile;
+    if (!simpleFile.read(fileName)) {
+        mError = tr("%1\n(while reading %2)")
+                .arg(simpleFile.errorString())
+                .arg(QDir::toNativeSeparators(fileName));
+        return false;
+    }
+
+    if (simpleFile.version() != VERSION_LATEST) {
+        mError = tr("Expected %1 version %2, got %3")
+                .arg(fileName).arg(VERSION_LATEST).arg(simpleFile.version());
+        return false;
+    }
+
+    mGrids.clear();
+
+    for (const SimpleFileBlock& tsBlock : simpleFile.blocks) {
+        if (tsBlock.name == QLatin1String("rearranged")) {
+            int blockOld = tsBlock.findBlock(QStringLiteral("old"));
+            int blockNew = tsBlock.findBlock(QStringLiteral("new"));
+            if (blockOld == -1 || blockNew == -1) {
+                mError = tr("Missing 'old' and/or 'new' blocks");
+                return false;
+            }
+            BuildingEditor::FloorTileGrid *gridOld = readGrid(tsBlock.blocks[blockOld]);
+            if (gridOld == nullptr) {
+                return false;
+            }
+            BuildingEditor::FloorTileGrid *gridNew = readGrid(tsBlock.blocks[blockNew]);
+            if (gridNew == nullptr) {
+                return false;
+            }
+            RearrangeGrid *grid = new RearrangeGrid();
+            grid->mOld = gridOld;
+            grid->mNew = gridNew;
+            mGrids += grid;
+        } else {
+            mError = tr("Unknown block name '%1'.").arg(tsBlock.name);
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool RearrangeGridFile::write(const QString &fileName, const QList<RearrangeGrid*> &grids)
+{
+    SimpleFile simpleFile;
+
+    for (const RearrangeGrid *grid : grids) {
+        SimpleFileBlock gridBlock;
+        gridBlock.name = QLatin1String("rearranged");
+        toBlock(gridBlock, *grid);
+        simpleFile.blocks += gridBlock;
+    }
+
+    qDebug() << "WRITE " << fileName;
+
+    simpleFile.setVersion(VERSION_LATEST);
+    if (!simpleFile.write(fileName)) {
+        mError = simpleFile.errorString();
+        return false;
+    }
+    return true;
+}
+
+BuildingEditor::FloorTileGrid *RearrangeGridFile::readGrid(const SimpleFileBlock &block)
+{
+    int maxX = -1, maxY = -1;
+    for (const SimpleFileKeyValue& kv : block.values) {
+        int col, row;
+        if (parse2Ints(kv.name, &col, &row)) {
+            maxX = std::max(maxX, col);
+            maxY = std::max(maxY, row);
+        } else {
+            mError = tr("Line %1: Expected col,row").arg(kv.lineNumber);
+            return nullptr;
+        }
+    }
+    BuildingEditor::FloorTileGrid *grid = new BuildingEditor::FloorTileGrid(maxX + 1, maxY + 1);
+    for (const SimpleFileKeyValue& kv : block.values) {
+        int col, row;
+        if (parse2Ints(kv.name, &col, &row)) {
+            grid->replace(col, row, kv.value);
+        }
+    }
+    return grid;
+}
+
+bool RearrangeGridFile::parse2Ints(const QString &s, int *pa, int *pb)
+{
+    QStringList coords = s.split(QLatin1Char(','), Qt::SkipEmptyParts);
+    if (coords.size() != 2)
+        return false;
+    bool ok;
+    int a = coords[0].toInt(&ok);
+    if (!ok) return false;
+    int b = coords[1].toInt(&ok);
+    if (!ok) return false;
+    *pa = a, *pb = b;
+    return true;
+}
+
+void RearrangeGridFile::toBlock(SimpleFileBlock &block, const RearrangeGrid &grid)
+{
+    SimpleFileBlock blockOld;
+    blockOld.name = QStringLiteral("old");
+    toBlock(blockOld, *grid.mOld);
+    block.blocks += blockOld;
+
+    SimpleFileBlock blockNew;
+    blockNew.name = QStringLiteral("new");
+    toBlock(blockNew, *grid.mNew);
+    block.blocks += blockNew;
+}
+
+void RearrangeGridFile::toBlock(SimpleFileBlock &block, const BuildingEditor::FloorTileGrid &tileGrid)
+{
+    for (int y = 0; y < tileGrid.height(); y++) {
+        for (int x = 0; x < tileGrid.width(); x++) {
+            block.addValue(QStringLiteral("%1,%2").arg(x).arg(y), tileGrid.at(x, y));
+        }
+    }
+}
+
+// // // // //
+
+RearrangeGrid::~RearrangeGrid()
+{
+    delete mOld;
+    delete mNew;
 }
