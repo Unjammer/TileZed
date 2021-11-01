@@ -39,6 +39,68 @@ rearranged
 {
 	old
 	{
+		0,0 = floors_rugs_01_000
+		0,1 = floors_rugs_01_002
+		0,2 = floors_rugs_01_006
+		1,0 = floors_rugs_01_001
+		1,1 = floors_rugs_01_003
+		1,2 = floors_rugs_01_007
+	}
+	new
+	{
+		0,0 = floors_rugs_01_006
+		0,1 = floors_rugs_01_002
+		0,2 = floors_rugs_01_000
+		1,0 = floors_rugs_01_007
+		1,1 = floors_rugs_01_003
+		1,2 = floors_rugs_01_001
+	}
+}
+
+rearranged
+{
+	old
+	{
+		0,0 = floors_rugs_01_008
+		0,1 = floors_rugs_01_010
+		0,2 = floors_rugs_01_014
+		1,0 = floors_rugs_01_009
+		1,1 = floors_rugs_01_011
+		1,2 = floors_rugs_01_015
+	}
+	new
+	{
+		0,0 = floors_rugs_01_014
+		0,1 = floors_rugs_01_010
+		0,2 = floors_rugs_01_008
+		1,0 = floors_rugs_01_015
+		1,1 = floors_rugs_01_011
+		1,2 = floors_rugs_01_009
+	}
+}
+
+rearranged
+{
+	old
+	{
+		0,0 = floors_rugs_01_008
+		1,0 = floors_rugs_01_009
+		0,2 = floors_rugs_01_014
+		1,2 = floors_rugs_01_015
+	}
+	new
+	{
+		0,0 = floors_rugs_01_014
+		1,0 = floors_rugs_01_015
+		0,2 = floors_rugs_01_008
+		1,2 = floors_rugs_01_009
+	}
+}
+
+rearranged
+{
+	old
+	{
 		0,0 = floors_rugs_01_016
 		0,1 = floors_rugs_01_018
 		0,2 = floors_rugs_01_022
@@ -57,25 +119,29 @@ rearranged
 	}
 }
 
+
+
+
+
 rearranged
 {
 	old
 	{
 		0,0 = floors_rugs_01_000
-		0,1 = floors_rugs_01_002
-		0,2 = floors_rugs_01_006
-		1,0 = floors_rugs_01_001
-		1,1 = floors_rugs_01_003
-		1,2 = floors_rugs_01_007
+		0,1 = floors_rugs_01_006
+		1,0 = floors_rugs_01_005
+		1,1 = floors_rugs_01_004
+		2,0 = floors_rugs_01_001
+		2,1 = floors_rugs_01_007
 	}
 	new
 	{
 		0,0 = floors_rugs_01_006
-		0,1 = floors_rugs_01_002
-		0,2 = floors_rugs_01_000
-		1,0 = floors_rugs_01_007
-		1,1 = floors_rugs_01_003
-		1,2 = floors_rugs_01_001
+		0,1 = floors_rugs_01_000
+		1,0 = floors_rugs_01_005
+		1,1 = floors_rugs_01_004
+		2,0 = floors_rugs_01_007
+		2,1 = floors_rugs_01_001
 	}
 }
 
@@ -83,28 +149,23 @@ rearranged
 {
 	old
 	{
-		0,0 = floors_rugs_01_000
-		0,1 = floors_rugs_01_002
-		0,2 = floors_rugs_01_006
-		1,0 = floors_rugs_01_001
-		1,1 = floors_rugs_01_003
-		1,2 = floors_rugs_01_007
+		0,0 = floors_rugs_01_008
+		0,1 = floors_rugs_01_014
+		1,0 = floors_rugs_01_013
+		1,1 = floors_rugs_01_012
+		2,0 = floors_rugs_01_009
+		2,1 = floors_rugs_01_015
 	}
 	new
 	{
-		0,0 = floors_rugs_01_006
-		0,1 = floors_rugs_01_002
-		0,2 = floors_rugs_01_000
-		1,0 = floors_rugs_01_007
-		1,1 = floors_rugs_01_003
-		1,2 = floors_rugs_01_001
+		0,0 = floors_rugs_01_014
+		0,1 = floors_rugs_01_008
+		1,0 = floors_rugs_01_013
+		1,1 = floors_rugs_01_012
+		2,0 = floors_rugs_01_015
+		2,1 = floors_rugs_01_009
 	}
 }
-
-
-
-
-
 
 rearranged
 {
@@ -128,47 +189,20 @@ rearranged
 	}
 }
 
-rearranged
-{
-	old
-	{
-		0,0 = floors_rugs_01_000
-		0,1 = floors_rugs_01_006
-		1,0 = floors_rugs_01_005
-		1,1 = floors_rugs_01_004
-		2,0 = floors_rugs_01_001
-		2,1 = floors_rugs_01_007
-	}
-	new
-	{
-		0,0 = floors_rugs_01_006
-		0,1 = floors_rugs_01_000
-		1,0 = floors_rugs_01_005
-		1,1 = floors_rugs_01_004
-		2,0 = floors_rugs_01_007
-		2,1 = floors_rugs_01_001
-	}
-}
+
+
 
 rearranged
 {
 	old
 	{
-		0,0 = floors_rugs_01_000
-		0,1 = floors_rugs_01_006
-		1,0 = floors_rugs_01_005
-		1,1 = floors_rugs_01_004
-		2,0 = floors_rugs_01_001
-		2,1 = floors_rugs_01_007
+		0,0 = furniture_tables_low_01_005
+		1,0 = furniture_tables_low_01_004
 	}
 	new
 	{
-		0,0 = floors_rugs_01_006
-		0,1 = floors_rugs_01_000
-		1,0 = floors_rugs_01_005
-		1,1 = floors_rugs_01_004
-		2,0 = floors_rugs_01_007
-		2,1 = floors_rugs_01_001
+		0,0 = furniture_tables_low_01_004
+		1,0 = furniture_tables_low_01_005
 	}
 }
 

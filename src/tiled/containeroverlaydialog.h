@@ -75,6 +75,7 @@ protected:
     bool isEmptySprite(const QString& tileName);
 
     typedef Tiled::Tileset Tileset;
+
 protected slots:
     void addOverlay();
     void addEntry();
@@ -83,6 +84,7 @@ protected slots:
     void overlayEntryHover(const QModelIndex &index, int entryIndex);
     void scrollToNow(const QModelIndex &index);
     void tileActivated(const QModelIndex &index);
+    void tilesetFilterEdited(const QString &text);
     void tilesetSelectionChanged();
     void manageTilesets();
     void tilesetAdded(Tiled::Tileset *tileset);

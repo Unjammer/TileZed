@@ -955,6 +955,7 @@ TilesetDock::TilesetDock(QWidget *parent):
 
     mFilter->setClearButtonEnabled(true);
     mFilter->setEnabled(false);
+    mFilter->setPlaceholderText(QStringLiteral("tileset name"));
     connect(mFilter, &QLineEdit::textEdited, this, &TilesetDock::filterEdited);
 
     tilesetNamesLayout->addWidget(mFilter);

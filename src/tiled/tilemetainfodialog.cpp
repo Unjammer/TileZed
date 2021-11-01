@@ -193,6 +193,10 @@ TileMetaInfoDialog::TileMetaInfoDialog(QWidget *parent) :
     ui->tiles->model()->setShowLabels(true);
     ui->tiles->model()->setHighlightLabelledItems(true);
 
+    ui->filterEdit->setClearButtonEnabled(true);
+    ui->filterEdit->setEnabled(false);
+    connect(ui->filterEdit, &QLineEdit::textEdited, this, &TileMetaInfoDialog::tilesetFilterEdited);
+
     connect(ui->browseTiles, SIGNAL(clicked()), SLOT(browse()));
     connect(ui->tilesets, SIGNAL(currentRowChanged(int)),
             SLOT(currentTilesetChanged(int)));
@@ -346,6 +350,48 @@ void TileMetaInfoDialog::currentTilesetChanged(int row)
     updateUI();
 }
 
+void TileMetaInfoDialog::tilesetFilterEdited(const QString &text)
+{
+    QListWidget* mTilesetNamesView = ui->tilesets;
+
+    for (int row = 0; row < mTilesetNamesView->count(); row++) {
+        QListWidgetItem* item = mTilesetNamesView->item(row);
+        item->setHidden(text.trimmed().isEmpty() ? false : !item->text().contains(text));
+    }
+
+    QListWidgetItem* current = mTilesetNamesView->currentItem();
+    if (current != nullptr && current->isHidden()) {
+        // Select previous visible row.
+        int row = mTilesetNamesView->row(current) - 1;
+        while (row >= 0 && mTilesetNamesView->item(row)->isHidden())
+            row--;
+        if (row >= 0) {
+            current = mTilesetNamesView->item(row);
+            mTilesetNamesView->setCurrentItem(current);
+            mTilesetNamesView->scrollToItem(current);
+            return;
+        }
+
+        // Select next visible row.
+        row = mTilesetNamesView->row(current) + 1;
+        while (row < mTilesetNamesView->count() && mTilesetNamesView->item(row)->isHidden())
+            row++;
+        if (row < mTilesetNamesView->count()) {
+            current = mTilesetNamesView->item(row);
+            mTilesetNamesView->setCurrentItem(current);
+            mTilesetNamesView->scrollToItem(current);
+            return;
+        }
+
+        // All items hidden
+        mTilesetNamesView->setCurrentItem(nullptr);
+    }
+
+    current = mTilesetNamesView->currentItem();
+    if (current != nullptr)
+        mTilesetNamesView->scrollToItem(current);
+}
+
 void TileMetaInfoDialog::tileSelectionChanged()
 {
     mSelectedTiles.clear();
@@ -470,6 +516,10 @@ void TileMetaInfoDialog::setTilesetList()
     }
     ui->tilesets->setFixedWidth(maxWidth + 16 +
         ui->tilesets->verticalScrollBar()->sizeHint().width());
+
+    ui->filterEdit->setFixedWidth(ui->tilesets->width());
+    ui->filterEdit->setEnabled(ui->tilesets->count() > 0);
+    tilesetFilterEdited(ui->filterEdit->text());
 }
 
 void TileMetaInfoDialog::setTilesList()

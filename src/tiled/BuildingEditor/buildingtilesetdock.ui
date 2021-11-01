@@ -31,6 +31,9 @@
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <widget class="QLineEdit" name="filter">
+        <property name="placeholderText">
+         <string>tileset name</string>
+        </property>
         <property name="clearButtonEnabled">
          <bool>true</bool>
         </property>

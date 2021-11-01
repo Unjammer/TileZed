@@ -44,6 +44,16 @@
      <item>
       <layout class="QVBoxLayout" name="tilesetLayout">
        <item>
+        <widget class="QLineEdit" name="filterEdit">
+         <property name="placeholderText">
+          <string>tileset name</string>
+         </property>
+         <property name="clearButtonEnabled">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QListWidget" name="tilesets">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">

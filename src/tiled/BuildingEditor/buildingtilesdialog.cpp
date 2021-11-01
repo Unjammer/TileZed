@@ -616,6 +616,10 @@ BuildingTilesDialog::BuildingTilesDialog(QWidget *parent) :
             SLOT(categoryNameEdited(QListWidgetItem*)));
 //    mCategory = BuildingTiles::instance()->categories().at(ui->categoryList->currentRow());
 
+    ui->filterEdit->setClearButtonEnabled(true);
+    ui->filterEdit->setEnabled(false);
+    connect(ui->filterEdit, &QLineEdit::textEdited, this, &BuildingTilesDialog::tilesetFilterEdited);
+
     ui->tilesetList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 //    ui->listWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
     connect(ui->tilesetList, SIGNAL(itemSelectionChanged()),
@@ -1144,6 +1148,10 @@ void BuildingTilesDialog::setTilesetList()
     }
     int sbw = ui->tilesetList->verticalScrollBar()->sizeHint().width();
     ui->tilesetList->setFixedWidth(width + 16 + sbw);
+
+    ui->filterEdit->setFixedWidth(ui->tilesetList->width());
+    ui->filterEdit->setEnabled(ui->tilesetList->count() > 0);
+    tilesetFilterEdited(ui->filterEdit->text());
 }
 
 void BuildingTilesDialog::saveSplitterSizes(QSplitter *splitter)
@@ -1298,6 +1306,48 @@ void BuildingTilesDialog::categoryChanged(int index)
         ui->categoryStack->setCurrentIndex(1);
     }
     synchUI();
+}
+
+void BuildingTilesDialog::tilesetFilterEdited(const QString &text)
+{
+    QListWidget* mTilesetNamesView = ui->tilesetList;
+
+    for (int row = 0; row < mTilesetNamesView->count(); row++) {
+        QListWidgetItem* item = mTilesetNamesView->item(row);
+        item->setHidden(text.trimmed().isEmpty() ? false : !item->text().contains(text));
+    }
+
+    QListWidgetItem* current = mTilesetNamesView->currentItem();
+    if (current != nullptr && current->isHidden()) {
+        // Select previous visible row.
+        int row = mTilesetNamesView->row(current) - 1;
+        while (row >= 0 && mTilesetNamesView->item(row)->isHidden())
+            row--;
+        if (row >= 0) {
+            current = mTilesetNamesView->item(row);
+            mTilesetNamesView->setCurrentItem(current);
+            mTilesetNamesView->scrollToItem(current);
+            return;
+        }
+
+        // Select next visible row.
+        row = mTilesetNamesView->row(current) + 1;
+        while (row < mTilesetNamesView->count() && mTilesetNamesView->item(row)->isHidden())
+            row++;
+        if (row < mTilesetNamesView->count()) {
+            current = mTilesetNamesView->item(row);
+            mTilesetNamesView->setCurrentItem(current);
+            mTilesetNamesView->scrollToItem(current);
+            return;
+        }
+
+        // All items hidden
+        mTilesetNamesView->setCurrentItem(nullptr);
+    }
+
+    current = mTilesetNamesView->currentItem();
+    if (current != nullptr)
+        mTilesetNamesView->scrollToItem(current);
 }
 
 void BuildingTilesDialog::tilesetSelectionChanged()

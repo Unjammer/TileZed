@@ -60,6 +60,7 @@ private slots:
 
     void addToMap();
 
+    void tilesetFilterEdited(const QString &text);
     void currentTilesetChanged(int row);
     void tileSelectionChanged();
 
