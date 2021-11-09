@@ -383,6 +383,30 @@ public:
         w.writeEndElement(); // </object>
     }
 
+    void writeProperties(QXmlStreamWriter &w, const Tiled::Properties &properties)
+    {
+        if (properties.isEmpty())
+            return;
+
+        w.writeStartElement(QLatin1String("properties"));
+
+        Tiled::Properties::const_iterator it = properties.constBegin();
+        Tiled::Properties::const_iterator it_end = properties.constEnd();
+        for (; it != it_end; ++it) {
+            w.writeStartElement(QLatin1String("property"));
+            w.writeAttribute(QLatin1String("name"), it.key());
+            const QString &value = it.value();
+            if (value.contains(QLatin1Char('\n'))) {
+                w.writeCharacters(value);
+            } else {
+                w.writeAttribute(QLatin1String("value"), it.value());
+            }
+            w.writeEndElement();
+        }
+
+        w.writeEndElement();
+    }
+
     void writeBoolean(QXmlStreamWriter &w, const QString &name, bool value)
     {
         w.writeAttribute(name, value ? QLatin1String("true") : QLatin1String("false"));

@@ -748,6 +748,8 @@ void MapManager::buildingLoadedByThread(Building *building, MapInfo *mapInfo)
     Map *map = bmap.mergedMap();
     bmap.addRoomDefObjects(map);
 
+    map->setProperties(building->properties());
+
     delete building;
 
     QSet<Tileset*> usedTilesets = map->usedTilesets();

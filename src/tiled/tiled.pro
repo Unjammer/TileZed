@@ -56,6 +56,7 @@ macx {
 #OBJECTS_DIR = .obj
 
 SOURCES += aboutdialog.cpp \
+    BuildingEditor/buildingkeyvaluesdialog.cpp \
     abstractobjecttool.cpp \
     abstracttiletool.cpp \
     abstracttool.cpp \
@@ -270,6 +271,7 @@ SOURCES += aboutdialog.cpp \
     BuildingEditor/roofhiding.cpp
 
 HEADERS += aboutdialog.h \
+    BuildingEditor/buildingkeyvaluesdialog.h \
     abstractobjecttool.h \
     abstractoverlay.h \
     abstracttiletool.h \
@@ -496,6 +498,7 @@ macx {
 }
 
 FORMS += aboutdialog.ui \
+    BuildingEditor/buildingkeyvaluesdialog.ui \
     commanddialog.ui \
     mainwindow.ui \
     newmapdialog.ui \

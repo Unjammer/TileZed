@@ -513,6 +513,13 @@ QRegion BuildingDocument::setTileSelection(const QRegion &selection)
     return old;
 }
 
+Tiled::Properties BuildingDocument::changeBuildingProperties(const Tiled::Properties &properties)
+{
+    Tiled::Properties old = building()->properties();
+    building()->properties() = properties;
+    return old;
+}
+
 void BuildingDocument::furnitureTileChanged(FurnitureTile *ftile)
 {
     foreach (BuildingFloor *floor, mBuilding->floors()) {

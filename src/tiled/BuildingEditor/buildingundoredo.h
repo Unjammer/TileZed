@@ -18,6 +18,8 @@
 #ifndef BUILDINGUNDOREDO_H
 #define BUILDINGUNDOREDO_H
 
+#include "properties.h"
+
 #include <QMap>
 #include <QRectF>
 #include <QRegion>
@@ -26,6 +28,7 @@
 
 namespace BuildingEditor {
 
+class Building;
 class BuildingObject;
 class BuildingDocument;
 class BuildingFloor;
@@ -623,6 +626,20 @@ private:
     QRegion mSelection;
 };
 
+class ChangeBuildingKeyValues : public QUndoCommand
+{
+public:
+    ChangeBuildingKeyValues(BuildingDocument *doc, const Tiled::Properties &properties);
+
+    void undo() override { swap(); }
+    void redo() override { swap(); }
+
+private:
+    void swap();
+
+    BuildingDocument *mDocument;
+    Tiled::Properties mProperties;
+};
 
 } // namespace BuildingEditor
 

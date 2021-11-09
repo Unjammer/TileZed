@@ -18,6 +18,8 @@
 #ifndef BUILDINGDOCUMENT_H
 #define BUILDINGDOCUMENT_H
 
+#include "properties.h"
+
 #include <QObject>
 #include <QRect>
 #include <QRegion>
@@ -171,6 +173,8 @@ public:
 
     QRegion setRoomSelection(const QRegion &selection);
     QRegion setTileSelection(const QRegion &selection);
+
+    Tiled::Properties changeBuildingProperties(const Tiled::Properties& properties);
     // -UNDO/REDO
 
 signals:

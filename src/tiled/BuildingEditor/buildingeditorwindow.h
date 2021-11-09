@@ -252,6 +252,7 @@ private slots:
     void preferences();
 
     void buildingPropertiesDialog();
+    void keyValuesDialog();
     void buildingGrime();
 
     void roomsDialog();
