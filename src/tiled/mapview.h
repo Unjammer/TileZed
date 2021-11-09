@@ -30,6 +30,9 @@
 namespace Tiled {
 namespace Internal {
 
+#ifdef ZOMBOID
+class MapDocument;
+#endif
 class MapScene;
 class Zoomable;
 
@@ -77,6 +80,9 @@ protected:
 private slots:
     void adjustScale(qreal scale);
     void setUseOpenGL(bool useOpenGL);
+#ifdef ZOMBOID
+    void currentDocumentChanged(MapDocument *doc);
+#endif
 
 private:
     QPoint mLastMousePos;
@@ -86,6 +92,7 @@ private:
 #ifdef ZOMBOID
     MiniMap *mMiniMap;
     MiniMapItem *mMiniMapItem;
+    bool mFixedMiniMap = false;
 #endif
 };
 

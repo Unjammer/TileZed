@@ -55,7 +55,13 @@ MapView::MapView(QWidget *parent)
 
 #ifndef QT_NO_OPENGL
     Preferences *prefs = Preferences::instance();
+#if 0
+    // The minimap isn't displayed for documents after the first, for some reason, when using OpenGL acceleration.
+    // If the OpenGL preference is changed after a document is loaded, the minimap is displayed just fine.
+    // This started happening with Qt 5.15, I believe.
+    // See currentDocumentChanged().
     setUseOpenGL(prefs->useOpenGL());
+#endif
     connect(prefs, SIGNAL(useOpenGLChanged(bool)), SLOT(setUseOpenGL(bool)));
 #endif
 
@@ -81,7 +87,21 @@ MapView::~MapView()
 }
 
 #ifdef ZOMBOID
+#include "documentmanager.h"
 #include "ZomboidScene.h"
+void MapView::currentDocumentChanged(MapDocument *doc)
+{
+    if (mFixedMiniMap) {
+        return;
+    }
+    ZomboidScene *scene2 = static_cast<ZomboidScene*>(scene());
+    if ((doc == nullptr) || (scene2 == nullptr) || (scene2->mapDocument() != doc)) {
+        return;
+    }
+    mFixedMiniMap = true;
+    setUseOpenGL(Preferences::instance()->useOpenGL());
+}
+
 void MapView::setMapScene(MapScene *scene)
 {
     QGraphicsView::setScene(scene);
@@ -91,6 +111,8 @@ void MapView::setMapScene(MapScene *scene)
 
     mMiniMapItem = new MiniMapItem(static_cast<ZomboidScene*>(scene));
     mMiniMap->setExtraItem(mMiniMapItem);
+
+    connect(DocumentManager::instance(), &DocumentManager::currentDocumentChanged, this, &MapView::currentDocumentChanged);
 }
 #endif
 
