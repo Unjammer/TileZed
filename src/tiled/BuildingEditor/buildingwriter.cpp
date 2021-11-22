@@ -35,7 +35,8 @@ using namespace BuildingEditor;
 
 #define VERSION1 1
 #define VERSION2 2
-#define VERSION_LATEST VERSION2
+#define VERSION3 3
+#define VERSION_LATEST VERSION3
 
 #if defined(Q_OS_WIN) && (_MSC_VER >= 1600)
 // Hmmmm.  libtiled.dll defines the Properties class as so:
@@ -94,6 +95,9 @@ public:
 
         for (int i = 0; i < Building::TileCount; i++)
             w.writeAttribute(building->enumToString(i), entryIndex(building->tile(i)));
+
+        // Put these near the beginning of the file so MapManager::MapInfoReader can read properties without reading much text.
+        writeProperties(w, building->properties());
 
         writeBuildingTileEntries(w);
 

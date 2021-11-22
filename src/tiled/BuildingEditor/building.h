@@ -183,6 +183,11 @@ public:
 
     QStringList tilesetNames() const;
 
+    void setProperties(const Tiled::Properties &properties)
+    {
+        mProperties = properties;
+    }
+
     Tiled::Properties &properties()
     { return mProperties; }
 

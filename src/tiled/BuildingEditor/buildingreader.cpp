@@ -44,7 +44,11 @@ using namespace BuildingEditor;
 // added FurnitureTiles::mCorners
 #define VERSION2 2
 
-#define VERSION_LATEST VERSION2
+// version="3"
+// Added <properties> for the in-game map
+#define VERSION3 3
+
+#define VERSION_LATEST VERSION3
 
 namespace BuildingEditor {
 
@@ -460,6 +464,8 @@ Building *BuildingReaderPrivate::readBuilding()
         } else if (xml.name() == QLatin1String("floor")) {
             if (BuildingFloor *floor = readFloor())
                 mBuilding->insertFloor(mBuilding->floorCount(), floor);
+        } else if (xml.name() == QLatin1String("properties")) {
+            mBuilding->setProperties(readProperties());
         } else
             readUnknownElement();
     }
