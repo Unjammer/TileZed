@@ -285,6 +285,7 @@ WelcomeMode::WelcomeMode(QObject *parent) :
     mLegendStrings += QStringLiteral("RestaurantsAndEntertainment");
     mLegendStrings += QStringLiteral("RetailAndCommercial");
     ui->legendCombo->lineEdit()->setPlaceholderText(QStringLiteral("<NONE>"));
+    ui->legendCombo->setDuplicatesEnabled(false);
     ui->legendCombo->addItems(mLegendStrings);
 
     setWidget(mWidget);
@@ -386,11 +387,12 @@ void WelcomeMode::synchLegendCombo()
         if (mapInfo->properties().contains(QStringLiteral("Legend"))) {
             QString legend = mapInfo->properties()[QStringLiteral("Legend")].trimmed();
             if (legend.isEmpty() == false) {
-                int index = mLegendStrings.indexOf(legend);
+                int index = ui->legendCombo->findText(legend); // mLegendStrings.indexOf(legend);
                 if (index == -1) {
                     ui->legendCombo->addItem(legend);
-                    mLegendStrings += legend;
-                    index = mLegendStrings.size() - 1;
+                    //mLegendStrings += legend;
+                    //index = mLegendStrings.size() - 1;
+                    index = ui->legendCombo->count() - 1;
                 }
                 ui->legendCombo->setCurrentIndex(index);
             }
