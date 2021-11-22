@@ -23,6 +23,7 @@
 #include "buildingdocumentmgr.h"
 #include "buildingfloor.h"
 #include "buildingfloorsdialog.h"
+#include "buildingkeyvaluesdialog.h"
 #include "buildingobjects.h"
 #include "buildingpreferences.h"
 #include "buildingpreferencesdialog.h"
@@ -433,6 +434,7 @@ BuildingEditorWindow::BuildingEditorWindow(QWidget *parent) :
 
     connect(ui->actionBuildingProperties, SIGNAL(triggered()),
             SLOT(buildingPropertiesDialog()));
+    connect(ui->actionKeyValues, &QAction::triggered, this, &BuildingEditorWindow::keyValuesDialog);
     connect(ui->actionGrime, SIGNAL(triggered()),
             SLOT(buildingGrime()));
     connect(ui->actionRooms, SIGNAL(triggered()), SLOT(roomsDialog()));
@@ -1481,6 +1483,15 @@ void BuildingEditorWindow::buildingPropertiesDialog()
     dialog.exec();
 }
 
+void BuildingEditorWindow::keyValuesDialog()
+{
+    if (mCurrentDocument == nullptr)
+        return;
+
+    BuildingKeyValuesDialog dialog(mCurrentDocument, this);
+    dialog.exec();
+}
+
 void BuildingEditorWindow::buildingGrime()
 {
     if (!mCurrentDocument)
@@ -2116,6 +2127,7 @@ void BuildingEditorWindow::updateActions()
     ui->actionShowObjects->setEnabled(hasDoc);
 
     ui->actionBuildingProperties->setEnabled(hasDoc);
+    ui->actionKeyValues->setEnabled(hasDoc);
     ui->actionGrime->setEnabled(hasDoc);
     ui->actionRooms->setEnabled(hasDoc);
     ui->actionTemplateFromBuilding->setEnabled(hasDoc);

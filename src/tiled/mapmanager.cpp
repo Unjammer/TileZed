@@ -425,7 +425,63 @@ public:
         mMapInfo = new MapInfo(orient, mapWidth + extra, mapHeight + extra,
                                tileWidth, tileHeight);
 
+        while (xml.readNextStartElement()) {
+            if (xml.name() == QLatin1String("properties")) {
+                mMapInfo->setProperties(readProperties());
+                break;
+            } else {
+                readUnknownElement();
+            }
+        }
+
         return mMapInfo;
+    }
+
+    Tiled::Properties readProperties()
+    {
+        Q_ASSERT(xml.isStartElement() && xml.name() == QLatin1String("properties"));
+
+        Tiled::Properties properties;
+
+        while (xml.readNextStartElement()) {
+            if (xml.name() == QLatin1String("property")) {
+                readProperty(&properties);
+            } else {
+                readUnknownElement();
+            }
+        }
+
+        return properties;
+    }
+
+    void readProperty(Tiled::Properties *properties)
+    {
+        Q_ASSERT(xml.isStartElement() && xml.name() == QLatin1String("property"));
+
+        const QXmlStreamAttributes atts = xml.attributes();
+        QString propertyName = atts.value(QLatin1String("name")).toString();
+        QString propertyValue = atts.value(QLatin1String("value")).toString();
+
+        while (xml.readNext() != QXmlStreamReader::Invalid) {
+            if (xml.isEndElement()) {
+                break;
+            }
+            if (xml.isCharacters() && !xml.isWhitespace()) {
+                if (propertyValue.isEmpty()) {
+                    propertyValue = xml.text().toString();
+                }
+            } else if (xml.isStartElement()) {
+                readUnknownElement();
+            }
+        }
+
+        properties->insert(propertyName, propertyValue);
+    }
+
+    void readUnknownElement()
+    {
+        qDebug() << "Unknown element (fixme):" << xml.name();
+        xml.skipCurrentElement();
     }
 
     QXmlStreamReader xml;
@@ -649,6 +705,13 @@ void MapManager::fileChangedTimeout()
                         mNextThreadForJob = (mNextThreadForJob + 1) % mMapReaderThread.size();
                     }
                 }
+                {
+                    MapInfoReader reader;
+                    if (MapInfo *mapInfo2 = reader.readMap(path)) {
+                        mapInfo->properties() = mapInfo2->properties();
+                        delete mapInfo2;
+                    }
+                }
                 emit mapFileChanged(mapInfo);
             }
         }
@@ -747,6 +810,8 @@ void MapManager::buildingLoadedByThread(Building *building, MapInfo *mapInfo)
     BuildingMap bmap(building);
     Map *map = bmap.mergedMap();
     bmap.addRoomDefObjects(map);
+
+    map->setProperties(building->properties());
 
     delete building;
 

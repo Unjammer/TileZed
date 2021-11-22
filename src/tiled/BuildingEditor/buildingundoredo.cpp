@@ -699,3 +699,16 @@ void ChangeTileSelection::swap()
 }
 
 /////
+
+ChangeBuildingKeyValues::ChangeBuildingKeyValues(BuildingDocument *doc, const Tiled::Properties &properties) :
+    QUndoCommand(QCoreApplication::translate("Undo Commands", "Change Building Properties")),
+    mDocument(doc),
+    mProperties(properties)
+{
+
+}
+
+void ChangeBuildingKeyValues::swap()
+{
+    mProperties = mDocument->changeBuildingProperties(mProperties);
+}

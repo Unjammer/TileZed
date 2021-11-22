@@ -90,8 +90,13 @@ public slots:
     void linkClickedRemove();
     void linkHovered(bool hover);
 
+    void legendIndexChanged(int index);
+    void legendTextChanged(const QString &text);
+
 private:
     void setAutoSaveFiles();
+    QString currentFilePath();
+    void synchLegendCombo();
 
 private:
     Ui::WelcomeMode *ui;
@@ -103,6 +108,8 @@ private:
     WelcomeModeNS::LinkItem *mOpenItem;
     QList<WelcomeModeNS::LinkItem*> mRecentItems;
     QList<WelcomeModeNS::LinkItem*> mAutoSaveItems;
+    QStringList mLegendStrings;
+    bool mSynchLegend = false;
 };
 
 } // namespace BuildingEditor

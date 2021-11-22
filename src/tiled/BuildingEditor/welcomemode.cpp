@@ -18,11 +18,15 @@
 #include "welcomemode.h"
 #include "ui_welcomemode.h"
 
+#include "building.h"
 #include "buildingeditorwindow.h"
+#include "buildingreader.h"
+#include "buildingwriter.h"
 #include "ui_buildingeditorwindow.h"
 #include "buildingpreferences.h"
 
 #include "mainwindow.h"
+#include "mapmanager.h"
 #include "mapimagemanager.h"
 
 #include <QCompleter>
@@ -266,6 +270,24 @@ WelcomeMode::WelcomeMode(QObject *parent) :
 
     connect(ui->dirBrowse, SIGNAL(clicked()), SLOT(browse()));
 
+    connect(ui->legendCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &WelcomeMode::legendIndexChanged);
+    connect(ui->legendCombo, &QComboBox::editTextChanged,
+            this, &WelcomeMode::legendTextChanged);
+
+    // TODO: set valid Legend values from a .txt file
+    mLegendStrings += QStringLiteral("<NONE>");
+    mLegendStrings += QStringLiteral("CommunityServices");
+    mLegendStrings += QStringLiteral("Hospitality");
+    mLegendStrings += QStringLiteral("Industrial");
+    mLegendStrings += QStringLiteral("Medical");
+    mLegendStrings += QStringLiteral("Residential");
+    mLegendStrings += QStringLiteral("RestaurantsAndEntertainment");
+    mLegendStrings += QStringLiteral("RetailAndCommercial");
+    ui->legendCombo->lineEdit()->setPlaceholderText(QStringLiteral("<NONE>"));
+    ui->legendCombo->setDuplicatesEnabled(false);
+    ui->legendCombo->addItems(mLegendStrings);
+
     setWidget(mWidget);
 
     connect(MapImageManager::instance(), SIGNAL(mapImageChanged(MapImage*)),
@@ -328,16 +350,14 @@ void WelcomeMode::onMapsDirectoryChanged()
 
 void WelcomeMode::selectionChanged()
 {
-    QModelIndexList selectedRows = ui->treeView->selectionModel()->selectedRows();
-    if (selectedRows.isEmpty()) {
+    synchLegendCombo();
+
+    QString path = currentFilePath();
+    if (path.isEmpty()) {
         ui->label->setPixmap(QPixmap());
-        mPreviewMapImage = 0;
+        mPreviewMapImage = nullptr;
         return;
     }
-    QModelIndex index = selectedRows.first();
-    QString path = mFSModel->filePath(index);
-    if (QFileInfo(path).isDir())
-        return;
     MapImage *mapImage = MapImageManager::instance()->getMapImage(path);
     if (mapImage) {
         if (mapImage->isLoaded()) {
@@ -345,9 +365,40 @@ void WelcomeMode::selectionChanged()
                                                     Qt::SmoothTransformation);
             ui->label->setPixmap(QPixmap::fromImage(image));
         }
-    } else
+    } else {
         ui->label->setPixmap(QPixmap());
+    }
     mPreviewMapImage = mapImage;
+}
+
+void WelcomeMode::synchLegendCombo()
+{
+    mSynchLegend = true;
+    ui->legendCombo->setCurrentIndex(-1);
+    ui->legendCombo->setEnabled(false);
+
+    QString path = currentFilePath();
+    if (path.isEmpty()) {
+        mSynchLegend = false;
+        return;
+    }
+    if (MapInfo *mapInfo = MapManager::instance()->mapInfo(path)) {
+        ui->legendCombo->setEnabled(true);
+        if (mapInfo->properties().contains(QStringLiteral("Legend"))) {
+            QString legend = mapInfo->properties()[QStringLiteral("Legend")].trimmed();
+            if (legend.isEmpty() == false) {
+                int index = ui->legendCombo->findText(legend); // mLegendStrings.indexOf(legend);
+                if (index == -1) {
+                    ui->legendCombo->addItem(legend);
+                    //mLegendStrings += legend;
+                    //index = mLegendStrings.size() - 1;
+                    index = ui->legendCombo->count() - 1;
+                }
+                ui->legendCombo->setCurrentIndex(index);
+            }
+        }
+    }
+    mSynchLegend = false;
 }
 
 void WelcomeMode::onMapImageChanged(MapImage *mapImage)
@@ -356,6 +407,8 @@ void WelcomeMode::onMapImageChanged(MapImage *mapImage)
         QImage image = mapImage->image().scaled(ui->label->width(), ui->label->height(), Qt::KeepAspectRatio,
                                                 Qt::SmoothTransformation);
         ui->label->setPixmap(QPixmap::fromImage(image));
+
+        synchLegendCombo();
     }
 }
 
@@ -437,9 +490,9 @@ void WelcomeMode::linkHovered(bool hover)
                                                             Qt::SmoothTransformation);
                     ui->label->setPixmap(QPixmap::fromImage(image));
                 }
-            } else
-                ui->label->setPixmap(QPixmap());
-            mPreviewMapImage = mapImage;
+                mPreviewMapImage = mapImage;
+                return;
+            }
         }
         index = mAutoSaveItems.indexOf(link);
         if (index >= 0) {
@@ -450,14 +503,73 @@ void WelcomeMode::linkHovered(bool hover)
                                                             Qt::SmoothTransformation);
                     ui->label->setPixmap(QPixmap::fromImage(image));
                 }
-            } else
-                ui->label->setPixmap(QPixmap());
-            mPreviewMapImage = mapImage;
+                mPreviewMapImage = mapImage;
+                return;
+            }
         }
-    } else if (mPreviewMapImage) {
-        ui->label->setPixmap(QPixmap());
-        mPreviewMapImage = 0;
     }
+    selectionChanged();
+}
+
+void WelcomeMode::legendIndexChanged(int index)
+{
+    // Called after ENTERing new text, after adding it to the combobox items.
+#if !defined(QT_NO_DEBUG)
+    qDebug() << "legendIndexChanged" << index;
+#endif
+    if (mSynchLegend)
+        return;
+
+    QString legend = (index < 1) ? QString() : ui->legendCombo->itemText(index).trimmed();
+
+    QString path = currentFilePath();
+    if (path.isEmpty())
+        return;
+
+    MapInfo *mapInfo = MapManager::instance()->mapInfo(path);
+    if (mapInfo == nullptr)
+        return;
+
+    QString LEGEND = QStringLiteral("Legend");
+    QString current = mapInfo->properties().value(LEGEND, QString());
+    if (legend.isEmpty()) {
+        if (current.isEmpty()) {
+            return;
+        }
+    } else {
+        if (current == legend) {
+            return;
+        }
+    }
+
+    qDebug() << "Updating Legend property in" << path;
+
+    // 1) Read the TBX
+    // 2) Set the Legend= property
+    // 3) Save the TBX
+    BuildingReader reader;
+    if (Building *building = reader.read(path)) {
+        reader.fix(building);
+        if (legend.isEmpty()) {
+            building->properties().remove(LEGEND);
+        } else {
+            building->properties().insert(LEGEND, legend);
+        }
+        BuildingWriter w;
+        if (!w.write(building, path)) {
+            QString error = w.errorString();
+            QMessageBox::warning(BuildingEditorWindow::instance(), tr("Error saving building"), error);
+        }
+        delete building;
+    }
+}
+
+void WelcomeMode::legendTextChanged(const QString &text)
+{
+    // Called when typing text.
+#if !defined(QT_NO_DEBUG)
+    qDebug() << "legendTextChanged" << text;
+#endif
 }
 
 void WelcomeMode::setAutoSaveFiles()
@@ -493,4 +605,18 @@ void WelcomeMode::setAutoSaveFiles()
     if (mAutoSaveItems.size())
         sceneRect |= sceneRectOfItem(mAutoSaveItems.last());
     ui->graphicsView->setSceneRect(sceneRect);
+}
+
+QString WelcomeMode::currentFilePath()
+{
+    QModelIndexList selectedRows = ui->treeView->selectionModel()->selectedRows();
+    if (selectedRows.isEmpty()) {
+        return QString();
+    }
+    QModelIndex index = selectedRows.first();
+    QString path = mFSModel->filePath(index);
+    if (QFileInfo(path).isDir()) {
+        return QString();
+    }
+    return path;
 }
