@@ -1152,6 +1152,14 @@ property
 property
 {
     Type = Boolean
+    Name = alwaysDraw
+    ShortName =
+    Default = false
+    ReverseLogic = false
+}
+property
+{
+    Type = Boolean
     Name = attachedN
     ShortName =
     Default = false
@@ -1547,6 +1555,8 @@ property
         Garage Door = GarageDoor
         Metal Door = MetalDoor
         Metal Gate = MetalGate
+        Prison Metal Door = PrisonMetalDoor
+        Sliding Glass Door = SlidingGlassDoor
         Wood Door = WoodDoor
         Wood Gate = WoodGate
     }
