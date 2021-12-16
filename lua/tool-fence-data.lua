@@ -27,6 +27,20 @@ fence {
 }
 
 fence {
+    label = 'Tall Wooden 2',
+    west1 = 'fencing_01_72',
+    west2 = 'fencing_01_72',
+    gate_space_w = 'fencing_01_46',
+    gate_door_w = 'fixtures_doors_fences_01_12',
+    north1 = 'fencing_01_73',
+    north2 = 'fencing_01_73',
+    gate_space_n = 'fencing_01_47',
+    gate_door_n = 'fixtures_doors_fences_01_13',
+    nw = 'fencing_01_75',
+    post = 'fencing_01_74'
+}
+
+fence {
     label = 'Short Chainlink',
     west1 = 'fencing_01_27',
     west2 = 'fencing_01_26',

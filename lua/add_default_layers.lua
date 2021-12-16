@@ -13,6 +13,10 @@ layerNames = {
 
 	'1_Furniture',
 	'1_Furniture2',
+
+	'2_Furniture',
+	'2_Furniture2',
+
 }
 
 function indexOfLayer(layerName)

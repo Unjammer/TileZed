@@ -23,6 +23,15 @@ property
     Default = false
     ReverseLogic = false
 }
+property
+{
+    Type = Integer
+    Name = ItemHeight
+    ShortName = 
+    Min = 0
+    Max = 256
+    Default = 0
+}
 
 separator
 {

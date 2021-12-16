@@ -26,7 +26,7 @@ tileset
 tileset
 {
     file = appliances_com_01
-    size = 8,10
+    size = 8,30
 }
 tileset
 {
@@ -296,7 +296,7 @@ tileset
 tileset
 {
     file = fencing_burnt_01
-    size = 8,8
+    size = 8,16
 }
 tileset
 {
@@ -860,18 +860,18 @@ tileset
 }
 tileset
 {
-    file = unreleased/location_entertainment_gallery_01
+    file = location_entertainment_gallery_01
     size = 8,16
 }
 tileset
 {
-    file = unreleased/location_entertainment_gallery_02
+    file = location_entertainment_gallery_02
     size = 8,16
 }
 tileset
 {
     file = location_entertainment_theatre_01
-    size = 8,16
+    size = 8,32
 }
 tileset
 {
@@ -890,17 +890,17 @@ tileset
 }
 tileset
 {
-    file = unreleased/location_military_generic_01
+    file = location_military_generic_01
     size = 8,8
 }
 tileset
 {
-    file = unreleased/location_military_knox_01
+    file = location_military_knox_01
     size = 8,8
 }
 tileset
 {
-    file = unreleased/location_military_tent_01
+    file = location_military_tent_01
     size = 8,16
 }
 tileset
@@ -1056,7 +1056,7 @@ tileset
 tileset
 {
     file = overlay_graffiti_wall_01
-    size = 8,8
+    size = 8,16
 }
 tileset
 {
@@ -1086,7 +1086,7 @@ tileset
 tileset
 {
     file = recreational_sports_01
-    size = 8,16
+    size = 8,32
 }
 tileset
 {
@@ -1160,6 +1160,11 @@ tileset
 }
 tileset
 {
+    file = signs_one-off_05
+    size = 8,96
+}
+tileset
+{
     file = stashes_01
     size = 8,16
 }
@@ -1171,6 +1176,51 @@ tileset
 tileset
 {
     file = street_curbs_01
+    size = 8,10
+}
+tileset
+{
+    file = street_curbs_01_blend_dark_grass
+    size = 8,11
+}
+tileset
+{
+    file = street_curbs_01_blend_dirt
+    size = 8,11
+}
+tileset
+{
+    file = street_curbs_01_blend_gravel
+    size = 8,11
+}
+tileset
+{
+    file = street_curbs_01_blend_light_grass
+    size = 8,11
+}
+tileset
+{
+    file = street_curbs_01_blend_medium_grass
+    size = 8,11
+}
+tileset
+{
+    file = street_curbs_01_blend_sand
+    size = 8,11
+}
+tileset
+{
+    file = street_curbs_01_blend_street
+    size = 8,11
+}
+tileset
+{
+    file = street_curbs_01_diag
+    size = 8,10
+}
+tileset
+{
+    file = street_curbs_01_diag_2
     size = 8,10
 }
 tileset
@@ -1187,6 +1237,26 @@ tileset
 {
     file = street_trafficlines_01
     size = 8,8
+}
+tileset
+{
+    file = street_trafficlines_curb_white_faded
+    size = 8,20
+}
+tileset
+{
+    file = street_trafficlines_curb_white_full
+    size = 8,20
+}
+tileset
+{
+    file = street_trafficlines_curb_yellow_faded
+    size = 8,20
+}
+tileset
+{
+    file = street_trafficlines_curb_yellow_full
+    size = 8,20
 }
 tileset
 {
