@@ -127,8 +127,21 @@ public:
         mRestrictToSelection = isRestricted;
         emit restrictToSelectionChanged();
     }
+
     bool restrictToSelection() const
     { return mRestrictToSelection;}
+
+    void setFillAllInSelection(bool fillAll)
+    {
+        if (mFillAllInSelection == fillAll) return;
+        mFillAllInSelection = fillAll;
+        emit fillAllInSelectionChanged();
+    }
+
+    bool fillAllInSelection() const
+    {
+        return mFillAllInSelection;
+    }
 
 protected:
     void mapDocumentChanged(MapDocument *oldDocument,
@@ -144,6 +157,7 @@ protected:
 signals:
     void ruleChanged();
     void restrictToSelectionChanged();
+    void fillAllInSelectionChanged();
     void brushChanged();
 
 private:
@@ -161,6 +175,7 @@ private:
     int mBrushSize;
     BrushShape mBrushShape;
     bool mRestrictToSelection;
+    bool mFillAllInSelection;
 };
 
 // This tool is for erasing pixels in a map's BMP images.

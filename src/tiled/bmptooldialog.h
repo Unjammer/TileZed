@@ -60,6 +60,7 @@ private slots:
     void brushSquare();
     void brushCircle();
     void restrictToSelection(bool isRestricted);
+    void fillAllInSelection(bool fillAll);
     void toggleOverlayLayers();
     void showBMPTiles(bool show);
     void showMapTiles(bool show);

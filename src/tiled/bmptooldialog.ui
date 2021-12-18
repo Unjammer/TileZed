@@ -236,6 +236,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="fillAllInSelectedArea">
+         <property name="text">
+          <string>Bucket: Fill all matching in selected area</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QToolButton" name="toggleOverlayLayers">
          <property name="text">
           <string>Show/Hide FloorOverlay Layers</string>

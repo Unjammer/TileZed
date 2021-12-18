@@ -175,6 +175,8 @@ BmpToolDialog::BmpToolDialog(QWidget *parent) :
             SLOT(brushCircle()));
     connect(ui->restrictToSelection, SIGNAL(toggled(bool)),
             SLOT(restrictToSelection(bool)));
+    connect(ui->fillAllInSelectedArea, &QCheckBox::toggled,
+            this, &BmpToolDialog::fillAllInSelection);
     connect(ui->toggleOverlayLayers, SIGNAL(clicked()),
             SLOT(toggleOverlayLayers()));
     connect(ui->showBMPTiles, SIGNAL(toggled(bool)),
@@ -212,9 +214,11 @@ BmpToolDialog::BmpToolDialog(QWidget *parent) :
     if (shape == QLatin1String("square")) brushSquare();
     else if (shape == QLatin1String("circle")) brushCircle();
 
-    bool isRestricted = settings.value(QLatin1String("restrictToSelection"),
-                                       true).toBool();
+    bool isRestricted = settings.value(QLatin1String("restrictToSelection"), true).toBool();
     BmpBrushTool::instance()->setRestrictToSelection(isRestricted);
+
+    bool fillAll = settings.value(QLatin1String("fillAllInSelection"), false).toBool();
+    BmpBrushTool::instance()->setFillAllInSelection(fillAll);
 
     bool expanded = settings.value(QLatin1String("expanded"), true).toBool();
     if (!expanded) expandCollapse();
@@ -261,6 +265,8 @@ void BmpToolDialog::setVisible(bool visible)
             settings.setValue(QLatin1String("brushShape"), QLatin1String("circle"));
         settings.setValue(QLatin1String("restrictToSelection"),
                           BmpBrushTool::instance()->restrictToSelection());
+        settings.setValue(QLatin1String("fillAllInSelection"),
+                          BmpBrushTool::instance()->fillAllInSelection());
         settings.setValue(QLatin1String("expanded"), mExpanded);
     }
     settings.endGroup();
@@ -525,6 +531,7 @@ void BmpToolDialog::setDocument(MapDocument *doc)
     case BmpBrushTool::Circle: ui->brushCircle->setChecked(true); break;
     }
     ui->restrictToSelection->setChecked(BmpBrushTool::instance()->restrictToSelection());
+    ui->fillAllInSelectedArea->setChecked(BmpBrushTool::instance()->fillAllInSelection());
     ui->showBMPTiles->setEnabled(mDocument != nullptr);
     ui->showMapTiles->setEnabled(mDocument != nullptr);
     ui->blendEdgesEverywhere->setEnabled(mDocument != nullptr);
@@ -612,6 +619,11 @@ void BmpToolDialog::brushCircle()
 void BmpToolDialog::restrictToSelection(bool isRestricted)
 {
     BmpBrushTool::instance()->setRestrictToSelection(isRestricted);
+}
+
+void BmpToolDialog::fillAllInSelection(bool fillAll)
+{
+    BmpBrushTool::instance()->setFillAllInSelection(fillAll);
 }
 
 void BmpToolDialog::toggleOverlayLayers()

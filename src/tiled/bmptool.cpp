@@ -330,7 +330,8 @@ BmpBrushTool::BmpBrushTool(QObject *parent) :
     mBmpIndex(0),
     mBrushSize(1),
     mBrushShape(Square),
-    mRestrictToSelection(false)
+    mRestrictToSelection(false),
+    mFillAllInSelection(false)
 {
 }
 
@@ -1570,6 +1571,8 @@ BmpBucketTool::BmpBucketTool(QObject *parent) :
             SLOT(bmpImageChanged()));
     connect(BmpBrushTool::instance(), SIGNAL(restrictToSelectionChanged()),
             SLOT(bmpImageChanged()));
+    connect(BmpBrushTool::instance(), &BmpBrushTool::fillAllInSelectionChanged,
+            this, &BmpBucketTool::bmpImageChanged);
 }
 
 void BmpBucketTool::tilePositionChanged(const QPoint &tilePos)
@@ -1582,6 +1585,29 @@ void BmpBucketTool::tilePositionChanged(const QPoint &tilePos)
     if (mFloodFill.mRegion.contains(tilePos))
         return;
     int bmpIndex = BmpBrushTool::instance()->bmpIndex();
+    const QRegion selection = mapDocument()->bmpSelection();
+    if ((selection.isEmpty() == false) && BmpBrushTool::instance()->restrictToSelection() && BmpBrushTool::instance()->fillAllInSelection()) {
+        QImage bmpImage = mapDocument()->map()->bmp(bmpIndex).image().copy();
+        const QRgb pixel = bmpImage.pixel(tilePos);
+        mFloodFill.mImage = mapDocument()->map()->bmp(bmpIndex).image().copy();
+        QRegion tileRgn;
+        for (const QRect& rect : selection) {
+            for (int y = rect.y(); y <= rect.bottom(); y++) {
+                for (int x = rect.x(); x <= rect.right(); x++) {
+                    if (tileRgn.contains(QPoint(x, y)))
+                        continue;
+                    if (bmpImage.pixel(x, y) != pixel)
+                        continue;
+                    mFloodFill.mRegion = QRegion();
+                    mFloodFill.floodFillScanlineStack(x, y, BmpBrushTool::instance()->color(), pixel);
+                    mFloodFill.mRegion &= selection;
+                    tileRgn |= mFloodFill.mRegion;
+                }
+            }
+        }
+        brushItem()->setTileRegion(tileRgn);
+        return;
+    }
     mFloodFill.mImage = mapDocument()->map()->bmp(bmpIndex).image().copy();
     mFloodFill.mRegion = QRegion();
     mFloodFill.floodFillScanlineStack(tilePos.x(), tilePos.y(),
@@ -1590,7 +1616,6 @@ void BmpBucketTool::tilePositionChanged(const QPoint &tilePos)
 
     QRegion tileRgn = mFloodFill.mRegion;
     if (BmpBrushTool::instance()->restrictToSelection()) {
-        QRegion selection = mapDocument()->bmpSelection();
         if (!selection.isEmpty())
             tileRgn &= selection;
     }
