@@ -1568,6 +1568,7 @@ property
         Sliding Glass Door = SlidingGlassDoor
         Wood Door = WoodDoor
         Wood Gate = WoodGate
+        Wood Shack Door = WoodShackDoor
     }
     Default = None
     ValueAsPropertyName = false

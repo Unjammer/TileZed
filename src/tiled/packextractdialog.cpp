@@ -5,9 +5,11 @@
 
 #include "BuildingEditor/buildingtiles.h"
 
+#include <QButtonGroup>
 #include <QDebug>
 #include <QFileDialog>
 #include <QPainter>
+#include <QSettings>
 
 PackExtractDialog::PackExtractDialog(PackFile &packFile, QWidget *parent) :
     QDialog(parent),
@@ -17,9 +19,19 @@ PackExtractDialog::PackExtractDialog(PackFile &packFile, QWidget *parent) :
     ui->setupUi(this);
 
     connect(ui->outputBrowse, SIGNAL(clicked()), SLOT(browse()));
+    connect(ui->radioSingle, &QRadioButton::toggled, this, &PackExtractDialog::radioToggled);
 
     ui->radioMultiple->setChecked(true);
     ui->radioSingle->setChecked(false);
+    ui->checkBox2x->setChecked(true);
+    ui->checkBox2x->setEnabled(ui->radioSingle->isChecked());
+
+    QSettings settings;
+    settings.beginGroup(QStringLiteral("PackExtractDialog"));
+    ui->radioSingle->setChecked(settings.value(QStringLiteral("IsTilesheet"), false).toBool());
+    ui->prefixEdit->setText(settings.value(QStringLiteral("Prefix")).toString());
+    ui->outputEdit->setText(settings.value(QStringLiteral("OutputDirectory")).toString());
+    settings.endGroup();
 }
 
 PackExtractDialog::~PackExtractDialog()
@@ -45,6 +57,13 @@ void PackExtractDialog::accept()
     if (!outputDir.exists())
         return;
 
+    QSettings settings;
+    settings.beginGroup(QStringLiteral("PackExtractDialog"));
+    settings.setValue(QStringLiteral("IsTilesheet"), ui->radioSingle->isChecked());
+    settings.setValue(QStringLiteral("Prefix"), prefix);
+    settings.setValue(QStringLiteral("OutputDirectory"), outputDir.path());
+    settings.endGroup();
+
     if (ui->radioMultiple->isChecked()) {
         foreach (PackPage page, mPackFile.pages()) {
             foreach (PackSubTexInfo tex, page.mInfo) {
@@ -67,14 +86,17 @@ void PackExtractDialog::accept()
         };
         QRect bounds(0, 0, 0, 0);
         QList<TileInfo> tiles;
+        int TileScale = ui->checkBox2x->isChecked() ? 2 : 1;
+        const int tileW = 64 * TileScale;
+        const int tileH = 128 * TileScale;
         foreach (PackPage page, mPackFile.pages()) {
             foreach (PackSubTexInfo tex, page.mInfo) {
                 if (tex.name.startsWith(prefix, Qt::CaseInsensitive)) {
                     QString tileName;
                     int tileIndex;
                     if (BuildingEditor::BuildingTilesMgr::parseTileName(tex.name, tileName, tileIndex)) {
-                        if (tex.fx != 64 || tex.fy != 128) {
-                            qDebug() << "WARNING: " << tex.name << "size is not 64x128" << tex.fx << "x" << tex.fy;
+                        if (tex.fx != tileW || tex.fy != tileH) {
+                            qDebug() << QStringLiteral("WARNING: %1 size %2x%3 is not %4x%5").arg(tex.name).arg(tex.fx).arg(tex.fy).arg(tileW).arg(tileH);
                         }
                         QImage image(tex.fx, tex.fy, QImage::Format_ARGB32);
                         image.fill(Qt::transparent);
@@ -86,7 +108,7 @@ void PackExtractDialog::accept()
                         info.tileName = tileName;
                         info.tileIndex = tileIndex;
                         info.tileImage = image;
-                        info.tileRect = QRect((tileIndex % 8) * 64, (tileIndex / 8) * 128, 64, 128);
+                        info.tileRect = QRect((tileIndex % 8) * tileW, (tileIndex / 8) * tileH, tileW, tileH);
                         tiles += info;
 
                         bounds |= info.tileRect;
@@ -107,4 +129,9 @@ void PackExtractDialog::accept()
     }
 
     QDialog::accept();
+}
+
+void PackExtractDialog::radioToggled()
+{
+    ui->checkBox2x->setEnabled(ui->radioSingle->isChecked());
 }

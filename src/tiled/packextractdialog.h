@@ -5,6 +5,8 @@ class PackFile;
 
 #include <QDialog>
 
+class QAbstractButton;
+
 namespace Ui {
 class PackExtractDialog;
 }
@@ -20,6 +22,7 @@ public:
 public slots:
     void browse();
     void accept();
+    void radioToggled();
 
 private:
     Ui::PackExtractDialog *ui;
