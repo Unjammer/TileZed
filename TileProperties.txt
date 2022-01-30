@@ -1584,6 +1584,7 @@ property
         None =
         Wood =
         Metal =
+        MetalBars = MetalGate
     }
     Default = None
     ValueAsPropertyName = false
@@ -1602,6 +1603,7 @@ property
         Sandbag =
         Gravelbag =
         Barbwire =
+        RoadBlock =
         Other =
     }
     Default = None
