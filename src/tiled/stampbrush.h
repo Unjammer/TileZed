@@ -46,6 +46,10 @@ public:
     StampBrush(QObject *parent = 0);
     ~StampBrush();
 
+#ifdef ZOMBOID
+    void deactivate(MapScene *scene);
+#endif
+
     void mousePressed(QGraphicsSceneMouseEvent *event);
     void mouseReleased(QGraphicsSceneMouseEvent *event);
 

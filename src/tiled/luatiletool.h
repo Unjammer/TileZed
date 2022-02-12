@@ -55,18 +55,20 @@ public:
 
     void loadScript();
 
-    void activate(Tiled::Internal::MapScene *scene);
-    void deactivate(Tiled::Internal::MapScene *scene);
+    void activate(Tiled::Internal::MapScene *scene) override;
+    void deactivate(Tiled::Internal::MapScene *scene) override;
 
-    void mouseLeft();
+    void mouseLeft() override;
 
-    void mouseMoved(const QPointF &pos, Qt::KeyboardModifiers modifiers);
-    void mousePressed(QGraphicsSceneMouseEvent *event);
-    void mouseReleased(QGraphicsSceneMouseEvent *event);
-    void modifiersChanged(Qt::KeyboardModifiers modifiers);
+    void mouseMoved(const QPointF &pos, Qt::KeyboardModifiers modifiers) override;
+    void mousePressed(QGraphicsSceneMouseEvent *event) override;
+    void mouseReleased(QGraphicsSceneMouseEvent *event) override;
+    void modifiersChanged(Qt::KeyboardModifiers modifiers) override;
 
-    void languageChanged();
-    void tilePositionChanged(const QPoint &tilePos);
+    void setHandScrolling(bool handScrolling) override;
+
+    void languageChanged() override;
+    void tilePositionChanged(const QPoint &tilePos) override;
 
     // Callable from Lua scripts
     enum CursorType {

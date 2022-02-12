@@ -183,6 +183,15 @@ void MapScene::setSelectedTool(AbstractTool *tool)
     mSelectedTool = tool;
 }
 
+#ifdef ZOMBOID
+void MapScene::setHandScrolling(bool handScrolling)
+{
+    if (mActiveTool != nullptr) {
+        mActiveTool->setHandScrolling(handScrolling);
+    }
+}
+#endif
+
 void MapScene::refreshScene()
 {
     mLayerItems.clear();

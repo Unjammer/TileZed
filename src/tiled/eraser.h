@@ -36,6 +36,10 @@ class Eraser : public AbstractTileTool
 public:
     Eraser(QObject *parent = 0);
 
+#ifdef ZOMBOID
+    void deactivate(MapScene *scene);
+#endif
+
     void mousePressed(QGraphicsSceneMouseEvent *event);
     void mouseReleased(QGraphicsSceneMouseEvent *event);
 

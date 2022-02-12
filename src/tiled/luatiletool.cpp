@@ -33,6 +33,7 @@
 #include "tilelayer.h"
 
 #include <qmath.h>
+#include <QApplication>
 #include <QDebug>
 #include <QFileInfo>
 #include <QSettings>
@@ -344,6 +345,17 @@ void LuaTileTool::modifiersChanged(Qt::KeyboardModifiers modifiers)
         QString output = QString::fromLatin1(lua_tostring(L, -1));
         lua_pop(L, -1); // pop error
         LuaConsole::instance()->write(output, (status == LUA_OK) ? Qt::black : Qt::red);
+    }
+}
+
+void LuaTileTool::setHandScrolling(bool handScrolling)
+{
+    if ((handScrolling == false) && (QApplication::mouseButtons().testFlag(Qt::MouseButton::LeftButton) == false) && (mButtons & Qt::MouseButton::LeftButton)) {
+        QGraphicsSceneMouseEvent event;
+        event.setButton(Qt::MouseButton::LeftButton);
+        event.setModifiers(QApplication::keyboardModifiers());
+        event.setScenePos(mCurrentScenePos);
+        mouseReleased(&event);
     }
 }
 

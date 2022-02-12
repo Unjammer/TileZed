@@ -227,6 +227,7 @@ property
         IsoBrokenGlass = IsoBrokenGlass
         IsoClothingDryer = IsoClothingDryer
         IsoClothingWasher = IsoClothingWasher
+        IsoCombinationWasherDryer = IsoCombinationWasherDryer
         IsoFireplace = IsoFireplace
         IsoMannequin = IsoMannequin
         IsoRadio = IsoRadio
@@ -1572,6 +1573,14 @@ property
     }
     Default = None
     ValueAsPropertyName = false
+}
+
+property
+{
+    Type = String
+    Name = AmbientSound
+    ShortName =
+    Default = 
 }
 
 property

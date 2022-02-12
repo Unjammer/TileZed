@@ -65,6 +65,13 @@ void AbstractTool::setEnabled(bool enabled)
     emit enabledChanged(mEnabled);
 }
 
+#ifdef ZOMBOID
+void AbstractTool::setHandScrolling(bool handScrolling)
+{
+
+}
+#endif
+
 void AbstractTool::updateEnabledState()
 {
     setEnabled(mMapDocument != 0);

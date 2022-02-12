@@ -192,9 +192,10 @@ void MapView::setHandScrolling(bool handScrolling)
 {
     if (mHandScrolling == handScrolling)
         return;
-
     mHandScrolling = handScrolling;
     setInteractive(!mHandScrolling);
+
+    mapScene()->setHandScrolling(handScrolling);
 
     if (mHandScrolling) {
         mLastMousePos = QCursor::pos();

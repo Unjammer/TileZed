@@ -57,6 +57,14 @@ StampBrush::~StampBrush()
     delete mStamp;
 }
 
+#ifdef ZOMBOID
+void StampBrush::deactivate(MapScene *scene)
+{
+    endCapture();
+    mBrushBehavior = Free;
+    AbstractTileTool::deactivate(scene);
+}
+#endif
 
 /**
  * Returns a lists of points on an ellipse.

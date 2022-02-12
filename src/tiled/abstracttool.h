@@ -127,6 +127,10 @@ public:
      */
     virtual void languageChanged() = 0;
 
+#ifdef ZOMBOID
+    virtual void setHandScrolling(bool handScrolling);
+#endif
+
 protected:
     /**
      * Can be used to respond to the map document changing.

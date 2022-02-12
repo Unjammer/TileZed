@@ -47,6 +47,14 @@ Eraser::Eraser(QObject *parent)
 #endif
 }
 
+#ifdef ZOMBOID
+void Eraser::deactivate(MapScene *scene)
+{
+    mErasing = false;
+    AbstractTileTool::deactivate(scene);
+}
+#endif
+
 void Eraser::tilePositionChanged(const QPoint &tilePos)
 {
 #ifdef ZOMBOID

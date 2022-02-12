@@ -346,6 +346,8 @@ void BmpBrushTool::activate(MapScene *scene)
 
 void BmpBrushTool::deactivate(MapScene *scene)
 {
+    mPainting = false;
+    mErasing = false;
     AbstractBmpTool::deactivate(scene);
 }
 
@@ -367,6 +369,14 @@ void BmpBrushTool::mouseReleased(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
         mPainting = false;
+}
+
+void BmpBrushTool::setHandScrolling(bool handScrolling)
+{
+    if ((handScrolling == false) && (QApplication::mouseButtons().testFlag(Qt::MouseButton::LeftButton) == false) && (mPainting == true)) {
+        mPainting = false;
+        mErasing = false;
+    }
 }
 
 void BmpBrushTool::setBrushSize(int size)
@@ -646,6 +656,7 @@ void BmpEraserTool::activate(MapScene *scene)
 
 void BmpEraserTool::deactivate(MapScene *scene)
 {
+    mPainting = false;
     AbstractBmpTool::deactivate(scene);
 }
 
@@ -666,6 +677,13 @@ void BmpEraserTool::mouseReleased(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
         mPainting = false;
+}
+
+void BmpEraserTool::setHandScrolling(bool handScrolling)
+{
+    if ((handScrolling == false) && (QApplication::mouseButtons().testFlag(Qt::MouseButton::LeftButton) == false) && (mPainting == true)) {
+        mPainting = false;
+    }
 }
 
 void BmpEraserTool::languageChanged()
@@ -1164,6 +1182,15 @@ void BmpSelectionTool::mouseMoved(const QPointF &pos, Qt::KeyboardModifiers modi
     AbstractBmpTool::mouseMoved(pos, modifiers);
 }
 
+void BmpSelectionTool::setHandScrolling(bool handScrolling)
+{
+    if ((handScrolling == false) && (QApplication::mouseButtons().testFlag(Qt::MouseButton::LeftButton) == false) && (mMouseDown == true)) {
+        QGraphicsSceneMouseEvent event;
+        event.setButton(Qt::MouseButton::LeftButton);
+        mouseReleased(&event);
+    }
+}
+
 void BmpSelectionTool::languageChanged()
 {
     setName(tr("BMP Rectangle Select"));
@@ -1511,6 +1538,15 @@ void BmpRectTool::mouseMoved(const QPointF &pos, Qt::KeyboardModifiers modifiers
     AbstractBmpTool::mouseMoved(pos, modifiers);
 }
 
+void BmpRectTool::setHandScrolling(bool handScrolling)
+{
+    if ((handScrolling == false) && (QApplication::mouseButtons().testFlag(Qt::MouseButton::LeftButton) == false) && (mMouseDown == true)) {
+        QGraphicsSceneMouseEvent event;
+        event.setButton(Qt::MouseButton::LeftButton);
+        mouseReleased(&event);
+    }
+}
+
 void BmpRectTool::modifiersChanged(Qt::KeyboardModifiers)
 {
     tilePositionChanged(tilePosition());
@@ -1725,6 +1761,7 @@ NoBlendTool *NoBlendTool::instance()
 void NoBlendTool::deactivate(MapScene *scene)
 {
     clearNoBlend();
+    mMode = NoMode;
     AbstractBmpTool::deactivate(scene);
 }
 
@@ -1931,6 +1968,15 @@ void NoBlendTool::mouseMoved(const QPointF &pos, Qt::KeyboardModifiers modifiers
     }
 
     AbstractBmpTool::mouseMoved(pos, modifiers);
+}
+
+void NoBlendTool::setHandScrolling(bool handScrolling)
+{
+    if ((handScrolling == false) && (QApplication::mouseButtons().testFlag(Qt::MouseButton::LeftButton) == false)) {
+        QGraphicsSceneMouseEvent event;
+        event.setButton(Qt::MouseButton::LeftButton);
+        mouseReleased(&event);
+    }
 }
 
 void NoBlendTool::modifiersChanged(Qt::KeyboardModifiers)
@@ -2213,6 +2259,7 @@ void BmpToLayersTool::activate(MapScene *scene)
 
 void BmpToLayersTool::deactivate(MapScene *scene)
 {
+    mPainting = false;
     AbstractBmpTool::deactivate(scene);
 }
 

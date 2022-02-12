@@ -33,6 +33,10 @@ class TileSelectionTool : public AbstractTileTool
 public:
     TileSelectionTool(QObject *parent = 0);
 
+#ifdef ZOMBOID
+    void deactivate(MapScene *scene);
+#endif
+
     void mousePressed(QGraphicsSceneMouseEvent *event);
     void mouseReleased(QGraphicsSceneMouseEvent *event);
 

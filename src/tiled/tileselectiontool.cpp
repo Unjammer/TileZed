@@ -42,6 +42,14 @@ TileSelectionTool::TileSelectionTool(QObject *parent)
     setTilePositionMethod(BetweenTiles);
 }
 
+#ifdef ZOMBOID
+void TileSelectionTool::deactivate(MapScene *scene)
+{
+    mSelecting = false;
+    AbstractTileTool::deactivate(scene);
+}
+#endif
+
 void TileSelectionTool::tilePositionChanged(const QPoint &)
 {
     if (mSelecting)
@@ -87,6 +95,11 @@ void TileSelectionTool::mousePressed(QGraphicsSceneMouseEvent *event)
 void TileSelectionTool::mouseReleased(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
+#ifdef ZOMBOID
+        if (mSelecting == false) {
+            return;
+        }
+#endif
         mSelecting = false;
 
         MapDocument *document = mapDocument();

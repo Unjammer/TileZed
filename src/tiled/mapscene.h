@@ -117,6 +117,8 @@ public:
     void setSelectedTool(AbstractTool *tool);
 
 #ifdef ZOMBOID
+    void setHandScrolling(bool handScrolling);
+
 #ifdef SEPARATE_BMP_SELECTION
     BmpSelectionItem *bmpSelectionItem() const
     { return mBmpSelectionItem; }

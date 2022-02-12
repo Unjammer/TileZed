@@ -94,11 +94,13 @@ class BmpBrushTool : public AbstractBmpTool
 public:
     static BmpBrushTool *instance();
 
-    void activate(MapScene *scene);
-    void deactivate(MapScene *scene);
+    void activate(MapScene *scene) override;
+    void deactivate(MapScene *scene) override;
 
-    void mousePressed(QGraphicsSceneMouseEvent *event);
-    void mouseReleased(QGraphicsSceneMouseEvent *event);
+    void mousePressed(QGraphicsSceneMouseEvent *event) override;
+    void mouseReleased(QGraphicsSceneMouseEvent *event) override;
+
+    void setHandScrolling(bool handScrolling) override;
 
     void setColor(int index, QRgb color)
     { mBmpIndex = index; mColor = color; emit ruleChanged(); }
@@ -185,17 +187,19 @@ class BmpEraserTool : public AbstractBmpTool
 public:
     static BmpEraserTool *instance();
 
-    void activate(MapScene *scene);
-    void deactivate(MapScene *scene);
+    void activate(MapScene *scene) override;
+    void deactivate(MapScene *scene) override;
 
-    void mousePressed(QGraphicsSceneMouseEvent *event);
-    void mouseReleased(QGraphicsSceneMouseEvent *event);
+    void mousePressed(QGraphicsSceneMouseEvent *event) override;
+    void mouseReleased(QGraphicsSceneMouseEvent *event) override;
+
+    void setHandScrolling(bool handScrolling) override;
 
 protected:
-    void languageChanged();
+    void languageChanged() override;
 
 protected:
-    void tilePositionChanged(const QPoint &tilePos);
+    void tilePositionChanged(const QPoint &tilePos) override;
     void setBrushRegion(const QPoint &tilePos);
     void paint();
     void eraseBmp(int bmpIndex, const QRegion &tileRgn);
@@ -222,17 +226,21 @@ class BmpSelectionTool : public AbstractBmpTool
 public:
     static BmpSelectionTool *instance();
 
-    void mousePressed(QGraphicsSceneMouseEvent *event);
-    void mouseReleased(QGraphicsSceneMouseEvent *event);
+    void mousePressed(QGraphicsSceneMouseEvent *event) override;
+    void mouseReleased(QGraphicsSceneMouseEvent *event) override;
 
-    void mouseMoved(const QPointF &pos, Qt::KeyboardModifiers modifiers);
+    void mouseMoved(const QPointF &pos, Qt::KeyboardModifiers modifiers) override;
 
-    void languageChanged();
+
+    void setHandScrolling(bool handScrolling) override;
+
+
+    void languageChanged() override;
 
 protected:
-    void tilePositionChanged(const QPoint &tilePos);
+    void tilePositionChanged(const QPoint &tilePos) override;
 
-    void updateStatusInfo();
+    void updateStatusInfo() override;
 
 private:
     Q_DISABLE_COPY(BmpSelectionTool)
@@ -344,19 +352,21 @@ class BmpRectTool : public AbstractBmpTool
 public:
     static BmpRectTool *instance();
 
-    void mousePressed(QGraphicsSceneMouseEvent *event);
-    void mouseReleased(QGraphicsSceneMouseEvent *event);
+    void mousePressed(QGraphicsSceneMouseEvent *event) override;
+    void mouseReleased(QGraphicsSceneMouseEvent *event) override;
 
-    void mouseMoved(const QPointF &pos, Qt::KeyboardModifiers modifiers);
+    void mouseMoved(const QPointF &pos, Qt::KeyboardModifiers modifiers) override;
 
-    void modifiersChanged(Qt::KeyboardModifiers);
+    void setHandScrolling(bool handScrolling) override;
 
-    void languageChanged();
+    void modifiersChanged(Qt::KeyboardModifiers) override;
+
+    void languageChanged() override;
 
 protected:
-    void tilePositionChanged(const QPoint &tilePos);
+    void tilePositionChanged(const QPoint &tilePos) override;
 
-    void updateStatusInfo();
+    void updateStatusInfo() override;
 
 private:
     Q_DISABLE_COPY(BmpRectTool)
@@ -458,21 +468,23 @@ class NoBlendTool : public AbstractBmpTool
 public:
     static NoBlendTool *instance();
 
-    void deactivate(MapScene *scene);
+    void deactivate(MapScene *scene) override;
 
-    void mousePressed(QGraphicsSceneMouseEvent *event);
-    void mouseReleased(QGraphicsSceneMouseEvent *event);
+    void mousePressed(QGraphicsSceneMouseEvent *event) override;
+    void mouseReleased(QGraphicsSceneMouseEvent *event) override;
 
-    void mouseMoved(const QPointF &pos, Qt::KeyboardModifiers modifiers);
+    void mouseMoved(const QPointF &pos, Qt::KeyboardModifiers modifiers) override;
 
-    void modifiersChanged(Qt::KeyboardModifiers);
+    void setHandScrolling(bool handScrolling) override;
 
-    void languageChanged();
+    void modifiersChanged(Qt::KeyboardModifiers) override;
+
+    void languageChanged() override;
 
 protected:
-    void tilePositionChanged(const QPoint &tilePos);
+    void tilePositionChanged(const QPoint &tilePos) override;
 
-    void updateStatusInfo();
+    void updateStatusInfo() override;
 
     bool isBlendLayer();
 
