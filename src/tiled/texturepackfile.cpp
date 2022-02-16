@@ -22,6 +22,9 @@
 #include <QDataStream>
 #include <QFile>
 
+static const int VERSION1 = 1;
+static const int VERSION_LATEST = VERSION1;
+
 PackFile::PackFile()
 {
 
@@ -73,7 +76,7 @@ static QString ReadString(QDataStream &in)
     return str;
 }
 
-static void SaveString(QDataStream &out, QString &str)
+static void SaveString(QDataStream &out, const QString &str)
 {
     out << (qint32) str.length();
     for (int i = 0; i < str.length(); i++)
@@ -95,7 +98,27 @@ bool PackFile::read(const QString &fileName)
     QDataStream in(&file);
     in.setByteOrder(QDataStream::LittleEndian);
 
-    int numPages = readInt(in);
+    in.startTransaction();
+    qint8 m1, m2, m3, m4;
+    in >> m1;
+    in >> m2;
+    in >> m3;
+    in >> m4;
+    int version = 0;
+    int numPages = 0;
+    if (m1 == 'P' && m2 == 'Z' && m3 == 'P' && m4 == 'K') {
+        in.commitTransaction();
+        version = readInt(in);
+        numPages = readInt(in);
+        if (version < VERSION1 || version > VERSION_LATEST) {
+            mError = tr("Invalid version number %1.\n%2").arg(version).arg(fileName);
+            return false;
+        }
+    } else {
+        in.rollbackTransaction();
+        numPages = readInt(in);
+    }
+
     qDebug() << "PackFile: reading" << numPages << "pages";
     for (int i = 0; i < numPages; i++) {
         PackPage page;
@@ -118,27 +141,37 @@ bool PackFile::read(const QString &fileName)
             page.mInfo += PackSubTexInfo(x, y, w, h, ox, oy, fx, fy, entryName);
         }
 
-        QBuffer buf;
-        buf.buffer().reserve(250 * 1024);
-        buf.open(QBuffer::ReadWrite);
-        while (true) {
-            quint32 ii = readIntByte(in);
-            if (ii == 0xDEADBEEF)
-                break;
-            char ch = ((ii >> 24) & 0xFF);
-            int n = buf.write(&ch, 1);
-            if (n != 1)
-                break;
+        if (version == 0) {
+            QBuffer buf;
+            buf.buffer().reserve(250 * 1024);
+            buf.open(QBuffer::ReadWrite);
+            while (true) {
+                quint32 ii = readIntByte(in);
+                if (ii == 0xDEADBEEF)
+                    break;
+                char ch = ((ii >> 24) & 0xFF);
+                int n = buf.write(&ch, 1);
+                if (n != 1)
+                    break;
+            }
+
+            qDebug() << "Creating PNG" << page.name << "size=" << buf.size();
+            page.image.loadFromData(buf.buffer(), "PNG");
+
+//            quint32 magic = readInt(in);
+//            if (magic != 0xDEADBEEF) {
+//                mError = tr("Expected 0xDEADBEEF after PNG data");
+//                return false;
+//            }
+        } else {
+            qint32 length = readInt(in);
+            uchar *data = new uchar[length];
+            in.readRawData((char*) data, length);
+
+            qDebug() << "Creating PNG" << page.name << "size=" << length;
+            page.image.loadFromData(data, length, "PNG");
+            delete [] data;
         }
-
-        qDebug() << "Creating PNG" << page.name << "size=" << buf.size();
-        page.image.loadFromData(buf.buffer(), "PNG");
-
-//        quint32 magic = readInt(in);
-//        if (magic != 0xDEADBEEF) {
-//            mError = tr("Expected 0xDEADBEEF after PNG data");
-//            return false;
-//        }
 
         mPages += page;
     }
@@ -157,13 +190,16 @@ bool PackFile::write(const QString &fileName)
     QDataStream out(&file);
     out.setByteOrder(QDataStream::LittleEndian);
 
+    out << quint8('P') << quint8('Z') << quint8('P') << quint8('K');
+    out << qint32(VERSION_LATEST);
+
     out << (qint32) mPages.size();
 
-    foreach (PackPage page, mPages) {
+    for (const PackPage& page : qAsConst(mPages)) {
         SaveString(out, page.name);
         out << (qint32) page.mInfo.size();
         out << (qint32) 1; // FIXME: mask???
-        foreach (PackSubTexInfo info, page.mInfo) {
+        for (const PackSubTexInfo& info : page.mInfo) {
             SaveString(out, info.name);
             out << (qint32) info.x;
             out << (qint32) info.y;
@@ -176,9 +212,23 @@ bool PackFile::write(const QString &fileName)
         }
         QBuffer b;
         b.buffer().reserve(250 * 1024);
+        b.open(QIODevice::WriteOnly);
+//        b.open(QIODevice::ReadWrite);
         page.image.save(&b, "PNG");
+        out << qint32(b.buffer().length());
         out.writeRawData(b.buffer().data(), b.buffer().length());
-        out << (quint32) 0xDEADBEEF;
+#if 0
+        b.seek(0L);
+        QDataStream in(&b);
+        long length = b.buffer().length();
+        long read = 0L;
+        while (read < length) {
+            quint32 ii = readIntByte(in);
+            if (ii == 0xDEADBEEF)
+                break;
+            read++;
+        }
+#endif
     }
 
     return true;
