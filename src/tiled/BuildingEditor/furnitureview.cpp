@@ -611,13 +611,19 @@ bool FurnitureModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
      QByteArray encodedData = data->data(mMimeType);
      QDataStream stream(&encodedData, QIODevice::ReadOnly);
 
+     int dropX = mDropCoords.x();
+     int dropY = mDropCoords.y();
+     int dx = (tile->isW() || tile->isE()) ? 0 : 1;
+     int dy = (tile->isN() || tile->isS()) ? 0 : 1;
      while (!stream.atEnd()) {
          QString tilesetName;
          stream >> tilesetName;
          int tileId;
          stream >> tileId;
          QString tileName = BuildingTilesMgr::nameForTile(tilesetName, tileId);
-         emit furnitureTileDropped(tile, mDropCoords.x(), mDropCoords.y(), tileName);
+         emit furnitureTileDropped(tile, dropX, dropY, tileName);
+         dropX += dx;
+         dropY += dy;
      }
 
      return true;
