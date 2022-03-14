@@ -1613,6 +1613,7 @@ property
         Gravelbag =
         Barbwire =
         RoadBlock =
+        MetalGate =
         Other =
     }
     Default = None
@@ -1638,6 +1639,21 @@ property
         Metal = Metal
     }
     Default = None
+    ValueAsPropertyName = false
+}
+
+property
+{
+    Type = Enum
+    Name = SinkType
+    ShortName = 
+    Enums
+    {
+        Generic =
+        Ceramic =
+        Metal =
+    }
+    Default = Generic
     ValueAsPropertyName = false
 }
 
