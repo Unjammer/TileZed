@@ -812,6 +812,12 @@ public:
     TileDefTile *tileAt(int index);
     void resize(int columns, int rows);
 
+    TileDefTile *tile(int col, int row)
+    {
+        int index = col + row * mColumns;
+        return (index >= 0 && index < mTiles.size()) ? mTiles[index] : 0;
+    }
+
     QString mName;
     QString mImageSource;
     int mColumns;

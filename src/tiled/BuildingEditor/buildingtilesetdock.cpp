@@ -66,6 +66,15 @@ BuildingTilesetDock::BuildingTilesetDock(QWidget *parent) :
     QToolBar *toolBar = new QToolBar(this);
     toolBar->setIconSize(QSize(16, 16));
     toolBar->addAction(mActionSwitchLayer);
+
+#ifdef BUILDINGED_SA
+    toolBar->addWidget(mBackgroundColorButton = new Tiled::Internal::ColorButton(toolBar));
+    mBackgroundColorButton->setColor(Preferences::instance()->tilesetBackgroundColor());
+    tilesetBackgroundColorChanged(Preferences::instance()->tilesetBackgroundColor());
+    connect(mBackgroundColorButton, &ColorButton::colorChanged, Preferences::instance(), &Preferences::setTilesetBackgroundColor);
+    connect(Preferences::instance(), &Preferences::tilesetBackgroundColorChanged, this, &BuildingTilesetDock::tilesetBackgroundColorChanged);
+#endif
+
     ui->toolBarLayout->insertWidget(0, toolBar, 1);
 
     ui->tiles->setSelectionMode(QAbstractItemView::ExtendedSelection);
@@ -190,6 +199,13 @@ void BuildingTilesetDock::filterEdited(const QString &text)
     if (current != nullptr)
         listWidget->scrollToItem(current);
 }
+
+#ifdef BUILDINGED_SA
+void BuildingTilesetDock::tilesetBackgroundColorChanged(const QColor &color)
+{
+    ui->tilesets->setStyleSheet(QStringLiteral("QTableView { alternate-background-color: %1; background-color: %1; }").arg(color.name()));
+}
+#endif
 
 void BuildingTilesetDock::setTilesetList()
 {

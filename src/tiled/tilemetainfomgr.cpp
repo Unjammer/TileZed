@@ -491,6 +491,7 @@ bool TileMetaInfoMgr::upgradeTxt()
 bool TileMetaInfoMgr::mergeTxt()
 {
 #ifdef WORLDED
+    // There isn't a source Tilesets.txt in WorldEd.
     return true;
 #endif
     QString userPath = txtPath();

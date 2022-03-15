@@ -18,6 +18,9 @@
 #ifndef BUILDINGTILESETDOCK_H
 #define BUILDINGTILESETDOCK_H
 
+#ifdef BUILDINGED_SA
+#include "colorbutton.h"
+#endif
 #include "mixedtilesetview.h"
 
 #include <QDockWidget>
@@ -88,6 +91,11 @@ private slots:
     void buildingTilePicked(const QString &tileName);
 
     void filterEdited(const QString &text);
+
+#ifdef BUILDINGED_SA
+    void tilesetBackgroundColorChanged(const QColor& color);
+#endif
+
 private:
     Ui::BuildingTilesetDock *ui;
     BuildingDocument *mDocument;
@@ -96,6 +104,9 @@ private:
     QIcon mIconTileLayer;
     QIcon mIconTileLayerStop;
     QAction *mActionSwitchLayer;
+#ifdef BUILDINGED_SA
+    Tiled::Internal::ColorButton *mBackgroundColorButton;
+#endif
 };
 
 } // namespace BuildingEditor
