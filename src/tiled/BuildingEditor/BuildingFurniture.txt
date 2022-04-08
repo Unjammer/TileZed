@@ -1,5 +1,5 @@
 version = 0
-revision = 20
+revision = 21
 group
 {
     label = Advertising
@@ -2941,6 +2941,7 @@ group
     label = Floors - Rugs
     furniture
     {
+        layer = FloorFurniture
         entry
         {
             orient = W
@@ -2964,6 +2965,7 @@ group
     }
     furniture
     {
+        layer = FloorFurniture
         entry
         {
             orient = W
@@ -2987,6 +2989,7 @@ group
     }
     furniture
     {
+        layer = FloorFurniture
         entry
         {
             orient = W
@@ -3010,6 +3013,7 @@ group
     }
     furniture
     {
+        layer = FloorFurniture
         entry
         {
             orient = W
@@ -3033,6 +3037,7 @@ group
     }
     furniture
     {
+        layer = FloorFurniture
         entry
         {
             orient = W
@@ -3056,6 +3061,7 @@ group
     }
     furniture
     {
+        layer = FloorFurniture
         entry
         {
             orient = W
@@ -3079,6 +3085,7 @@ group
     }
     furniture
     {
+        layer = FloorFurniture
         entry
         {
             orient = W
@@ -3092,6 +3099,7 @@ group
     }
     furniture
     {
+        layer = FloorFurniture
         entry
         {
             orient = N
@@ -3105,6 +3113,7 @@ group
     }
     furniture
     {
+        layer = FloorFurniture
         entry
         {
             orient = W
@@ -3118,6 +3127,7 @@ group
     }
     furniture
     {
+        layer = FloorFurniture
         entry
         {
             orient = N
@@ -3131,6 +3141,7 @@ group
     }
     furniture
     {
+        layer = FloorFurniture
         entry
         {
             orient = W
@@ -3146,6 +3157,7 @@ group
     }
     furniture
     {
+        layer = FloorFurniture
         entry
         {
             orient = W
@@ -3161,6 +3173,7 @@ group
     }
     furniture
     {
+        layer = FloorFurniture
         entry
         {
             orient = W
@@ -3176,6 +3189,7 @@ group
     }
     furniture
     {
+        layer = FloorFurniture
         entry
         {
             orient = W

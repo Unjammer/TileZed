@@ -799,6 +799,7 @@ void FurnitureTiles::initNames()
     mLayerNames += QLatin1String("Frames");
     mLayerNames += QLatin1String("Doors");
     mLayerNames += QLatin1String("Roof");
+    mLayerNames += QLatin1String("FloorFurniture");
 
     Q_ASSERT(mLayerNames.size() == LayerCount);
 }
