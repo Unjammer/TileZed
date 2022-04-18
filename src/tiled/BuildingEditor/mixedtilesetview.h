@@ -46,7 +46,9 @@ public:
 
     enum {
         HeaderRole = Qt::UserRole,
-        CategoryBgRole
+        CategoryBgRole,
+        ItemHeightRole,
+        SurfaceRole,
     };
     QVariant data(const QModelIndex &index,
                   int role = Qt::DisplayRole) const;
@@ -114,20 +116,26 @@ private:
     public:
         Item() :
             mTile(nullptr),
-            mUserData(nullptr)
+            mUserData(nullptr),
+            mItemHeightProperty(-1),
+            mSurfaceProperty(-1)
         {
         }
 
         Item(Tiled::Tile *tile, void *userData = nullptr) :
             mTile(tile),
-            mUserData(userData)
+            mUserData(userData),
+            mItemHeightProperty(-1),
+            mSurfaceProperty(-1)
         {
 
         }
         Item(const QString &tilesetName) :
             mTile(nullptr),
             mUserData(nullptr),
-            mTilesetName(tilesetName)
+            mTilesetName(tilesetName),
+            mItemHeightProperty(-1),
+            mSurfaceProperty(-1)
         {
 
         }
@@ -141,6 +149,8 @@ private:
         QBrush mBackground;
         QRect mCategoryBounds;
         QColor mCategoryColor;
+        int mItemHeightProperty;
+        int mSurfaceProperty;
     };
 
     Item *toItem(const QModelIndex &index) const;

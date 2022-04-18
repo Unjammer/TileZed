@@ -1387,6 +1387,17 @@ void TileDefDialog::setToolTipEtc(int tileID)
     }
     m->setData(m->index((void*)defTile), QBrush(color), MixedTilesetModel::CategoryBgRole);
 
+    auto pSurface = properties.find(QStringLiteral("Surface"));
+    int Surface = 0;
+    if ((pSurface != properties.end()) && (pSurface.value().toInt() > 0)) {
+        Surface = pSurface.value().toInt();
+        m->setData(m->index((void*)defTile), Surface, MixedTilesetModel::SurfaceRole);
+    }
+    auto ItemHeight = properties.find(QStringLiteral("ItemHeight"));
+    if ((ItemHeight != properties.end()) && (ItemHeight.value().toInt() > 0)) {
+        m->setData(m->index((void*)defTile), Surface + ItemHeight.value().toInt(), MixedTilesetModel::ItemHeightRole);
+    }
+
     if (tooltip.size())
         tooltip += QLatin1String("");
     tooltip += QString::fromLatin1("gid %1").arg(defTile->tileset()->mID * 1000 + defTile->id());
