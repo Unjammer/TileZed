@@ -228,6 +228,7 @@ property
         IsoClothingDryer = IsoClothingDryer
         IsoClothingWasher = IsoClothingWasher
         IsoCombinationWasherDryer = IsoCombinationWasherDryer
+        IsoCompost = IsoCompost
         IsoFireplace = IsoFireplace
         IsoMannequin = IsoMannequin
         IsoRadio = IsoRadio
@@ -320,6 +321,7 @@ property
         Fridge = Fridge
         Glass = Glass
         Leather = Leather
+        Log = Log
         Mechanical = Mechanical
         MetalBars = MetalBars
         MetalPipe = MetalPipe
@@ -365,6 +367,7 @@ property
         Fridge = Fridge
         Glass = Glass
         Leather = Leather
+        Log = Log
         Mechanical = Mechanical
         MetalBars = MetalBars
         MetalPipe = MetalPipe
@@ -1086,6 +1089,20 @@ property
     }
     Default = None
     ValueAsPropertyName = true
+}
+property
+{
+    Type = String
+    Name = CornerWestWall
+    ShortName =
+    Default = 
+}
+property
+{
+    Type = String
+    Name = CornerNorthWall
+    ShortName =
+    Default = 
 }
 property
 {
