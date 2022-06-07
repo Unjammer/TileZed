@@ -667,6 +667,8 @@ void TileDefDialog::fileOpen()
     initStringComboBoxValues();
     updateTilesetListLater();
     updateUI();
+
+    checkProperties();
 }
 
 bool TileDefDialog::fileSave()
@@ -1708,14 +1710,14 @@ void TileDefDialog::tilesDirChanged()
     mTilesetByName.clear();
 
     QDir dir(tilesDir());
-    QDir dir2x(tilesDir() + QLatin1Literal("/2x"));
+    QDir dir2x(tilesDir() + QLatin1String("/2x"));
 
     QList<ResizedTileset> resized;
 
-    foreach (TileDefTileset *tsDef, mTileDefFile->tilesets()) {
+    for (TileDefTileset *tsDef : mTileDefFile->tilesets()) {
         QString imageSource = dir.filePath(tsDef->mImageSource);
         QString imageSource2x = dir2x.filePath(tsDef->mImageSource);
-        if (QFileInfo(imageSource2x).exists()) {
+        if (QFileInfo::exists(imageSource2x)) {
             imageSource2x = QFileInfo(imageSource2x).canonicalFilePath();
             QImageReader ir(imageSource2x);
             if (ir.size().isValid()) {
@@ -1728,10 +1730,10 @@ void TileDefDialog::tilesDirChanged()
                     tsDef->resize(columns, rows);
                 }
             }
-            if (QFileInfo(imageSource).exists()) {
+            if (QFileInfo::exists(imageSource)) {
                imageSource = QFileInfo(imageSource).canonicalFilePath();
             }
-        } else if (QFileInfo(imageSource).exists()) {
+        } else if (QFileInfo::exists(imageSource)) {
             imageSource = QFileInfo(imageSource).canonicalFilePath();
             QImageReader ir(imageSource);
             if (ir.size().isValid()) {
@@ -1748,7 +1750,7 @@ void TileDefDialog::tilesDirChanged()
 
         // Try to reuse a tileset from our list of removed tilesets.
         bool reused = false;
-        foreach (Tileset *ts, mRemovedTilesets) {
+        for (Tileset *ts : qAsConst(mRemovedTilesets)) {
             if ((ts->imageSource() == imageSource) || (!imageSource2x.isEmpty() && (imageSource2x == ts->imageSource2x()))) {
                 mTilesets += ts;
                 mTilesetByName[ts->name()] = ts;
@@ -1776,7 +1778,7 @@ void TileDefDialog::tilesDirChanged()
 
     if (resized.size()) {
         QStringList sl;
-        foreach (ResizedTileset rt, resized) {
+        for (const ResizedTileset& rt : qAsConst(resized)) {
             bool smaller = rt.oldSize.width() > rt.newSize.width() ||
                     rt.oldSize.height() > rt.newSize.height();
             sl += QString::fromLatin1("%1 - was %2x%3, now %4x%5 - %6")
@@ -1790,6 +1792,35 @@ void TileDefDialog::tilesDirChanged()
         dialog.setWindowTitle(tr("Tileset Images Changed Size"));
         dialog.exec();
     }
+}
+
+void TileDefDialog::checkProperties()
+{
+    QStringList warnings;
+    for (TileDefTileset *tsDef : mTileDefFile->tilesets()) {
+        for (TileDefTile *tdt : qAsConst(tsDef->mTiles)) {
+            for (auto it = tdt->mProperties.cbegin(); it != tdt->mProperties.cend(); it++) {
+                QString propName = it.key();
+                QString propValue = it.value();
+                if (TileDefProperty *prop = mTileDefProperties->property(propName)) {
+                    if (EnumTileDefProperty *enumProp = prop->asEnum()) {
+                        if (enumProp->mValueAsPropertyName == false && enumProp->mShortEnums.contains(propValue) == false) {
+                            warnings += QStringLiteral("%1_%2 has undefined enum value %3=%4").arg(tdt->tileset()->mName).arg(tdt->id()).arg(propName).arg(propValue);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (warnings.isEmpty()) {
+        return;
+    }
+    QString prompt = tr("Some issues were found in the .tiles file.\nYou may need to update your TileProperties.txt file.\nOriginal: %1\nYours: %2")
+            .arg(QDir::toNativeSeparators(Preferences::instance()->appConfigPath(TilePropertyMgr::instance()->txtName())))
+            .arg(QDir::toNativeSeparators(TilePropertyMgr::instance()->txtPath()));
+    BuildingEditor::ListOfStringsDialog dialog(prompt, warnings, this);
+    dialog.setWindowTitle(tr("Tileset Property Issues"));
+    dialog.exec();
 }
 
 QString TileDefDialog::tilesDir()

@@ -174,6 +174,7 @@ private:
     bool loadTilesetImage(Tileset *ts, const QString &source);
 #endif
     void tilesDirChanged();
+    void checkProperties();
 
     QString tilesDir();
 #ifdef TDEF_TILES_DIR
