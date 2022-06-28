@@ -28,6 +28,10 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 }
 contains(QT_CONFIG, opengl): QT += opengl
 
+greaterThan(QT_MAJOR_VERSION, 5) {
+    QT += openglwidgets
+}
+
 DEFINES += QT_NO_CAST_FROM_ASCII \
     QT_NO_CAST_TO_ASCII
 DEFINES += ZOMBOID

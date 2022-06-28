@@ -56,9 +56,9 @@ public:
 protected slots:
     void onActiveStateChanged(bool active);
 
-    virtual void documentAdded(BuildingDocument *doc);
-    void currentDocumentChanged(BuildingDocument *doc);
-    void documentAboutToClose(int index, BuildingDocument *doc);
+    virtual void documentAdded(BuildingEditor::BuildingDocument *doc);
+    void currentDocumentChanged(BuildingEditor::BuildingDocument *doc);
+    void documentAboutToClose(int index, BuildingEditor::BuildingDocument *doc);
 
     void currentDocumentTabChanged(int index);
     void documentTabCloseRequested(int index);

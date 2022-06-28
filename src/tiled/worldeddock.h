@@ -150,7 +150,7 @@ private slots:
 
     void selectedLotsChanged();
 
-    void documentAboutToClose(int index, MapDocument *mapDocument);
+    void documentAboutToClose(int index, Tiled::Internal::MapDocument *mapDocument);
 
 private:
     MapDocument *mDocument;

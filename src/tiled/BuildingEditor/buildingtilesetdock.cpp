@@ -104,10 +104,10 @@ BuildingTilesetDock::BuildingTilesetDock(QWidget *parent) :
     connect(TileMetaInfoMgr::instance(), SIGNAL(tilesetAboutToBeRemoved(Tiled::Tileset*)),
             SLOT(tilesetAboutToBeRemoved(Tiled::Tileset*)));
 
-    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tileset*)),
-            SLOT(tilesetChanged(Tileset*)));
-    connect(TilesetManager::instance(), SIGNAL(tileLayerNameChanged(Tile*)),
-            SLOT(tileLayerNameChanged(Tile*)));
+    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tiled::Tileset*)),
+            SLOT(tilesetChanged(Tiled::Tileset*)));
+    connect(TilesetManager::instance(), SIGNAL(tileLayerNameChanged(Tiled::Tile*)),
+            SLOT(tileLayerNameChanged(Tiled::Tile*)));
 
     connect(PickTileTool::instance(), SIGNAL(tilePicked(QString)),
             SLOT(buildingTilePicked(QString)));
@@ -219,7 +219,7 @@ void BuildingTilesetDock::setTilesetList()
         if (tileset->isMissing())
             item->setForeground(Qt::red);
         ui->tilesets->addItem(item);
-        width = qMax(width, fm.width(tileset->name()));
+        width = qMax(width, fm.horizontalAdvance(tileset->name()));
     }
     int sbw = ui->tilesets->verticalScrollBar()->sizeHint().width();
     ui->tilesets->setFixedWidth(width + 16 + sbw);
@@ -379,7 +379,8 @@ void BuildingTilesetView::contextMenuEvent(QContextMenuEvent *event)
     QStringList layerNames;
     if (tile) {
         // Get a list of layer names from the current map
-        QSet<QString> set = BuildingMap::layerNames(0).toSet();
+        QStringList layerNames0 = BuildingMap::layerNames(0);
+        QSet<QString> set(layerNames0.constBegin(), layerNames0.constEnd());
 
         // Get a list of layer names for the current tileset
         for (int i = 0; i < tile->tileset()->tileCount(); i++) {
@@ -388,7 +389,7 @@ void BuildingTilesetView::contextMenuEvent(QContextMenuEvent *event)
             if (!layerName.isEmpty())
                 set.insert(layerName);
         }
-        layerNames = QStringList::fromSet(set);
+        layerNames = QStringList(set.constBegin(), set.constEnd());
         layerNames.sort();
 
         QMenu *layersMenu = menu.addMenu(QLatin1String("Default Layer"));

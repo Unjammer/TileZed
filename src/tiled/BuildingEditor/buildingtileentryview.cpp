@@ -32,8 +32,8 @@ BuildingTileEntryView::BuildingTileEntryView(QWidget *parent) :
     MixedTilesetView(parent),
     mCategoryLabels(false)
 {
-    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tileset*)),
-            SLOT(tilesetChanged(Tileset*)));
+    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tiled::Tileset*)),
+            SLOT(tilesetChanged(Tiled::Tileset*)));
 
     connect(TileMetaInfoMgr::instance(), SIGNAL(tilesetAdded(Tiled::Tileset*)),
             SLOT(tilesetAdded(Tiled::Tileset*)));

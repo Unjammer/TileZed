@@ -1070,7 +1070,7 @@ MapImageData MapImageRenderWorker::generateMapImage(MapComposite *mapComposite)
     QPainter painter(&image);
 
     painter.setRenderHints(QPainter::SmoothPixmapTransform |
-                           QPainter::HighQualityAntialiasing);
+                           QPainter::Antialiasing);
     painter.setTransform(QTransform::fromScale(scale, scale).translate(-sceneRect.left(), -sceneRect.top()));
 
     foreach (MapComposite::ZOrderItem zo, mapComposite->zOrder()) {

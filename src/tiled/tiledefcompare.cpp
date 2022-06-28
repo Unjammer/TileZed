@@ -137,7 +137,7 @@ void TileDefCompare::compare()
 
     ui->textBrowser->insertHtml(QLatin1String("<br><b>Properties differences:</b><br>"));
     QSet<QString> shared = in1 & in2;
-    QStringList sorted3 = shared.toList();
+    QStringList sorted3(shared.begin(), shared.end());
     sorted3.sort();
     foreach (QString tsName, sorted3) {
         TileDefTileset *ts1 = mPackFile1.tileset(tsName);

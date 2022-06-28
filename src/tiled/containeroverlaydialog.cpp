@@ -409,8 +409,8 @@ AbstractOverlayDialog::AbstractOverlayDialog(QWidget *parent) :
     connect(TileMetaInfoMgr::instance(), SIGNAL(tilesetRemoved(Tiled::Tileset*)),
             SLOT(tilesetRemoved(Tiled::Tileset*)));
 
-    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tileset*)),
-            SLOT(tilesetChanged(Tileset*)));
+    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tiled::Tileset*)),
+            SLOT(tilesetChanged(Tiled::Tileset*)));
 
     ui->tilesetTilesView->setZoomable(mZoomable);
     ui->tilesetTilesView->setSelectionMode(QAbstractItemView::ExtendedSelection);
@@ -562,7 +562,7 @@ void AbstractOverlayDialog::setTilesetList()
         if (tileset->isMissing())
             item->setForeground(Qt::red);
         ui->tilesetList->addItem(item);
-        width = qMax(width, fm.width(tileset->name()));
+        width = qMax(width, fm.horizontalAdvance(tileset->name()));
     }
     int sbw = ui->tilesetList->verticalScrollBar()->sizeHint().width();
     ui->tilesetList->setFixedWidth(width + 16 + sbw);
@@ -912,7 +912,7 @@ void AbstractOverlayDialog::tileDropped(AbstractOverlay *overlay, const QStringL
             continue;
         }
         if (isEmptySprite(tileName)) {
-            tileName = QLatin1Literal("none");
+            tileName = QLatin1String("none");
         }
         mUndoStack->push(new SetBaseTile(this, overlay, tileName));
         break; // <---------
@@ -925,7 +925,7 @@ void AbstractOverlayDialog::tileDropped(AbstractOverlayEntry *entry, int index, 
         if (ui->overlayView->model()->moreThan2Tiles()) {
             for (QString tileName : tileNames) {
                 if (isEmptySprite(tileName)) {
-                    tileName = QLatin1Literal("none");
+                    tileName = QLatin1String("none");
                 }
                 mUndoStack->push(new AddEntryTile(this, entry, tileName));
             }
@@ -934,7 +934,7 @@ void AbstractOverlayDialog::tileDropped(AbstractOverlayEntry *entry, int index, 
     }
     QString tileName = tileNames[0];
     if (isEmptySprite(tileName)) {
-        tileName = QLatin1Literal("none");
+        tileName = QLatin1String("none");
     }
     mUndoStack->push(new SetEntryTile(this, entry, index, tileName));
 }

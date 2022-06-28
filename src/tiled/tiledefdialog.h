@@ -111,7 +111,7 @@ private slots:
     void tileEntered(const QModelIndex &index);
     void tileLeft(const QModelIndex &index);
 
-    void tilesetChanged(Tileset *tileset);
+    void tilesetChanged(Tiled::Tileset *tileset);
 
     void tilesetFilterEdited(const QString &text);
     void propertyFilterEdited(const QString &text);

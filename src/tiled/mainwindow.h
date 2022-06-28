@@ -102,7 +102,7 @@ public:
     static MainWindow *instance() { return mInstance; }
 #endif
 
-    MainWindow(QWidget *parent = 0, Qt::WindowFlags flags = 0);
+    MainWindow(QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags());
     ~MainWindow();
 
     void commitData(QSessionManager &manager);
@@ -211,17 +211,17 @@ public slots:
     void rotateStampLeft();
     void rotateStampRight();
 
-    void setStampBrush(const TileLayer *tiles);
+    void setStampBrush(const Tiled::TileLayer *tiles);
     void updateStatusInfoLabel(const QString &statusInfo);
 
-    void mapDocumentChanged(MapDocument *mapDocument);
+    void mapDocumentChanged(Tiled::Internal::MapDocument *mapDocument);
     void closeMapDocument(int index);
 
     void autoMappingError();
     void autoMappingWarning();
 
 #ifdef ZOMBOID
-    void tilePicked(Tile *tile);
+    void tilePicked(Tiled::Tile *tile);
 
     void showBuildingEditor();
     void checkBuildings();

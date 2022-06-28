@@ -278,12 +278,12 @@ BuildingEditorWindow::BuildingEditorWindow(QWidget *parent) :
 
     BuildingPreferences *prefs = BuildingPreferences::instance();
 
-    connect(docman(), SIGNAL(documentAdded(BuildingDocument*)),
-            SLOT(documentAdded(BuildingDocument*)));
-    connect(docman(), SIGNAL(documentAboutToClose(int,BuildingDocument*)),
-            SLOT(documentAboutToClose(int,BuildingDocument*)));
-    connect(docman(), SIGNAL(currentDocumentChanged(BuildingDocument*)),
-            SLOT(currentDocumentChanged(BuildingDocument*)));
+    connect(docman(), SIGNAL(documentAdded(BuildingEditor::BuildingDocument*)),
+            SLOT(documentAdded(BuildingEditor::BuildingDocument*)));
+    connect(docman(), SIGNAL(documentAboutToClose(int,BuildingEditor::BuildingDocument*)),
+            SLOT(documentAboutToClose(int,BuildingEditor::BuildingDocument*)));
+    connect(docman(), SIGNAL(currentDocumentChanged(BuildingEditor::BuildingDocument*)),
+            SLOT(currentDocumentChanged(BuildingEditor::BuildingDocument*)));
 
     PencilTool::instance()->setAction(ui->actionPecil);
     SelectMoveRoomsTool::instance()->setAction(ui->actionSelectRooms);
@@ -607,8 +607,8 @@ bool BuildingEditorWindow::Startup()
     connect(BuildingTilesMgr::instance(), SIGNAL(tilesetRemoved(Tiled::Tileset*)),
             SLOT(tilesetRemoved(Tiled::Tileset*)));
 
-    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tileset*)),
-            SLOT(tilesetChanged(Tileset*)));
+    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tiled::Tileset*)),
+            SLOT(tilesetChanged(Tiled::Tileset*)));
 
     return true;
 }
@@ -1268,7 +1268,7 @@ void BuildingEditorWindow::exportNewBinary()
         return;
     QFileInfo fileInfo(mCurrentDocument->fileName());
     QString dir = fileInfo.dir().path();
-    QString fileName = fileInfo.dir().filePath(fileInfo.baseName() + QLatin1Literal(".pzby"));
+    QString fileName = fileInfo.dir().filePath(fileInfo.baseName() + QLatin1String(".pzby"));
     fileName = QFileDialog::getSaveFileName(this, tr("Export New Binary"), fileName, tr("Project Zomboid Map Binary (*.pzby)"));
     if (fileName.isEmpty())
         return;
@@ -1427,7 +1427,7 @@ void BuildingEditorWindow::selectAll()
                     new ChangeRoomSelection(mCurrentDocument, currentFloor()->bounds()));
         return;
     }
-    QSet<BuildingObject*> objects = currentFloor()->objects().toSet();
+    QSet<BuildingObject*> objects(currentFloor()->objects().begin(), currentFloor()->objects().end());
     mCurrentDocument->setSelectedObjects(objects);
 }
 

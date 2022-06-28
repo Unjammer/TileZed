@@ -40,8 +40,8 @@ AbstractTool::AbstractTool(const QString &name, const QIcon &icon,
     , mMapDocument(0)
 {
     MapDocumentActionHandler *handler = MapDocumentActionHandler::instance();
-    connect(handler, SIGNAL(mapDocumentChanged(MapDocument*)),
-            SLOT(setMapDocument(MapDocument*)));
+    connect(handler, SIGNAL(mapDocumentChanged(Tiled::Internal::MapDocument*)),
+            SLOT(setMapDocument(Tiled::Internal::MapDocument*)));
 }
 
 /**

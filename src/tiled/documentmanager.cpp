@@ -74,8 +74,8 @@ DocumentManager::DocumentManager(QObject *parent)
 
     ToolManager *toolManager = ToolManager::instance();
     setSelectedTool(toolManager->selectedTool());
-    connect(toolManager, SIGNAL(selectedToolChanged(AbstractTool*)),
-            SLOT(setSelectedTool(AbstractTool*)));
+    connect(toolManager, SIGNAL(selectedToolChanged(Tiled::Internal::AbstractTool*)),
+            SLOT(setSelectedTool(Tiled::Internal::AbstractTool*)));
 }
 
 DocumentManager::~DocumentManager()

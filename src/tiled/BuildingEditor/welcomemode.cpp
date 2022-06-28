@@ -31,7 +31,6 @@
 
 #include <QCompleter>
 #include <QDebug>
-#include <QDirModel>
 #include <QFileDialog>
 #include <QFileSystemModel>
 #include <QGraphicsScene>
@@ -214,7 +213,8 @@ WelcomeMode::WelcomeMode(QObject *parent) :
     }
 
     {
-        QDirModel *model = new QDirModel(this);
+        QFileSystemModel *model = new QFileSystemModel(this);
+        model->setRootPath(QDir::rootPath());
         model->setFilter(QDir::AllDirs | QDir::Dirs | QDir::Drives | QDir::NoDotAndDotDot);
         QCompleter *completer = new QCompleter(model, this);
         ui->dirEdit->setCompleter(completer);

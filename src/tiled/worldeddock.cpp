@@ -318,8 +318,8 @@ WorldEdDock::WorldEdDock(QWidget *parent) :
     connect(WorldEd::WorldEdMgr::instance(), SIGNAL(selectedLotsChanged()),
             SLOT(selectedLotsChanged()));
 
-    connect(DocumentManager::instance(), SIGNAL(documentAboutToClose(int,MapDocument*)),
-            SLOT(documentAboutToClose(int,MapDocument*)));
+    connect(DocumentManager::instance(), SIGNAL(documentAboutToClose(int,Tiled::Internal::MapDocument*)),
+            SLOT(documentAboutToClose(int,Tiled::Internal::MapDocument*)));
 }
 
 WorldEdDock::~WorldEdDock()

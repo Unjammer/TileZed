@@ -34,6 +34,7 @@
 #include <QDesktopServices>
 #include <QFileInfo>
 #include <QSettings>
+#include <QStandardPaths>
 
 using namespace Tiled;
 using namespace Tiled::Internal;

@@ -77,7 +77,7 @@ QString writableImageFormatsFilter()
 QList<QRegion> coherentRegions(const QRegion &region)
 {
     QList<QRegion> result;
-    QVector<QRect> rects = region.rects();
+    QVector<QRect> rects(region.begin(), region.end());
 
     while (!rects.isEmpty()) {
         QRegion newCoherentRegion = rects.last();

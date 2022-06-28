@@ -106,7 +106,7 @@ private:
     MapDocument *mMapDocument;
 
 private slots:
-    void tileLayerNameChanged(Tile *tile);
+    void tileLayerNameChanged(Tiled::Tile *tile);
 #endif
 
 private:

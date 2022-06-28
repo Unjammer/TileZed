@@ -202,10 +202,10 @@ signals:
     /**
      * Emitted when a tileset's images have changed and views need updating.
      */
-    void tilesetChanged(Tileset *tileset);
+    void tilesetChanged(Tiled::Tileset *tileset);
 
 #ifdef ZOMBOID
-    void tileLayerNameChanged(Tile *tile);
+    void tileLayerNameChanged(Tiled::Tile *tile);
 #endif
 
 private slots:

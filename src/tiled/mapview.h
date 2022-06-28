@@ -81,7 +81,7 @@ private slots:
     void adjustScale(qreal scale);
     void setUseOpenGL(bool useOpenGL);
 #ifdef ZOMBOID
-    void currentDocumentChanged(MapDocument *doc);
+    void currentDocumentChanged(Tiled::Internal::MapDocument *doc);
 #endif
 
 private:

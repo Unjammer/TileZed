@@ -67,7 +67,7 @@ private slots:
     void blendEdgesEverywhere(bool everywhere);
     void setVisibleNow();
 
-    void blendHighlighted(BmpBlend *blend, int dir);
+    void blendHighlighted(Tiled::BmpBlend *blend, int dir);
     void synchBlendTilesView();
 
     void expandCollapse();
@@ -90,7 +90,7 @@ private slots:
 
     void brushChanged();
 
-    void documentAboutToClose(int index, MapDocument *doc);
+    void documentAboutToClose(int index, Tiled::Internal::MapDocument *doc);
 
     void warningsChanged();
 

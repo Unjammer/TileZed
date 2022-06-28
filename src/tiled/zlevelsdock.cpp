@@ -54,7 +54,7 @@ ZLevelsDock::ZLevelsDock(QWidget *parent) :
 
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
-    layout->setMargin(5);
+    layout->setContentsMargins(5, 5, 5, 5);
 
     QHBoxLayout *opacityLayout = new QHBoxLayout;
     mOpacitySlider->setRange(0, 100);
@@ -127,8 +127,8 @@ ZLevelsDock::ZLevelsDock(QWidget *parent) :
     connect(this, SIGNAL(visibilityChanged(bool)),
             mView, SLOT(setVisible(bool)));
 
-    connect(DocumentManager::instance(), SIGNAL(documentAboutToClose(int,MapDocument*)),
-            SLOT(documentAboutToClose(int,MapDocument*)));
+    connect(DocumentManager::instance(), SIGNAL(documentAboutToClose(int,Tiled::Internal::MapDocument*)),
+            SLOT(documentAboutToClose(int,Tiled::Internal::MapDocument*)));
 
     updateActions();
 }

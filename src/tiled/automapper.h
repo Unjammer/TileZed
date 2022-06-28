@@ -23,6 +23,7 @@
 
 #include <QMap>
 #include <QList>
+#include <QObject>
 
 #include <QRegion>
 

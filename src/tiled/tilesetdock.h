@@ -79,12 +79,12 @@ signals:
     /**
      * Emitted when the current tile changed.
      */
-    void currentTileChanged(Tile *tile);
+    void currentTileChanged(Tiled::Tile *tile);
 
     /**
      * Emitted when the currently selected tiles changed.
      */
-    void currentTilesChanged(const TileLayer *tiles);
+    void currentTilesChanged(const Tiled::TileLayer *tiles);
 
     /**
      * Emitted when files are dropped at the tileset dock.
@@ -98,13 +98,13 @@ protected:
     void dropEvent(QDropEvent *);
 
 private slots:
-    void insertTilesetView(int index, Tileset *tileset);
+    void insertTilesetView(int index, Tiled::Tileset *tileset);
     void updateActions();
     void updateCurrentTiles();
-    void tilesetChanged(Tileset *tileset);
-    void tilesetRemoved(Tileset *tileset);
+    void tilesetChanged(Tiled::Tileset *tileset);
+    void tilesetRemoved(Tiled::Tileset *tileset);
     void tilesetMoved(int from, int to);
-    void tilesetNameChanged(Tileset *tileset);
+    void tilesetNameChanged(Tiled::Tileset *tileset);
 
     void removeTileset();
     void removeTileset(int index);
@@ -160,7 +160,7 @@ private:
 
 #include <QDockWidget>
 #include <QLineEdit>
-#include <QMap>
+#include <QMultiMap>
 #include <QIcon>
 
 class QAction;
@@ -210,18 +210,18 @@ public:
     Tile *currentTile() const { return mCurrentTile; }
 
 public slots:
-    void tilePicked(Tile *tile);
+    void tilePicked(Tiled::Tile *tile);
 
 signals:
     /**
      * Emitted when the current tile changed.
      */
-    void currentTileChanged(Tile *tile);
+    void currentTileChanged(Tiled::Tile *tile);
 
     /**
      * Emitted when the currently selected tiles changed.
      */
-    void currentTilesChanged(const TileLayer *tiles);
+    void currentTilesChanged(const Tiled::TileLayer *tiles);
 
     /**
      * Emitted when files are dropped at the tileset dock.
@@ -238,13 +238,13 @@ private slots:
     void currentTilesetChanged(int row);
     void tilesetItemChanged(QListWidgetItem *item);
 
-    void tilesetAdded(int index, Tileset *tileset);
+    void tilesetAdded(int index, Tiled::Tileset *tileset);
     void updateActions();
     void updateCurrentTiles();
-    void tilesetChanged(Tileset *tileset);
-    void tilesetRemoved(Tileset *tileset);
+    void tilesetChanged(Tiled::Tileset *tileset);
+    void tilesetRemoved(Tiled::Tileset *tileset);
     void tilesetMoved(int from, int to);
-    void tilesetNameChanged(Tileset *tileset);
+    void tilesetNameChanged(Tiled::Tileset *tileset);
 
     void removeTileset();
     void removeTileset(int index);
@@ -256,7 +256,7 @@ private slots:
 
     void renameTileset();
 
-    void documentAboutToClose(int index, MapDocument *mapDocument);
+    void documentAboutToClose(int index, Tiled::Internal::MapDocument *mapDocument);
 
     void moveTilesetUp();
     void moveTilesetDown();
@@ -265,7 +265,7 @@ private slots:
 
     void layerSwitchToggled();
     void autoSwitchLayerChanged(bool enable);
-    void switchLayerForTile(Tile *tile);
+    void switchLayerForTile(Tiled::Tile *tile);
 
     void filterEdited(const QString& text);
 
@@ -282,7 +282,7 @@ private:
 
     MapDocument *mMapDocument;
     QList<Tileset*> mTilesets;
-    QMap<QString,Tileset*> mTilesetByName;
+    QMultiMap<QString,Tileset*> mTilesetByName;
     QToolBar *mToolBar;
     Tileset *mCurrentTileset;
     Tile *mCurrentTile;

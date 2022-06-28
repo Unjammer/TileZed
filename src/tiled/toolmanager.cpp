@@ -130,7 +130,7 @@ void ToolManager::registerTool(AbstractTool *tool)
 #ifdef ZOMBOID
 void ToolManager::removeTool(AbstractTool *tool)
 {
-
+    Q_UNUSED(tool)
 }
 #endif
 

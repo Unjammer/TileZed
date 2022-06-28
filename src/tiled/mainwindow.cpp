@@ -137,7 +137,7 @@
 #include <QUndoStack>
 #include <QUndoView>
 #include <QImageReader>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QSignalMapper>
 #include <QShortcut>
 #include <QToolButton>
@@ -498,17 +498,17 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     CreateObjectTool *polylineObjectsTool = new CreateObjectTool(
             CreateObjectTool::CreatePolyline, this);
 
-    connect(mTilesetDock, SIGNAL(currentTilesChanged(const TileLayer*)),
-            this, SLOT(setStampBrush(const TileLayer*)));
-    connect(mStampBrush, SIGNAL(currentTilesChanged(const TileLayer*)),
-            this, SLOT(setStampBrush(const TileLayer*)));
-    connect(mTilesetDock, SIGNAL(currentTileChanged(Tile*)),
-            tileObjectsTool, SLOT(setTile(Tile*)));
+    connect(mTilesetDock, SIGNAL(currentTilesChanged(const Tiled::TileLayer*)),
+            this, SLOT(setStampBrush(const Tiled::TileLayer*)));
+    connect(mStampBrush, SIGNAL(currentTilesChanged(const Tiled::TileLayer*)),
+            this, SLOT(setStampBrush(const Tiled::TileLayer*)));
+    connect(mTilesetDock, SIGNAL(currentTileChanged(Tiled::Tile*)),
+            tileObjectsTool, SLOT(setTile(Tiled::Tile*)));
 #ifdef ZOMBOID
-    connect(mStampBrush, SIGNAL(tilePicked(Tile*)),
-            SLOT(tilePicked(Tile*)));
-    connect(mTileLayersPanel, SIGNAL(tilePicked(Tile*)),
-            SLOT(tilePicked(Tile*)));
+    connect(mStampBrush, SIGNAL(tilePicked(Tiled::Tile*)),
+            SLOT(tilePicked(Tiled::Tile*)));
+    connect(mTileLayersPanel, SIGNAL(tilePicked(Tiled::Tile*)),
+            SLOT(tilePicked(Tiled::Tile*)));
 #endif
 
     connect(mRandomButton, SIGNAL(toggled(bool)),
@@ -566,8 +566,8 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     connect(brushSizePlus, SIGNAL(triggered()), SLOT(brushSizePlus()));
     addAction(brushSizePlus);
 
-    connect(PickTileTool::instancePtr(), SIGNAL(tilePicked(Tile*)),
-            SLOT(tilePicked(Tile*)));
+    connect(PickTileTool::instancePtr(), SIGNAL(tilePicked(Tiled::Tile*)),
+            SLOT(tilePicked(Tiled::Tile*)));
 #endif
 
     addToolBar(toolManager->toolBar());
@@ -614,8 +614,8 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
 
     connect(mClipboardManager, SIGNAL(hasMapChanged()), SLOT(updateActions()));
 
-    connect(mDocumentManager, SIGNAL(currentDocumentChanged(MapDocument*)),
-            SLOT(mapDocumentChanged(MapDocument*)));
+    connect(mDocumentManager, SIGNAL(currentDocumentChanged(Tiled::Internal::MapDocument*)),
+            SLOT(mapDocumentChanged(Tiled::Internal::MapDocument*)));
     connect(mDocumentManager, SIGNAL(documentCloseRequested(int)),
             this, SLOT(closeMapDocument(int)));
 
@@ -1222,9 +1222,9 @@ void MainWindow::exportAs()
     QFileInfo baseNameInfo = QFileInfo(mMapDocument->fileName());
     QString baseName = baseNameInfo.baseName();
 
-    QRegExp extensionFinder(QLatin1String("\\(\\*\\.([^\\)\\s]*)"));
-    extensionFinder.indexIn(selectedFilter);
-    const QString extension = extensionFinder.cap(1);
+    QRegularExpression extensionFinder(QLatin1String("\\(\\*\\.([^\\)\\s]*)"));
+    QRegularExpressionMatch extensionFinderMatch = extensionFinder.match(selectedFilter);
+    const QString extension = extensionFinderMatch.captured(1);
 
     Preferences *pref = Preferences::instance();
     QString lastExportedFilePath = pref->lastPath(Preferences::ExportedFile);
@@ -1300,7 +1300,7 @@ void MainWindow::exportNewBinary()
     QString filter = tr("Project Zomboid Map Binary (*.pzby)");
     QString selectedFilter;
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export As..."),
-                                                    QLatin1Literal("test.pzby"),
+                                                    QLatin1String("test.pzby"),
                                                     filter, &selectedFilter);
     if (fileName.isEmpty())
         return;
@@ -2065,7 +2065,7 @@ static QList<QRect> cleanupRegion(QRegion region)
 {
     // Clean up the region by merging vertically-adjacent rectangles of the
     // same width.
-    QVector<QRect> rects = region.rects();
+    QVector<QRect> rects(region.begin(), region.end());
     for (int i = 0; i < rects.size(); i++) {
         QRect r = rects[i];
         if (!r.isValid()) continue;
@@ -2827,7 +2827,7 @@ void MainWindow::resizeStatusInfoLabel()
     }
     QFontMetrics fm = mStatusInfoLabel->fontMetrics();
     QString coordString = QString(QLatin1String("%1,%2")).arg(width).arg(height);
-    mStatusInfoLabel->setMinimumWidth(fm.width(coordString) + 8);
+    mStatusInfoLabel->setMinimumWidth(fm.horizontalAdvance(coordString) + 8);
 }
 
 void MainWindow::aboutToShowLevelMenu()
@@ -3263,18 +3263,18 @@ void MainWindow::setupQuickStamps()
 
         // Set up shortcut for saving this quick stamp
         QShortcut *saveStamp = new QShortcut(this);
-        saveStamp->setKey(QKeySequence(Qt::CTRL + keys.value(i)));
+        saveStamp->setKey(QKeySequence(Qt::CTRL | keys.value(i)));
         connect(saveStamp, SIGNAL(activated()), saveMapper, SLOT(map()));
         saveMapper->setMapping(saveStamp, i);
     }
 
-    connect(selectMapper, SIGNAL(mapped(int)),
+    connect(selectMapper, SIGNAL(mappedInt(int)),
             quickStampManager, SLOT(selectQuickStamp(int)));
-    connect(saveMapper, SIGNAL(mapped(int)),
+    connect(saveMapper, SIGNAL(mappedInt(int)),
             quickStampManager, SLOT(saveQuickStamp(int)));
 
-    connect(quickStampManager, SIGNAL(setStampBrush(const TileLayer*)),
-            this, SLOT(setStampBrush(const TileLayer*)));
+    connect(quickStampManager, SIGNAL(setStampBrush(const Tiled::TileLayer*)),
+            this, SLOT(setStampBrush(const Tiled::TileLayer*)));
 }
 
 void MainWindow::closeMapDocument(int index)

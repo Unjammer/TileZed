@@ -71,7 +71,7 @@ private slots:
 
     void browse();
 
-    void tilesetChanged(Tileset *tileset);
+    void tilesetChanged(Tiled::Tileset *tileset);
 
     void updateUI();
 

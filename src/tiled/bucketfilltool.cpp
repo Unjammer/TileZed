@@ -259,7 +259,7 @@ void BucketFillTool::makeConnections()
 
     // Overlay may need to be cleared if a region changed
 #ifdef ZOMBOID
-    connect(mapDocument(), SIGNAL(regionChanged(QRegion,Layer*)),
+    connect(mapDocument(), SIGNAL(regionChanged(QRegion,Tiled::Layer*)),
             this, SLOT(clearOverlay()));
 #else
     connect(mapDocument(), SIGNAL(regionChanged(QRegion)),
@@ -281,7 +281,7 @@ void BucketFillTool::clearConnections(MapDocument *mapDocument)
         return;
 
 #ifdef ZOMBOID
-    disconnect(mapDocument, SIGNAL(regionChanged(QRegion,Layer*)),
+    disconnect(mapDocument, SIGNAL(regionChanged(QRegion,Tiled::Layer*)),
                this, SLOT(clearOverlay()));
 #else
     disconnect(mapDocument, SIGNAL(regionChanged(QRegion)),
@@ -323,7 +323,7 @@ TileLayer *BucketFillTool::getRandomTileLayer(const QRegion &region) const
     if (region.isEmpty() || mRandomList.empty())
         return result;
 
-    foreach (const QRect &rect, region.rects()) {
+    for (const QRect &rect : region) {
         for (int _x = rect.left(); _x <= rect.right(); ++_x) {
             for (int _y = rect.top(); _y <= rect.bottom(); ++_y) {
 

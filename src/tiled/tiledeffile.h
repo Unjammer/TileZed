@@ -25,6 +25,7 @@
 #include <QObject>
 #include <QPoint>
 #include <QStringList>
+#include <QVariant>
 #include <QVector>
 
 class SimpleFileBlock;
@@ -743,7 +744,7 @@ public:
             foreach (QString s, prop->knownPropertyNames())
                 ret.insert(s);
         }
-        return ret.toList();
+        return { ret.begin(), ret.end() };
     }
 
     void copy(const UIProperties &other)

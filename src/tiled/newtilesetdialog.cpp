@@ -122,7 +122,7 @@ void NewTilesetDialog::tryAccept()
     const QPoint offset = QPoint(mUi->offsetX->value(),
                                  mUi->offsetY->value());
 
-    std::auto_ptr<Tileset> tileset(new Tileset(name,
+    std::unique_ptr<Tileset> tileset(new Tileset(name,
                                                tileWidth, tileHeight,
                                                spacing, margin));
 

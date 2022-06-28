@@ -37,7 +37,7 @@ public:
 
     typedef Tiled::Tileset Tileset;
 private slots:
-    void tilesetChanged(Tileset *tileset);
+    void tilesetChanged(Tiled::Tileset *tileset);
     void tilesetAdded(Tiled::Tileset *tileset);
     void tilesetAboutToBeRemoved(Tiled::Tileset *tileset);
     void tilesetRemoved(Tiled::Tileset *tileset);

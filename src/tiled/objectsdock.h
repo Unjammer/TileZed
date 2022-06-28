@@ -55,7 +55,7 @@ private slots:
     void duplicateObjects();
     void removeObjects();
     void objectProperties();
-    void documentAboutToClose(int index, MapDocument *mapDocument);
+    void documentAboutToClose(int index, Tiled::Internal::MapDocument *mapDocument);
 
 private:
     void retranslateUi();

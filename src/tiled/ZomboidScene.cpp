@@ -148,8 +148,8 @@ void ZomboidScene::setMapDocument(MapDocument *mapDoc)
     mLotManager.setMapDocument(mapDocument());
 
     if (mapDocument()) {
-        connect(mMapDocument, SIGNAL(regionAltered(QRegion,Layer*)),
-                SLOT(regionAltered(QRegion,Layer*)));
+        connect(mMapDocument, SIGNAL(regionAltered(QRegion,Tiled::Layer*)),
+                SLOT(regionAltered(QRegion,Tiled::Layer*)));
         connect(mMapDocument, SIGNAL(layerGroupAdded(int)), SLOT(layerGroupAdded(int)));
         connect(mMapDocument, SIGNAL(layerGroupVisibilityChanged(CompositeLayerGroup*)), SLOT(layerGroupVisibilityChanged(CompositeLayerGroup*)));
         connect(mMapDocument, SIGNAL(layerAddedToGroup(int)), SLOT(layerAddedToGroup(int)));
@@ -158,11 +158,11 @@ void ZomboidScene::setMapDocument(MapDocument *mapDoc)
         connect(mMapDocument, SIGNAL(mapCompositeChanged()),
                 SLOT(mapCompositeChanged()));
 
-        connect(mMapDocument, SIGNAL(objectsAdded(QList<MapObject*>)),
+        connect(mMapDocument, SIGNAL(objectsAdded(QList<Tiled::MapObject*>)),
                 SLOT(invalidateMapBuildings()));
-        connect(mMapDocument, SIGNAL(objectsRemoved(QList<MapObject*>)),
+        connect(mMapDocument, SIGNAL(objectsRemoved(QList<Tiled::MapObject*>)),
                 SLOT(invalidateMapBuildings()));
-        connect(mMapDocument, SIGNAL(objectsChanged(QList<MapObject*>)),
+        connect(mMapDocument, SIGNAL(objectsChanged(QList<Tiled::MapObject*>)),
                 SLOT(invalidateMapBuildings()));
 
         connect(mMapDocument->mapComposite()->bmpBlender(), SIGNAL(layersRecreated()),
@@ -172,9 +172,9 @@ void ZomboidScene::setMapDocument(MapDocument *mapDoc)
         connect(mMapDocument, SIGNAL(bmpRulesChanged()), SLOT(bmpXXXChanged()));
         connect(mMapDocument, SIGNAL(bmpBlendsChanged()), SLOT(bmpXXXChanged()));
 
-        connect(mMapDocument, SIGNAL(noBlendPainted(MapNoBlend*,QRegion)), SLOT(noBlendPainted(MapNoBlend*,QRegion)));
+        connect(mMapDocument, SIGNAL(noBlendPainted(Tiled::MapNoBlend*,QRegion)), SLOT(noBlendPainted(Tiled::MapNoBlend*,QRegion)));
         connect(mMapDocument, SIGNAL(currentLayerIndexChanged(int)), SLOT(synchNoBlendVisible()));
-        connect(ToolManager::instance(), SIGNAL(selectedToolChanged(AbstractTool*)), SLOT(synchNoBlendVisible()));
+        connect(ToolManager::instance(), SIGNAL(selectedToolChanged(Tiled::Internal::AbstractTool*)), SLOT(synchNoBlendVisible()));
 
         connect(Preferences::instance(), SIGNAL(highlightRoomUnderPointerChanged(bool)),
                 SLOT(highlightRoomUnderPointerChanged(bool)));
@@ -699,7 +699,7 @@ void ZomboidScene::bmpPainted(int bmpIndex, const QRegion &region)
     const MapRenderer *renderer = mMapDocument->renderer();
     const QMargins margins = mMapDocument->map()->drawMargins();
 
-    foreach (const QRect &r, region.rects()) {
+    for (const QRect &r : region) {
         update(renderer->boundingRect(r, 0).adjusted(-margins.left(),
                                                      -margins.top(),
                                                      margins.right(),

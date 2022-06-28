@@ -144,7 +144,7 @@ public:
     { return mExpanded; }
 
 signals:
-    void blendHighlighted(BmpBlend *blend, int dir);
+    void blendHighlighted(Tiled::BmpBlend *blend, int dir);
 
 public slots:
     void scaleChanged(qreal scale);

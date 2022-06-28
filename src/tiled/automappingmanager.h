@@ -85,7 +85,7 @@ signals:
     void warningsOccurred();
 
 public slots:
-    void autoMap(QRegion where, Layer *touchedLayer);
+    void autoMap(QRegion where, Tiled::Layer *touchedLayer);
 
 private:
     Q_DISABLE_COPY(AutomappingManager)

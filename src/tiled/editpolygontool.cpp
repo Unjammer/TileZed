@@ -156,18 +156,18 @@ void EditPolygonTool::activate(MapScene *scene)
     // TODO: Could be more optimal by separating the updating of handles from
     // the creation and removal of handles depending on changes in the
     // selection, and by only updating the handles of the objects that changed.
-    connect(mapDocument(), SIGNAL(objectsChanged(QList<MapObject*>)),
+    connect(mapDocument(), SIGNAL(objectsChanged(QList<Tiled::MapObject*>)),
             this, SLOT(updateHandles()));
     connect(scene, SIGNAL(selectedObjectItemsChanged()),
             this, SLOT(updateHandles()));
 
-    connect(mapDocument(), SIGNAL(objectsRemoved(QList<MapObject*>)),
-            this, SLOT(objectsRemoved(QList<MapObject*>)));
+    connect(mapDocument(), SIGNAL(objectsRemoved(QList<Tiled::MapObject*>)),
+            this, SLOT(objectsRemoved(QList<Tiled::MapObject*>)));
 }
 
 void EditPolygonTool::deactivate(MapScene *scene)
 {
-    disconnect(mapDocument(), SIGNAL(objectsChanged(QList<MapObject*>)),
+    disconnect(mapDocument(), SIGNAL(objectsChanged(QList<Tiled::MapObject*>)),
                this, SLOT(updateHandles()));
     disconnect(scene, SIGNAL(selectedObjectItemsChanged()),
                this, SLOT(updateHandles()));

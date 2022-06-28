@@ -61,7 +61,7 @@ public slots:
      * Sets the tile that will be used when the creation mode is
      * CreateTileObjects.
      */
-    void setTile(Tile *tile) { mTile = tile; }
+    void setTile(Tiled::Tile *tile) { mTile = tile; }
 
 private:
     void startNewMapObject(const QPointF &pos, ObjectGroup *objectGroup);

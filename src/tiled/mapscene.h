@@ -24,6 +24,8 @@
 #ifndef MAPSCENE_H
 #define MAPSCENE_H
 
+#include "mapobject.h" // needed for meta-type for some reason
+
 #include <QGraphicsScene>
 #include <QMap>
 #include <QSet>
@@ -177,7 +179,7 @@ private slots:
      * Repaints the specified region. The region is in tile coordinates.
      */
 #ifdef ZOMBOID
-    virtual void regionChanged(const QRegion &region, Layer *layer);
+    virtual void regionChanged(const QRegion &region, Tiled::Layer *layer);
 #else
     void repaintRegion(const QRegion &region);
 #endif
@@ -189,7 +191,7 @@ private slots:
 #else
     void mapChanged();
 #endif
-    void tilesetChanged(Tileset *tileset);
+    void tilesetChanged(Tiled::Tileset *tileset);
 
 #ifdef ZOMBOID
     virtual void layerAdded(int index);
@@ -203,9 +205,9 @@ private slots:
     void layerChanged(int index);
 #endif
 
-    void objectsAdded(const QList<MapObject*> &objects);
-    void objectsRemoved(const QList<MapObject*> &objects);
-    void objectsChanged(const QList<MapObject*> &objects);
+    void objectsAdded(const QList<Tiled::MapObject*> &objects);
+    void objectsRemoved(const QList<Tiled::MapObject*> &objects);
+    void objectsChanged(const QList<Tiled::MapObject*> &objects);
 
     void updateSelectedObjectItems();
     void syncAllObjectItems();

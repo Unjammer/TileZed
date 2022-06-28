@@ -67,12 +67,12 @@ void ZLotManager::setMapDocument(MapDocument *mapDoc)
                     this, SLOT(onLayerAdded(int)));
             connect(mapDocument(), SIGNAL(layerAboutToBeRemoved(int)),
                     this, SLOT(onLayerAboutToBeRemoved(int)));
-            connect(mapDocument(), SIGNAL(objectsAdded(QList<MapObject*>)),
-                    this, SLOT(onObjectsAdded(QList<MapObject*>)));
-            connect(mapDocument(), SIGNAL(objectsChanged(QList<MapObject*>)),
-                    this, SLOT(onObjectsChanged(QList<MapObject*>)));
-            connect(mapDocument(), SIGNAL(objectsRemoved(QList<MapObject*>)),
-                this, SLOT(onObjectsRemoved(QList<MapObject*>)));
+            connect(mapDocument(), SIGNAL(objectsAdded(QList<Tiled::MapObject*>)),
+                    this, SLOT(onObjectsAdded(QList<Tiled::MapObject*>)));
+            connect(mapDocument(), SIGNAL(objectsChanged(QList<Tiled::MapObject*>)),
+                    this, SLOT(onObjectsChanged(QList<Tiled::MapObject*>)));
+            connect(mapDocument(), SIGNAL(objectsRemoved(QList<Tiled::MapObject*>)),
+                this, SLOT(onObjectsRemoved(QList<Tiled::MapObject*>)));
 
             Map *map = mapDocument()->map();
             foreach (ObjectGroup *og, map->objectGroups())

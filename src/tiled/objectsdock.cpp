@@ -77,7 +77,7 @@ ObjectsDock::ObjectsDock(QWidget *parent)
 
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
-    layout->setMargin(5);
+    layout->setContentsMargins(5, 5, 5, 5);
     layout->addWidget(mObjectsView);
 
     MapDocumentActionHandler *handler = MapDocumentActionHandler::instance();
@@ -122,8 +122,8 @@ ObjectsDock::ObjectsDock(QWidget *parent)
     connect(this, SIGNAL(visibilityChanged(bool)),
             mObjectsView, SLOT(setVisible(bool)));
 
-    connect(DocumentManager::instance(), SIGNAL(documentAboutToClose(int,MapDocument*)),
-            SLOT(documentAboutToClose(int,MapDocument*)));
+    connect(DocumentManager::instance(), SIGNAL(documentAboutToClose(int,Tiled::Internal::MapDocument*)),
+            SLOT(documentAboutToClose(int,Tiled::Internal::MapDocument*)));
 
     updateActions();
 }

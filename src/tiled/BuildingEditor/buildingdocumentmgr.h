@@ -61,9 +61,9 @@ public:
 //    bool failedToAdd();
 
 signals:
-    void currentDocumentChanged(BuildingDocument *doc);
-    void documentAdded(BuildingDocument *doc);
-    void documentAboutToClose(int index, BuildingDocument *doc);
+    void currentDocumentChanged(BuildingEditor::BuildingDocument *doc);
+    void documentAdded(BuildingEditor::BuildingDocument *doc);
+    void documentAboutToClose(int index, BuildingEditor::BuildingDocument *doc);
 
 private:
     Q_DISABLE_COPY(BuildingDocumentMgr)

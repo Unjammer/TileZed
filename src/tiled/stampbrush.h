@@ -78,10 +78,10 @@ signals:
      * this signal instead of setting its stamp directly so that the fill tool
      * also gets the new stamp.
      */
-    void currentTilesChanged(const TileLayer *tiles);
+    void currentTilesChanged(const Tiled::TileLayer *tiles);
 
 #ifdef ZOMBOID
-    void tilePicked(Tile *tile);
+    void tilePicked(Tiled::Tile *tile);
 #endif // ZOMBOID
 
 protected:

@@ -47,7 +47,7 @@ protected:
 
     typedef Tiled::Tile Tile;
 signals:
-    void tilePicked(Tile *tile);
+    void tilePicked(Tiled::Tile *tile);
 };
 
 } // namespace Internal

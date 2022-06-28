@@ -22,11 +22,11 @@
 #define ZOOMABLE_H
 
 #include <QObject>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QVector>
 
 class QComboBox;
-class QRegExpValidator;
+class QRegularExpressionValidator;
 
 namespace Tiled {
 namespace Internal {
@@ -90,8 +90,8 @@ private:
     qreal mScale;
     QVector<qreal> mZoomFactors;
     QComboBox *mComboBox;
-    QRegExp mComboRegExp;
-    QRegExpValidator *mComboValidator;
+    QRegularExpression mComboRegExp;
+    QRegularExpressionValidator *mComboValidator;
 };
 
 } // namespace Internal

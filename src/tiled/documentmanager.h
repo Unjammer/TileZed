@@ -139,7 +139,7 @@ signals:
     /**
      * Emitted when the current displayed map document changed.
      */
-    void currentDocumentChanged(MapDocument *mapDocument);
+    void currentDocumentChanged(Tiled::Internal::MapDocument *mapDocument);
 
     /**
      * Emitted when the user requested the document at \a index to be closed.
@@ -147,7 +147,7 @@ signals:
     void documentCloseRequested(int index);
 
 #ifdef ZOMBOID
-    void documentAboutToClose(int index, MapDocument *mapDocument);
+    void documentAboutToClose(int index, Tiled::Internal::MapDocument *mapDocument);
 #endif
 
 public slots:
@@ -156,7 +156,7 @@ public slots:
 
 private slots:
     void currentIndexChanged();
-    void setSelectedTool(AbstractTool *tool);
+    void setSelectedTool(Tiled::Internal::AbstractTool *tool);
     void updateDocumentTab();
 
 private:

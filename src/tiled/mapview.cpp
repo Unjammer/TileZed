@@ -35,7 +35,7 @@
 #include <QScrollBar>
 
 #ifndef QT_NO_OPENGL
-#include <QGLWidget>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 #endif
 
 using namespace Tiled::Internal;
@@ -134,15 +134,16 @@ void MapView::setUseOpenGL(bool useOpenGL)
 #ifndef QT_NO_OPENGL
     QWidget *oldViewport = viewport();
     QWidget *newViewport = viewport();
-    if (useOpenGL && QGLFormat::hasOpenGL()) {
-        if (!qobject_cast<QGLWidget*>(viewport())) {
-            QGLFormat format = QGLFormat::defaultFormat();
-            format.setDepth(false); // No need for a depth buffer
-            format.setSampleBuffers(true); // Enable anti-aliasing
-            newViewport = new QGLWidget(format);
+    if (useOpenGL) {
+        if (!qobject_cast<QOpenGLWidget*>(viewport())) {
+            QSurfaceFormat format = QSurfaceFormat::defaultFormat();
+            format.setDepthBufferSize(0); // No need for a depth buffer
+            format.setSamples(4); // Enable anti-aliasing
+            newViewport = new QOpenGLWidget();
+            ((QOpenGLWidget*) newViewport)->setFormat(format);
         }
     } else {
-        if (qobject_cast<QGLWidget*>(viewport()))
+        if (qobject_cast<QOpenGLWidget*>(viewport()))
             newViewport = 0;
     }
 
@@ -232,13 +233,15 @@ void MapView::hideEvent(QHideEvent *event)
  */
 void MapView::wheelEvent(QWheelEvent *event)
 {
-    if (event->modifiers() & Qt::ControlModifier
-        && event->orientation() == Qt::Vertical)
+    QPoint numDegrees = event->angleDelta() / 8;
+    if ((event->modifiers() & Qt::ControlModifier) && (numDegrees.y() != 0))
     {
+        QPoint numSteps = numDegrees / 15;
+
         // No automatic anchoring since we'll do it manually
         setTransformationAnchor(QGraphicsView::NoAnchor);
 
-        mZoomable->handleWheelDelta(event->delta());
+        mZoomable->handleWheelDelta(numSteps.y() * 120);
 
         // Place the last known mouse scene pos below the mouse again
         QWidget *view = viewport();
@@ -260,7 +263,7 @@ void MapView::wheelEvent(QWheelEvent *event)
  */
 void MapView::mousePressEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::MidButton) {
+    if (event->button() == Qt::MiddleButton) {
         setHandScrolling(true);
         return;
     }
@@ -273,7 +276,7 @@ void MapView::mousePressEvent(QMouseEvent *event)
  */
 void MapView::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::MidButton) {
+    if (event->button() == Qt::MiddleButton) {
         setHandScrolling(false);
         return;
     }

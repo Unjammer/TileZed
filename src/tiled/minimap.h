@@ -23,14 +23,15 @@
 
 #include "threads.h"
 
+#include "map.h"
+#include "tilelayer.h"
+
 class MapComposite;
 class MapInfo;
 class WorldCellLot;
 
 namespace Tiled {
 class Layer;
-class Map;
-class MapNoBlend;
 class MapObject;
 class MapRenderer;
 class Tileset;
@@ -90,7 +91,78 @@ public:
     QMap<MapComposite*,quintptr> mLotToID;
 };
 
-class MapChange;
+
+/////
+
+class MapChange
+{
+public:
+    enum Change {
+        LayerAdded,
+        LayerRemoved,
+        LayerRenamed,
+        RegionAltered,
+        LotAdded,
+        LotRemoved,
+        LotUpdated,
+        MapChanged,
+        MapResized,
+        TilesetAdded,
+        TilesetRemoved,
+        TilesetChanged,
+        BmpPainted,
+        BmpAliasesChanged,
+        BmpRulesChanged,
+        BmpBlendsChanged,
+        NoBlendPainted,
+        Recreate
+    };
+
+    MapChange(Change change) :
+        mChange(change),
+        mTileLayer(QString(), 0, 0, 0, 0)
+    {
+
+    }
+
+    Change mChange;
+    struct LotInfo
+    {
+        MapInfo *mapInfo;
+        quintptr id;
+        QPoint pos;
+        int level;
+    };
+    LotInfo mLotInfo;
+    Tiled::Layer *mLayer;
+    int mLayerIndex;
+    QString mName;
+    struct CellEntry
+    {
+        CellEntry(int x, int y, const Tiled::Cell &cell) :
+            x(x), y(y), cell(cell)
+        {
+
+        }
+
+        int x, y;
+        Tiled::Cell cell;
+    };
+    QList<CellEntry> mCells;
+    Tiled::TileLayer mTileLayer;
+    Tiled::Tileset *mTileset;
+    int mTilesetIndex;
+    QString mTilesetName;
+    QSize mMapSize;
+
+    QImage mBmps[2];
+    int mBmpIndex;
+    QList<Tiled::BmpAlias*> mBmpAliases;
+    QList<Tiled::BmpRule*> mBmpRules;
+    QList<Tiled::BmpBlend*> mBmpBlends;
+    QList<Tiled::MapNoBlend> mNoBlends;
+    QRegion mRegion;
+};
 
 class MiniMapRenderWorker : public BaseWorker
 {
@@ -169,23 +241,23 @@ private slots:
     void lotRemoved(MapComposite *mc, WorldCellLot *lot);
     void lotUpdated(MapComposite *mc, WorldCellLot *lot);
 
-    void regionAltered(const QRegion &region, Layer *layer);
+    void regionAltered(const QRegion &region, Tiled::Layer *layer);
 
     void mapAboutToChange(MapInfo *mapInfo);
     void mapChanged(MapInfo *mapInfo);
 
     void mapChanged();
 
-    void tilesetAdded(int index, Tileset *tileset);
-    void tilesetRemoved(Tileset *tileset);
-    void tilesetChanged(Tileset *tileset);
+    void tilesetAdded(int index, Tiled::Tileset *tileset);
+    void tilesetRemoved(Tiled::Tileset *tileset);
+    void tilesetChanged(Tiled::Tileset *tileset);
 
     void bmpPainted(int bmpIndex, const QRegion &region);
     void bmpAliasesChanged();
     void bmpRulesChanged();
     void bmpBlendsChanged();
 
-    void noBlendPainted(MapNoBlend *noBlend, const QRegion &region);
+    void noBlendPainted(Tiled::MapNoBlend *noBlend, const QRegion &region);
 
     void painted(QImage image, QRectF sceneRect);
     void imageResized(QSize sz);

@@ -789,7 +789,7 @@ bool TexturePacker::LoadTileNamesFile(QString imageName, int columns)
             continue;
         if (line.startsWith(QLatin1String("//")))
             continue;
-        QStringList ss = line.split(re, QString::SkipEmptyParts);
+        QStringList ss = line.split(re, Qt::SkipEmptyParts);
         if (ss.size() != 3) {
             mError = tr("\"col row name\" expected on line %1\n%2").arg(lineNumber).arg(imageName);
             return false;

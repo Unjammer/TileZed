@@ -54,7 +54,7 @@ private slots:
     void setTopmostVisibleLayer(int layerIndex);
 
     void updateActions();
-    void documentAboutToClose(int index, MapDocument *mapDocument);
+    void documentAboutToClose(int index, Tiled::Internal::MapDocument *mapDocument);
 
 private:
     void retranslateUi();

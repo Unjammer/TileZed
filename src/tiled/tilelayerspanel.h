@@ -160,7 +160,7 @@ public:
     qreal scale() const;
 
 signals:
-    void tilePicked(Tile *tile);
+    void tilePicked(Tiled::Tile *tile);
 
 public slots:
     void setTilePosition(const QPoint &tilePos);
@@ -172,8 +172,8 @@ private slots:
     void currentChanged();
     void layerIndexChanged(int layerIndex);
     void layerChanged(int index);
-    void regionAltered(const QRegion &region, Layer *layer);
-    void noBlendPainted(MapNoBlend *noBlend, const QRegion &rgn);
+    void regionAltered(const QRegion &region, Tiled::Layer *layer);
+    void noBlendPainted(Tiled::MapNoBlend *noBlend, const QRegion &rgn);
     void showTileLayersPanelChanged(bool show);
 
 private:

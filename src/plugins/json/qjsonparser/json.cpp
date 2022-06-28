@@ -10,7 +10,12 @@
 #include "json.h"
 #include "jsonparser.cpp"
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QTextCodec>
+#else
+#include <QStringConverter>
+#endif
+
 #include <qnumeric.h>
 
 /*!
@@ -99,6 +104,7 @@ JsonReader::~JsonReader()
  */
 bool JsonReader::parse(const QByteArray &ba)
 {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     int mib = 106; // utf-8
 
     QTextCodec *codec = QTextCodec::codecForUtfText(ba, 0); // try BOM detection
@@ -120,6 +126,27 @@ bool JsonReader::parse(const QByteArray &ba)
         codec = QTextCodec::codecForMib(mib);
     }
     QString str = codec->toUnicode(ba);
+#else
+    auto encoding = QStringConverter::encodingForData(ba, 0);
+    if (!encoding) {
+        encoding = QStringConverter::Utf8;
+        if (ba.length() > 3) { // auto-detect
+            const char *data = ba.constData();
+            if (data[0] != 0) {
+                if (data[1] != 0)
+                    encoding = QStringConverter::Utf8;
+                else if (data[2] != 0)
+                    encoding = QStringConverter::Utf16LE;
+                else
+                    encoding = QStringConverter::Utf32LE;
+            } else if (data[1] != 0)
+                encoding = QStringConverter::Utf16BE;
+            else
+                encoding = QStringConverter::Utf32BE;
+        }
+    }
+    QString str = QStringDecoder(*encoding).decode(ba);
+#endif
     return parse(str);
 }
 

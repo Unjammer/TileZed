@@ -21,6 +21,8 @@
 #ifndef MAPOBJECTMODEL_H
 #define MAPOBJECTMODEL_H
 
+#include "mapobject.h" // needed for meta-type for some reason
+
 #include <QAbstractItemModel>
 #include <QIcon>
 
@@ -98,10 +100,10 @@ public:
     void setObjectSize(MapObject *o, const QSizeF &size);
 
 signals:
-    void objectsAdded(const QList<MapObject *> &objects);
-    void objectsChanged(const QList<MapObject *> &objects);
-    void objectsAboutToBeRemoved(const QList<MapObject *> &objects);
-    void objectsRemoved(const QList<MapObject *> &objects);
+    void objectsAdded(const QList<Tiled::MapObject *> &objects);
+    void objectsChanged(const QList<Tiled::MapObject *> &objects);
+    void objectsAboutToBeRemoved(const QList<Tiled::MapObject *> &objects);
+    void objectsRemoved(const QList<Tiled::MapObject *> &objects);
 
 private slots:
     void layerAdded(int index);

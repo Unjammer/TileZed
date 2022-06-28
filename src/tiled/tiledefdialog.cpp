@@ -390,8 +390,8 @@ TileDefDialog::TileDefDialog(QWidget *parent) :
 
     connect(ui->actionUserGuide, SIGNAL(triggered()), SLOT(help()));
 
-    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tileset*)),
-            SLOT(tilesetChanged(Tileset*)));
+    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tiled::Tileset*)),
+            SLOT(tilesetChanged(Tiled::Tileset*)));
 
     connect(Preferences::instance(), &Preferences::tilesetBackgroundColorChanged, this, &TileDefDialog::tilesetBackgroundColorChanged);
 
@@ -1307,7 +1307,7 @@ void TileDefDialog::setTilesetList()
             item->setForeground(Qt::red);
         item->setData(Qt::UserRole, ts->name());
         ui->tilesets->addItem(item);
-        maxWidth = qMax(maxWidth, fm.width(item->text()));
+        maxWidth = qMax(maxWidth, fm.horizontalAdvance(item->text()));
     }
     ui->tilesets->setFixedWidth(maxWidth + 16 +
         ui->tilesets->verticalScrollBar()->sizeHint().width());
@@ -1369,7 +1369,8 @@ void TileDefDialog::setToolTipEtc(int tileID)
 
     // Use a different background color for tiles that have unknown property names.
     QColor color; // invalid means use default color
-    QSet<QString> known = defTile->mPropertyUI.knownPropertyNames().toSet(); // FIXME: same for every tile
+    QStringList knownPropertyNames = defTile->mPropertyUI.knownPropertyNames();
+    QSet<QString> known(knownPropertyNames.begin(), knownPropertyNames.end()); // FIXME: same for every tile
     QStringList unknown;
     foreach (QString name, defTile->mProperties.keys()) {
         if (!known.contains(name))
@@ -1378,7 +1379,7 @@ void TileDefDialog::setToolTipEtc(int tileID)
     if (properties.isEmpty()) {
         QStyleOption styleOption;
         styleOption.initFrom(ui->tiles);
-        color = styleOption.palette.background().color(); // Qt::white;
+        color = styleOption.palette.window().color(); // Qt::white;
     }
     if (unknown.size()) {
         if (tooltip.size())
@@ -1573,7 +1574,7 @@ void TileDefDialog::initStringComboBoxValues()
             if (values.contains(p->mName)) {
                 if (QComboBox *w = mComboBoxes[p->mName]) {
                     w->clear();
-                    QStringList names(values[p->mName].toList());
+                    QStringList names(values[p->mName].constBegin(), values[p->mName].constEnd());
                     names.sort();
                     w->addItems(names);
                     w->clearEditText();

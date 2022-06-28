@@ -250,7 +250,7 @@ void ObjectEditModeToolBar::updateRoomComboBox()
             mRoomComboBox->setItemIcon(index, QPixmap::fromImage(image));
             index++;
 
-            minWidth = qMax(minWidth, 20 + mRoomComboBox->view()->fontMetrics().width(room->Name) + scrollBarWidth + 20);
+            minWidth = qMax(minWidth, 20 + mRoomComboBox->view()->fontMetrics().horizontalAdvance(room->Name) + scrollBarWidth + 20);
         }
 
         index = currentBuilding()->indexOf(currentRoom);
@@ -568,7 +568,7 @@ ObjectEditMode::ObjectEditMode(QObject *parent) :
 
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->setObjectName(QLatin1String("ObjectEditMode.VBox"));
-    vbox->setMargin(0);
+    vbox->setContentsMargins(0, 0, 0, 0);
 //    vbox->addWidget(mToolBar);
     vbox->addWidget(mTabWidget);
     vbox->addLayout(mStatusBar->statusBarLayout);
@@ -593,12 +593,12 @@ ObjectEditMode::ObjectEditMode(QObject *parent) :
     connect(mTabWidget, SIGNAL(tabCloseRequested(int)),
             SLOT(documentTabCloseRequested(int)));
 
-    connect(BuildingDocumentMgr::instance(), SIGNAL(documentAdded(BuildingDocument*)),
-            SLOT(documentAdded(BuildingDocument*)));
-    connect(BuildingDocumentMgr::instance(), SIGNAL(currentDocumentChanged(BuildingDocument*)),
-            SLOT(currentDocumentChanged(BuildingDocument*)));
-    connect(BuildingDocumentMgr::instance(), SIGNAL(documentAboutToClose(int,BuildingDocument*)),
-            SLOT(documentAboutToClose(int,BuildingDocument*)));
+    connect(BuildingDocumentMgr::instance(), SIGNAL(documentAdded(BuildingEditor::BuildingDocument*)),
+            SLOT(documentAdded(BuildingEditor::BuildingDocument*)));
+    connect(BuildingDocumentMgr::instance(), SIGNAL(currentDocumentChanged(BuildingEditor::BuildingDocument*)),
+            SLOT(currentDocumentChanged(BuildingEditor::BuildingDocument*)));
+    connect(BuildingDocumentMgr::instance(), SIGNAL(documentAboutToClose(int,BuildingEditor::BuildingDocument*)),
+            SLOT(documentAboutToClose(int,BuildingEditor::BuildingDocument*)));
 
     connect(this, SIGNAL(activeStateChanged(bool)), SLOT(onActiveStateChanged(bool)));
 }

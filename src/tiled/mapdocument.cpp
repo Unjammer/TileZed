@@ -157,14 +157,14 @@ MapDocument::MapDocument(Map *map, const QString &fileName):
 
     // Forward signals emitted from the map object model
     mMapObjectModel->setMapDocument(this);
-    connect(mMapObjectModel, SIGNAL(objectsAdded(QList<MapObject*>)),
-            SIGNAL(objectsAdded(QList<MapObject*>)));
-    connect(mMapObjectModel, SIGNAL(objectsChanged(QList<MapObject*>)),
-            SIGNAL(objectsChanged(QList<MapObject*>)));
-    connect(mMapObjectModel, SIGNAL(objectsAboutToBeRemoved(QList<MapObject*>)),
-            SIGNAL(objectsAboutToBeRemoved(QList<MapObject*>)));
-    connect(mMapObjectModel, SIGNAL(objectsRemoved(QList<MapObject*>)),
-            SLOT(onObjectsRemoved(QList<MapObject*>)));
+    connect(mMapObjectModel, SIGNAL(objectsAdded(QList<Tiled::MapObject*>)),
+            SIGNAL(objectsAdded(QList<Tiled::MapObject*>)));
+    connect(mMapObjectModel, SIGNAL(objectsChanged(QList<Tiled::MapObject*>)),
+            SIGNAL(objectsChanged(QList<Tiled::MapObject*>)));
+    connect(mMapObjectModel, SIGNAL(objectsAboutToBeRemoved(QList<Tiled::MapObject*>)),
+            SIGNAL(objectsAboutToBeRemoved(QList<Tiled::MapObject*>)));
+    connect(mMapObjectModel, SIGNAL(objectsRemoved(QList<Tiled::MapObject*>)),
+            SLOT(onObjectsRemoved(QList<Tiled::MapObject*>)));
 
     connect(mUndoStack, SIGNAL(cleanChanged(bool)), SIGNAL(modifiedChanged()));
 
@@ -173,8 +173,8 @@ MapDocument::MapDocument(Map *map, const QString &fileName):
     tilesetManager->addReferences(mMap->tilesets());
 
 #ifdef ZOMBOID
-    connect(tilesetManager, SIGNAL(tileLayerNameChanged(Tile*)),
-            SIGNAL(tileLayerNameChanged(Tile*)));
+    connect(tilesetManager, SIGNAL(tileLayerNameChanged(Tiled::Tile*)),
+            SIGNAL(tileLayerNameChanged(Tiled::Tile*)));
 
     mMapComposite->setShowLotFloorsOnly(Preferences::instance()->showLotFloorsOnly());
 #endif
@@ -625,7 +625,7 @@ void MapDocument::paintBmp(int bmpIndex, int px, int py, const QImage &source,
     MapBmp &bmp = mMap->rbmp(bmpIndex);
     QRegion region = paintRgn & QRect(0, 0, bmp.width(), bmp.height());
 
-    foreach (QRect r, region.rects()) {
+    for (QRect r : region) {
         for (int y = r.top(); y <= r.bottom(); y++) {
             for (int x = r.left(); x <= r.right(); x++) {
                 bmp.setPixel(x, y, source.pixel(x - px, y - py));
@@ -825,7 +825,7 @@ public:
         mDocument->map()->rbmpSettings()->setBlendEdgesEverywhere(mEnabled);
 
         // Highlight changed parts of the map.
-        PROGRESS progress(QLatin1Literal("BMP blending..."), Tiled::Internal::MainWindow::instance());
+        PROGRESS progress(QLatin1String("BMP blending..."), Tiled::Internal::MainWindow::instance());
         QRegion tileSelection;
         mDocument->mapComposite()->bmpBlender()->testBlendEdgesEverywhere(mEnabled, tileSelection);
 

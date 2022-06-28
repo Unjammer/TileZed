@@ -38,6 +38,7 @@
 #include "utils.h"
 
 #include <QDebug>
+#include <QRandomGenerator>
 
 using namespace Tiled;
 using namespace Tiled::Internal;
@@ -289,7 +290,7 @@ bool AutoMapper::setupRuleList()
             mLayerInputRegions->region() +
             mLayerOutputRegions->region());
 
-    qSort(combinedRegions.begin(), combinedRegions.end(), compareRuleRegion);
+    std::sort(combinedRegions.begin(), combinedRegions.end(), compareRuleRegion);
 
     QList<QRegion> rulesInput = coherentRegions(
             mLayerInputRegions->region());
@@ -357,7 +358,8 @@ bool AutoMapper::setupRulesUsedCheck()
                 continue;
 
             const TileLayer *setLayer = mMapWork->layerAt(i)->asTileLayer();
-            QList<Tileset*> tilesetWork = setLayer->usedTilesets().toList();
+            QSet<Tileset*> usedTilesets = setLayer->usedTilesets();
+            QList<Tileset*> tilesetWork(usedTilesets.begin(), usedTilesets.end());
 
             foreach (const TileLayer *tilelayer, ii[name].listYes)
                 foreach (Tileset *tileset, tilelayer->usedTilesets())
@@ -478,7 +480,7 @@ void AutoMapper::autoMap(QRegion *where)
     // first resize the active area
     if (mAutoMappingRadius) {
         QRegion region;
-        foreach (const QRect &r, where->rects()) {
+        for (const QRect &r : *where) {
             region += r.adjusted(- mAutoMappingRadius,
                                  - mAutoMappingRadius,
                                  + mAutoMappingRadius,
@@ -511,7 +513,7 @@ void AutoMapper::autoMap(QRegion *where)
     // This needs to be done, so you can rely on the order of the rules at all
     // locations
     QRegion ret;
-    foreach (const QRect &rect, where->rects())
+    for (const QRect &rect : *where)
         for (int i = 0; i < mRulesInput.size(); ++i) {
             // at the moment the parallel execution does not work yet
             // TODO: make multithreading available!
@@ -568,6 +570,8 @@ QRect AutoMapper::applyRule(const int ruleIndex, const QRect &where)
         for (int i = 0; i < mMapWork->layerCount(); i++)
             appliedRegions.append(QRegion());
 
+    QRandomGenerator randomGenerator;
+
     for (int y = minY; y <= maxY; ++y)
     for (int x = minX; x <= maxX; ++x) {
         bool anymatch = false;
@@ -594,7 +598,7 @@ QRect AutoMapper::applyRule(const int ruleIndex, const QRect &where)
             int r = 0;
             // choose by chance which group of rule_layers should be used:
             if (mLayerList.size() > 1)
-                r = qrand() % mLayerList.size();
+                r = randomGenerator.generate() % mLayerList.size();
 
             if (!mNoOverlappingRules) {
                 copyMapRegion(ruleOutput, QPoint(x, y), mLayerList.at(r));
@@ -649,7 +653,7 @@ static QVector<Cell> cellsInRegion(const QVector<TileLayer*> &list,
 {
     QVector<Cell> cells;
     foreach (const TileLayer *tilelayer, list) {
-        foreach (const QRect &rect, r.rects()) {
+        for (const QRect &rect : r) {
             for (int x = rect.left(); x <= rect.right(); ++x) {
                 for (int y = rect.top(); y <= rect.bottom(); ++y) {
                     const Cell &cell = tilelayer->cellAt(x, y);
@@ -742,7 +746,7 @@ static bool compareLayerTo(const TileLayer *setLayer,
     if (listNo.isEmpty())
         cells = cellsInRegion(listYes, ruleRegion);
 
-    foreach (const QRect &rect, ruleRegion.rects()) {
+    for (const QRect &rect : ruleRegion) {
         for (int x = rect.left(); x <= rect.right(); ++x) {
             for (int y = rect.top(); y <= rect.bottom(); ++y) {
                 // this is only used in the case where only one list has layers
@@ -829,7 +833,7 @@ void AutoMapper::copyMapRegion(const QRegion &region, QPoint offset,
     for (int i = 0; i < layerTranslation->keys().size(); ++i) {
         Layer *from = layerTranslation->keys().at(i);
         Layer *to = mMapWork->layerAt(layerTranslation->value(from));
-        foreach (const QRect &rect, region.rects()) {
+        for (const QRect &rect : region) {
             TileLayer *fromTileLayer = from->asTileLayer();
             ObjectGroup *fromObjectGroup = from->asObjectGroup();
             if (fromTileLayer) {

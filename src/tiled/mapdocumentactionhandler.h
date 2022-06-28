@@ -70,7 +70,7 @@ public:
     QAction *actionLayerProperties() const { return mActionLayerProperties; }
 
 signals:
-    void mapDocumentChanged(MapDocument *mapDocument);
+    void mapDocumentChanged(Tiled::Internal::MapDocument *mapDocument);
 
 public slots:
     void selectAll();

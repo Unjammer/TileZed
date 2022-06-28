@@ -20,6 +20,8 @@
 
 #include "tiled_global.h"
 
+#include "mapobject.h" // needed for meta-type for some reason
+
 #include <QObject>
 #include <QList>
 #include <QMap>
@@ -70,9 +72,9 @@ private slots:
     void onLayerAdded(int index);
     void onLayerAboutToBeRemoved(int index);
 
-    void onObjectsAdded(const QList<MapObject*> &objects);
-    void onObjectsChanged(const QList<MapObject*> &objects);
-    void onObjectsRemoved(const QList<MapObject*> &objects);
+    void onObjectsAdded(const QList<Tiled::MapObject*> &objects);
+    void onObjectsChanged(const QList<Tiled::MapObject*> &objects);
+    void onObjectsRemoved(const QList<Tiled::MapObject*> &objects);
 
     void mapLoaded(MapInfo *mapInfo);
     void mapFailedToLoad(MapInfo *mapInfo);

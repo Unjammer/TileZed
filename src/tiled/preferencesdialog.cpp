@@ -29,10 +29,11 @@
 #include <QColorDialog>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QPainter>
 #include <QStyledItemDelegate>
 
 #ifndef QT_NO_OPENGL
-#include <QGLFormat>
+//#include <QGLFormat>
 #endif
 
 using namespace Tiled;
@@ -103,7 +104,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
 #ifndef QT_NO_OPENGL
-    mUi->openGL->setEnabled(QGLFormat::hasOpenGL());
+    mUi->openGL->setEnabled(true/*QGLFormat::hasOpenGL()*/);
 #else
     mUi->openGL->setEnabled(false);
 #endif

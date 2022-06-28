@@ -245,4 +245,7 @@ private:
 
 } // namespace Tiled
 
+#include <QMetaType>
+Q_DECLARE_METATYPE(Tiled::MapObject*)
+
 #endif // MAPOBJECT_H

@@ -294,7 +294,7 @@ QMenu *CommandDataModel::contextMenu(QWidget *parent, const QModelIndex &index)
             QSignalMapper *mapper = new QSignalMapper(action);
             mapper->setMapping(action, row + 1);
             connect(action, SIGNAL(triggered()), mapper, SLOT(map()));
-            connect(mapper, SIGNAL(mapped(int)), SLOT(moveUp(int)));
+            connect(mapper, SIGNAL(mappedInt(int)), SLOT(moveUp(int)));
         }
 
         menu->addSeparator();
@@ -304,7 +304,7 @@ QMenu *CommandDataModel::contextMenu(QWidget *parent, const QModelIndex &index)
             QSignalMapper *mapper = new QSignalMapper(action);
             mapper->setMapping(action, row);
             connect(action, SIGNAL(triggered()), mapper, SLOT(map()));
-            connect(mapper, SIGNAL(mapped(int)), SLOT(execute(int)));
+            connect(mapper, SIGNAL(mappedInt(int)), SLOT(execute(int)));
         }
 
 #if defined(Q_WS_X11) || defined(Q_WS_MAC)
@@ -313,7 +313,7 @@ QMenu *CommandDataModel::contextMenu(QWidget *parent, const QModelIndex &index)
             QSignalMapper *mapper = new QSignalMapper(action);
             mapper->setMapping(action, row);
             connect(action, SIGNAL(triggered()), mapper, SLOT(map()));
-            connect(mapper, SIGNAL(mapped(int)), SLOT(executeInTerminal(int)));
+            connect(mapper, SIGNAL(mappedInt(int)), SLOT(executeInTerminal(int)));
         }
 #endif
 
@@ -324,7 +324,7 @@ QMenu *CommandDataModel::contextMenu(QWidget *parent, const QModelIndex &index)
             QSignalMapper *mapper = new QSignalMapper(action);
             mapper->setMapping(action, row);
             connect(action, SIGNAL(triggered()), mapper, SLOT(map()));
-            connect(mapper, SIGNAL(mapped(int)), SLOT(remove(int)));
+            connect(mapper, SIGNAL(mappedInt(int)), SLOT(remove(int)));
         }
     }
 
@@ -441,7 +441,7 @@ bool CommandDataModel::move(int commandIndex, int newIndex)
 
     if (commandIndex - newIndex == 1 || newIndex - commandIndex == 1)
         // Swapping is probably more efficient than removing/inserting
-        mCommands.swap(commandIndex, newIndex);
+        mCommands.swapItemsAt(commandIndex, newIndex);
     else {
         const Command command = mCommands.at(commandIndex);
         mCommands.removeAt(commandIndex);

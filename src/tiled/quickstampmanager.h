@@ -77,10 +77,10 @@ public:
 public slots:
     void selectQuickStamp(int index);
     void saveQuickStamp(int index);
-    void setMapDocument(MapDocument *mapDocument);
+    void setMapDocument(Tiled::Internal::MapDocument *mapDocument);
 
 signals:
-    void setStampBrush(const TileLayer*);
+    void setStampBrush(const Tiled::TileLayer*);
 
 private:
     Q_DISABLE_COPY(QuickStampManager)

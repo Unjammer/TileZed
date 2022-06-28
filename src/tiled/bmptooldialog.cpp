@@ -158,8 +158,8 @@ BmpToolDialog::BmpToolDialog(QWidget *parent) :
             SLOT(expandCollapse()));
     ui->tableView->zoomable()->connectToComboBox(ui->scaleCombo);
 
-    connect(ui->blendView, SIGNAL(blendHighlighted(BmpBlend*,int)),
-            SLOT(blendHighlighted(BmpBlend*,int)));
+    connect(ui->blendView, SIGNAL(blendHighlighted(Tiled::BmpBlend*,int)),
+            SLOT(blendHighlighted(Tiled::BmpBlend*,int)));
     ui->blendView->zoomable()->connectToComboBox(ui->blendScaleCombo);
 
     ui->tilesInBlend->model()->setShowHeaders(false);
@@ -231,8 +231,8 @@ BmpToolDialog::BmpToolDialog(QWidget *parent) :
     connect(BmpBrushTool::instance(), SIGNAL(brushChanged()),
             SLOT(brushChanged()));
 
-    connect(DocumentManager::instance(), SIGNAL(documentAboutToClose(int,MapDocument*)),
-            SLOT(documentAboutToClose(int,MapDocument*)));
+    connect(DocumentManager::instance(), SIGNAL(documentAboutToClose(int,Tiled::Internal::MapDocument*)),
+            SLOT(documentAboutToClose(int,Tiled::Internal::MapDocument*)));
 }
 
 BmpToolDialog::~BmpToolDialog()

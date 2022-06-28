@@ -23,6 +23,8 @@
 
 #include "abstractobjecttool.h"
 
+#include "mapobject.h" // needed for meta-type for some reason
+
 #include <QMap>
 #include <QSet>
 
@@ -60,7 +62,7 @@ public:
 
 private slots:
     void updateHandles();
-    void objectsRemoved(const QList<MapObject *> &objects);
+    void objectsRemoved(const QList<Tiled::MapObject *> &objects);
 
     void deleteNodes();
     void joinNodes();

@@ -19,6 +19,7 @@
 #define SIMPLEFILE_H
 
 #include <QCoreApplication>
+#include <QRegularExpression>
 #include <QStringList>
 #include <QTextStream>
 
@@ -52,7 +53,8 @@ public:
 
     QStringList values() const
     {
-        return value.split(QRegExp(QLatin1String("[\\s]+")), QString::SkipEmptyParts);
+        static QRegularExpression re(QLatin1String("[\\s]+"));
+        return value.split(re, Qt::SkipEmptyParts);
     }
 
     QString name;

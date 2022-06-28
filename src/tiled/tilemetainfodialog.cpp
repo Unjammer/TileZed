@@ -209,8 +209,8 @@ TileMetaInfoDialog::TileMetaInfoDialog(QWidget *parent) :
     connect(ui->enums, SIGNAL(activated(int)),
             SLOT(enumChanged(int)));
 
-    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tileset*)),
-            SLOT(tilesetChanged(Tileset*)));
+    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tiled::Tileset*)),
+            SLOT(tilesetChanged(Tiled::Tileset*)));
 
     // Hack - force the tileset-names-list font to be updated now, because
     // setTilesetList() uses its font metrics to determine the maximum item
@@ -512,7 +512,7 @@ void TileMetaInfoDialog::setTilesetList()
         if (ts->isMissing())
             item->setForeground(Qt::red);
         ui->tilesets->addItem(item);
-        maxWidth = qMax(maxWidth, fm.width(ts->name()));
+        maxWidth = qMax(maxWidth, fm.horizontalAdvance(ts->name()));
     }
     ui->tilesets->setFixedWidth(maxWidth + 16 +
         ui->tilesets->verticalScrollBar()->sizeHint().width());

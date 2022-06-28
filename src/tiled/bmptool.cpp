@@ -183,7 +183,7 @@ PaintBMP::PaintBMP(MapDocument *mapDocument, int bmpIndex,
     int index = origMap->indexOfLayer(QLatin1String("0_Floor"));
     if (index != -1)
         map.addLayer(origMap->layerAt(index)->clone());
-    foreach (QRect r, mRegion.rects()) {
+    for (QRect r : mRegion) {
         for (int y = r.top(); y <= r.bottom(); y++) {
             for (int x = r.left(); x <= r.right(); x++) {
                 if (QRect(0, 0, source.width(), source.height()).contains(x - mX, y - mY))
@@ -205,7 +205,7 @@ PaintBMP::PaintBMP(MapDocument *mapDocument, int bmpIndex,
         QSet<Tile*> blendTiles = blender.knownBlendTiles();
         foreach (TileLayer *tl, lg->layers()) {
             QRegion eraseRgn;
-            foreach (QRect r, mRegion.rects()) {
+            for (QRect r : mRegion) {
                 for (int y = r.top() - 1; y <= r.bottom() + 1; y++) {
                     for (int x = r.left() - 1; x <= r.right() + 1; x++) {
                         if (!tl->contains(x, y)) continue;
@@ -574,7 +574,7 @@ static QRegion bmpPixelRegion(Map *map, int bmpIndex, const QRegion &tileRgn, QR
     QRect mapBounds(QPoint(), map->size());
 
     QRegion paintRgn;
-    foreach (QRect r, tileRgn.rects()) {
+    for (QRect r : tileRgn) {
         r &= mapBounds;
         for (int y = r.top(); y <= r.bottom(); y++) {
             for (int x = r.left(); x <= r.right(); x++) {
@@ -612,7 +612,7 @@ void BmpBrushTool::paint()
     QImage image(r.size(), QImage::Format_ARGB32);
     image.fill(Qt::black);
     QPainter p(&image);
-    foreach (QRect r, paintRgn.rects())
+    for (QRect r : paintRgn)
         p.fillRect(r.translated(-topLeft), color);
     p.end();
     PaintBMP *cmd = new PaintBMP(mapDocument(), mBmpIndex,
@@ -1096,7 +1096,7 @@ void BmpSelectionTool::mouseReleased(QGraphicsSceneMouseEvent *event)
                     QImage &bmp = doc->map()->rbmp(bmpIndex).rimage();
                     QRect r = paintedRgn.boundingRect();
                     QImage image = bmp.copy(r.x(), r.y(), r.width(), r.height());
-                    foreach (QRect rect, oldSelection.rects()) {
+                    for (QRect rect : oldSelection) {
                         copyImageToImage(rect.x(), rect.y(),
                                          rect.width(), rect.height(), bmp,
                                          rect.x() + offset.x() - r.x(),
@@ -1105,7 +1105,7 @@ void BmpSelectionTool::mouseReleased(QGraphicsSceneMouseEvent *event)
                     // Hold down Ctrl to copy the moved pixels, otherwise erase.
                     if (!(event->modifiers() & Qt::ControlModifier)) {
                         QPainter p(&image);
-                        foreach (QRect rect, (paintedRgn - newSelection).rects()) {
+                        for (QRect rect : (paintedRgn - newSelection)) {
                             p.fillRect(rect.translated(-r.topLeft()), Qt::black);
                         }
                         p.end();
@@ -1119,7 +1119,7 @@ void BmpSelectionTool::mouseReleased(QGraphicsSceneMouseEvent *event)
                     QImage &bmp = doc->map()->rbmp(!bmpIndex).rimage();
                     QRect r = paintedRgn.boundingRect();
                     QImage image = bmp.copy(r.x(), r.y(), r.width(), r.height());
-                    foreach (QRect rect, oldSelection.rects()) {
+                    for (QRect rect : oldSelection) {
                         copyImageToImage(rect.x(), rect.y(),
                                          rect.width(), rect.height(), bmp,
                                          rect.x() + offset.x() - r.x(),
@@ -1128,7 +1128,7 @@ void BmpSelectionTool::mouseReleased(QGraphicsSceneMouseEvent *event)
                     // Hold down Ctrl to copy the moved pixels, otherwise erase.
                     if (!(event->modifiers() & Qt::ControlModifier)) {
                         QPainter p(&image);
-                        foreach (QRect rect, (paintedRgn - newSelection).rects()) {
+                        for (QRect rect : (paintedRgn - newSelection)) {
                             p.fillRect(rect.translated(-r.topLeft()), Qt::black);
                         }
                         p.end();
@@ -1324,7 +1324,7 @@ void BmpWandTool::mouseReleased(QGraphicsSceneMouseEvent *event)
                     QImage &bmp = doc->map()->rbmp(bmpIndex).rimage();
                     QRect r = paintedRgn.boundingRect();
                     QImage image = bmp.copy(r.x(), r.y(), r.width(), r.height());
-                    foreach (QRect rect, oldSelection.rects()) {
+                    for (QRect rect : oldSelection) {
                         copyImageToImage(rect.x(), rect.y(),
                                          rect.width(), rect.height(), bmp,
                                          rect.x() + offset.x() - r.x(),
@@ -1333,7 +1333,7 @@ void BmpWandTool::mouseReleased(QGraphicsSceneMouseEvent *event)
                     // Hold down Ctrl to copy the moved pixels, otherwise erase.
                     if (!(event->modifiers() & Qt::ControlModifier)) {
                         QPainter p(&image);
-                        foreach (QRect rect, (paintedRgn - newSelection).rects()) {
+                        for (QRect rect : (paintedRgn - newSelection)) {
                             p.fillRect(rect.translated(-r.topLeft()), Qt::black);
                         }
                         p.end();
@@ -1347,7 +1347,7 @@ void BmpWandTool::mouseReleased(QGraphicsSceneMouseEvent *event)
                     QImage &bmp = doc->map()->rbmp(!bmpIndex).rimage();
                     QRect r = paintedRgn.boundingRect();
                     QImage image = bmp.copy(r.x(), r.y(), r.width(), r.height());
-                    foreach (QRect rect, oldSelection.rects()) {
+                    for (QRect rect : oldSelection) {
                         copyImageToImage(rect.x(), rect.y(),
                                          rect.width(), rect.height(), bmp,
                                          rect.x() + offset.x() - r.x(),
@@ -1356,7 +1356,7 @@ void BmpWandTool::mouseReleased(QGraphicsSceneMouseEvent *event)
                     // Hold down Ctrl to copy the moved pixels, otherwise erase.
                     if (!(event->modifiers() & Qt::ControlModifier)) {
                         QPainter p(&image);
-                        foreach (QRect rect, (paintedRgn - newSelection).rects()) {
+                        for (QRect rect : (paintedRgn - newSelection)) {
                             p.fillRect(rect.translated(-r.topLeft()), Qt::black);
                         }
                         p.end();
@@ -1735,7 +1735,7 @@ static QRegion noBlendRegion(Map *map, MapNoBlend *noBlend,
     QRect mapBounds(QPoint(), map->size());
 
     QRegion ret;
-    foreach (QRect r, tileRgn.rects()) {
+    for (QRect r : tileRgn) {
         r &= mapBounds;
         for (int y = r.top(); y <= r.bottom(); y++) {
             for (int x = r.left(); x <= r.right(); x++) {
@@ -1786,7 +1786,7 @@ void NoBlendTool::tilePositionChanged(const QPoint &tilePos)
             MapDocument *doc = mapDocument();
             MapNoBlend *nb = doc->map()->noBlend(currentLayer()->name());
             MapNoBlend noBlend = nb->copy(brushItem()->tileRegion());
-            foreach (QRect r, brushItem()->tileRegion().rects()) {
+            for (QRect r : brushItem()->tileRegion()) {
                 for (int y = r.top(); y <= r.bottom(); y++) {
                     for (int x = r.left(); x <= r.right(); x++) {
                         noBlend.set(x - r.left(), y - r.top(), !noBlend.get(x - r.left(), y - r.top()));
@@ -1890,7 +1890,7 @@ void NoBlendTool::mouseReleased(QGraphicsSceneMouseEvent *event)
                     if (!paintRgn.isEmpty()) {
                         QRect paintRect = paintRgn.boundingRect();
                         MapNoBlend bits = noBlend->copy(paintRgn);
-                        foreach (QRect r, paintRgn.rects()) {
+                        for (QRect r : paintRgn) {
                             for (int y = r.top(); y <= r.bottom(); y++) {
                                 for (int x = r.left(); x <= r.right(); x++) {
                                     bits.set(x - paintRect.x(), y - paintRect.y(), !noBlend->get(x, y));
@@ -1911,7 +1911,7 @@ void NoBlendTool::mouseReleased(QGraphicsSceneMouseEvent *event)
                                 if (layerIndex >= 0) {
                                     QRegion eraseRgn;
                                     TileLayer *tl = doc->map()->layerAt(layerIndex)->asTileLayer();
-                                    foreach (QRect rgnRect, paintRgn.rects()) {
+                                    for (QRect rgnRect : paintRgn) {
                                         for (int y = rgnRect.top(); y <= rgnRect.bottom(); y++) {
                                             for (int x = rgnRect.left(); x <= rgnRect.right(); x++) {
                                                 if (blendTiles.contains(tl->cellAt(x, y).tile))
@@ -1933,7 +1933,7 @@ void NoBlendTool::mouseReleased(QGraphicsSceneMouseEvent *event)
                             // Erase known user-drawn blend tiles in the layer.
                             QRegion eraseRgn;
                             TileLayer *tl = currentLayer()->asTileLayer();
-                            foreach (QRect rgnRect, paintRgn.rects()) {
+                            for (QRect rgnRect : paintRgn) {
                                 for (int y = rgnRect.top(); y <= rgnRect.bottom(); y++) {
                                     for (int x = rgnRect.left(); x <= rgnRect.right(); x++) {
                                         if (blendTiles.contains(tl->cellAt(x, y).tile))
@@ -2134,7 +2134,7 @@ BmpToLayers::BmpToLayers(MapDocument *mapDocument, const QRegion &region, bool m
     // The blender affects 2 tiles around areas where there are pixels, so
     // copy those tiles too.
     QRegion adjusted;
-    foreach (QRect rect, region.rects())
+    for (QRect rect : region)
         adjusted += rect.adjusted(-2, -2, 2, 2) & QRect(QPoint(), mMapDocument->map()->size());
 
     // Put the blender's tiles into the map's tile layers.
@@ -2146,7 +2146,7 @@ BmpToLayers::BmpToLayers(MapDocument *mapDocument, const QRegion &region, bool m
             TileLayer *source = tl->copy(adjusted);
             QPoint topLeft = adjusted.boundingRect().topLeft();
             // Preserve user-drawn tiles where the blender didn't place a tile.
-            foreach (QRect r, adjusted.rects()) {
+            for (QRect r : adjusted) {
                 for (int y = r.top(); y <= r.bottom(); y++) {
                     for (int x = r.left(); x <= r.right(); x++) {
                         if (tl->cellAt(x, y).isEmpty() && !target->cellAt(x, y).isEmpty())

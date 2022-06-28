@@ -87,7 +87,7 @@ public:
     QToolBar *toolBar() const { return mToolBar; }
 
 signals:
-    void selectedToolChanged(AbstractTool *tool);
+    void selectedToolChanged(Tiled::Internal::AbstractTool *tool);
 
     /**
      * Emitted when the status information of the current tool changed.

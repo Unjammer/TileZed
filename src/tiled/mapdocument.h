@@ -31,6 +31,7 @@
 #include "layer.h"
 #ifdef ZOMBOID
 #include "map.h" // for MapRands
+#include "mapobject.h" // needed for meta-type for some reason
 #endif
 
 class QPoint;
@@ -362,7 +363,7 @@ signals:
      * tile coordinates.
      */
 #ifdef ZOMBOID
-    void regionChanged(const QRegion &region, Layer *layer);
+    void regionChanged(const QRegion &region, Tiled::Layer *layer);
 #else
     void regionChanged(const QRegion &region);
 #endif
@@ -372,7 +373,7 @@ signals:
      * The region is given in tile coordinates.
      * If multiple layers have been edited, multiple signals will be emitted.
      */
-    void regionEdited(const QRegion &region, Layer *layer);
+    void regionEdited(const QRegion &region, Tiled::Layer *layer);
 
 #ifdef ZOMBOID
     /**
@@ -381,22 +382,22 @@ signals:
       * regionAltered -- changes due to user edit plus undo/redo
       * This is to support the MiniMap.
       */
-    void regionAltered(const QRegion &region, Layer *layer);
+    void regionAltered(const QRegion &region, Tiled::Layer *layer);
 #endif
 
-    void tilesetAdded(int index, Tileset *tileset);
-    void tilesetRemoved(Tileset *tileset);
+    void tilesetAdded(int index, Tiled::Tileset *tileset);
+    void tilesetRemoved(Tiled::Tileset *tileset);
     void tilesetMoved(int from, int to);
-    void tilesetFileNameChanged(Tileset *tileset);
-    void tilesetNameChanged(Tileset *tileset);
+    void tilesetFileNameChanged(Tiled::Tileset *tileset);
+    void tilesetNameChanged(Tiled::Tileset *tileset);
 #ifdef ZOMBOID
-    void tileLayerNameChanged(Tile *tile);
+    void tileLayerNameChanged(Tiled::Tile *tile);
 #endif
 
-    void objectsAdded(const QList<MapObject*> &objects);
-    void objectsAboutToBeRemoved(const QList<MapObject*> &objects);
-    void objectsRemoved(const QList<MapObject*> &objects);
-    void objectsChanged(const QList<MapObject*> &objects);
+    void objectsAdded(const QList<Tiled::MapObject*> &objects);
+    void objectsAboutToBeRemoved(const QList<Tiled::MapObject*> &objects);
+    void objectsRemoved(const QList<Tiled::MapObject*> &objects);
+    void objectsChanged(const QList<Tiled::MapObject*> &objects);
 
 #ifdef ZOMBOID
     void mapCompositeChanged();
@@ -407,11 +408,11 @@ signals:
     void bmpBlendsChanged();
     void bmpBlendEdgesEverywhereChanged();
 
-    void noBlendPainted(MapNoBlend *noBlend, const QRegion &rgn);
+    void noBlendPainted(Tiled::MapNoBlend *noBlend, const QRegion &rgn);
 #endif
 
 private slots:
-    void onObjectsRemoved(const QList<MapObject*> &objects);
+    void onObjectsRemoved(const QList<Tiled::MapObject*> &objects);
 
     void onLayerAdded(int index);
     void onLayerAboutToBeRemoved(int index);

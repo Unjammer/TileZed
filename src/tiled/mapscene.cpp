@@ -81,8 +81,8 @@ MapScene::MapScene(QObject *parent):
 #endif
 
     TilesetManager *tilesetManager = TilesetManager::instance();
-    connect(tilesetManager, SIGNAL(tilesetChanged(Tileset*)),
-            this, SLOT(tilesetChanged(Tileset*)));
+    connect(tilesetManager, SIGNAL(tilesetChanged(Tiled::Tileset*)),
+            this, SLOT(tilesetChanged(Tiled::Tileset*)));
 
     Preferences *prefs = Preferences::instance();
     connect(prefs, SIGNAL(objectTypesChanged()), SLOT(syncAllObjectItems()));
@@ -130,8 +130,8 @@ void MapScene::setMapDocument(MapDocument *mapDocument)
         connect(mMapDocument, SIGNAL(mapChanged()),
                 this, SLOT(mapChanged()));
 #ifdef ZOMBOID
-        connect(mMapDocument, SIGNAL(regionChanged(QRegion,Layer*)),
-                this, SLOT(regionChanged(QRegion,Layer*)));
+        connect(mMapDocument, SIGNAL(regionChanged(QRegion,Tiled::Layer*)),
+                this, SLOT(regionChanged(QRegion,Tiled::Layer*)));
 #else
         connect(mMapDocument, SIGNAL(regionChanged(QRegion)),
                 this, SLOT(repaintRegion(QRegion)));
@@ -150,12 +150,12 @@ void MapScene::setMapDocument(MapDocument *mapDocument)
                 this, SLOT(layerChanged(int)));
         connect(mMapDocument, SIGNAL(currentLayerIndexChanged(int)),
                 this, SLOT(currentLayerIndexChanged()));
-        connect(mMapDocument, SIGNAL(objectsAdded(QList<MapObject*>)),
-                this, SLOT(objectsAdded(QList<MapObject*>)));
-        connect(mMapDocument, SIGNAL(objectsRemoved(QList<MapObject*>)),
-                this, SLOT(objectsRemoved(QList<MapObject*>)));
-        connect(mMapDocument, SIGNAL(objectsChanged(QList<MapObject*>)),
-                this, SLOT(objectsChanged(QList<MapObject*>)));
+        connect(mMapDocument, SIGNAL(objectsAdded(QList<Tiled::MapObject*>)),
+                this, SLOT(objectsAdded(QList<Tiled::MapObject*>)));
+        connect(mMapDocument, SIGNAL(objectsRemoved(QList<Tiled::MapObject*>)),
+                this, SLOT(objectsRemoved(QList<Tiled::MapObject*>)));
+        connect(mMapDocument, SIGNAL(objectsChanged(QList<Tiled::MapObject*>)),
+                this, SLOT(objectsChanged(QList<Tiled::MapObject*>)));
         connect(mMapDocument, SIGNAL(selectedObjectsChanged()),
                 this, SLOT(updateSelectedObjectItems()));
 #ifdef ZOMBOID
@@ -316,7 +316,7 @@ void MapScene::regionChanged(const QRegion &region, Layer *layer)
     const MapRenderer *renderer = mMapDocument->renderer();
     const QMargins margins = mMapDocument->map()->drawMargins();
 
-    foreach (const QRect &r, region.rects()) {
+    for (const QRect &r : region) {
         update(renderer->boundingRect(r, layer->level()).adjusted(-margins.left(),
                                                                   -margins.top(),
                                                                   margins.right(),

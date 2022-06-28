@@ -62,7 +62,7 @@ QPainterPath BuildingRegionItem::shape() const
 {
     BuildingRenderer *renderer = mScene->renderer();
     QPainterPath path;
-    foreach (const QRect &r, mRegion.rects()) {
+    for (const QRect &r : mRegion) {
         QPolygonF polygon = renderer->tileToScenePolygonF(r, mLevel);
         path.addPolygon(polygon);
     }
@@ -79,7 +79,7 @@ void BuildingRegionItem::paint(QPainter *painter,
     painter->setPen(Qt::NoPen);
 
     BuildingRenderer *renderer = mScene->renderer();
-    foreach (const QRect &r, mRegion.rects()) {
+    for (const QRect &r : mRegion) {
         QPolygonF polygon = renderer->tileToScenePolygonF(r, mLevel);
         if (QRectF(polygon.boundingRect()).intersects(option->exposedRect))
             painter->drawConvexPolygon(polygon);
@@ -1578,7 +1578,7 @@ BuildingOrthoView::BuildingOrthoView(QWidget *parent) :
 
 void BuildingOrthoView::mousePressEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::MidButton) {
+    if (event->button() == Qt::MiddleButton) {
         setHandScrolling(true);
         return;
     }
@@ -1613,7 +1613,7 @@ void BuildingOrthoView::mouseMoveEvent(QMouseEvent *event)
 
 void BuildingOrthoView::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::MidButton) {
+    if (event->button() == Qt::MiddleButton) {
         setHandScrolling(false);
         return;
     }
@@ -1626,13 +1626,15 @@ void BuildingOrthoView::mouseReleaseEvent(QMouseEvent *event)
  */
 void BuildingOrthoView::wheelEvent(QWheelEvent *event)
 {
-    if (event->modifiers() & Qt::ControlModifier
-        && event->orientation() == Qt::Vertical)
+    QPoint numDegrees = event->angleDelta() / 8;
+    if ((event->modifiers() & Qt::ControlModifier) && (numDegrees.y() != 0))
     {
+        QPoint numSteps = numDegrees / 15;
+
         // No automatic anchoring since we'll do it manually
         setTransformationAnchor(QGraphicsView::NoAnchor);
 
-        mZoomable->handleWheelDelta(event->delta());
+        mZoomable->handleWheelDelta(numSteps.y() * 120);
 
         // Place the last known mouse scene pos below the mouse again
         QWidget *view = viewport();

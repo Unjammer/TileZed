@@ -159,7 +159,7 @@ signals:
     void enabledChanged(bool enabled);
 
 private slots:
-    void setMapDocument(MapDocument *mapDocument);
+    void setMapDocument(Tiled::Internal::MapDocument *mapDocument);
 
 private:
     QString mName;

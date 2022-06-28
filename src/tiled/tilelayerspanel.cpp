@@ -534,10 +534,11 @@ void LayersPanelView::mouseDoubleClickEvent(QMouseEvent *event)
 
 void LayersPanelView::wheelEvent(QWheelEvent *event)
 {
-    if (event->modifiers() & Qt::ControlModifier
-        && event->orientation() == Qt::Vertical)
+    QPoint numDegrees = event->angleDelta() / 8;
+    if ((event->modifiers() & Qt::ControlModifier) && (numDegrees.y() != 0))
     {
-        mZoomable->handleWheelDelta(event->delta());
+        QPoint numSteps = numDegrees / 15;
+        mZoomable->handleWheelDelta(numSteps.y() * 120);
         return;
     }
 
@@ -560,7 +561,7 @@ void LayersPanelView::clear()
 
 void LayersPanelView::prependLayer(const QString &layerName, Tile *tile, int layerIndex)
 {
-    int width = fontMetrics().width(layerName);
+    int width = fontMetrics().horizontalAdvance(layerName);
     mMaxHeaderWidth = qMax(mMaxHeaderWidth, width);
 
     model()->prependLayer(layerName, tile, layerIndex);
@@ -618,10 +619,10 @@ void TileLayersPanel::setDocument(MapDocument *doc)
         connect(mDocument, SIGNAL(layerRemovedFromGroup(int,CompositeLayerGroup*)),
                 SLOT(setList()));
         connect(mDocument, SIGNAL(layerChanged(int)), SLOT(layerChanged(int)));
-        connect(mDocument, SIGNAL(regionAltered(QRegion,Layer*)),
-                SLOT(regionAltered(QRegion,Layer*)));
-        connect(mDocument, SIGNAL(noBlendPainted(MapNoBlend*,QRegion)),
-                SLOT(noBlendPainted(MapNoBlend*,QRegion)));
+        connect(mDocument, SIGNAL(regionAltered(QRegion,Tiled::Layer*)),
+                SLOT(regionAltered(QRegion,Tiled::Layer*)));
+        connect(mDocument, SIGNAL(noBlendPainted(Tiled::MapNoBlend*,QRegion)),
+                SLOT(noBlendPainted(Tiled::MapNoBlend*,QRegion)));
 
         mCurrentLayerIndex = mDocument->currentLayerIndex();
         setList();

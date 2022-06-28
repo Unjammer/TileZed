@@ -93,6 +93,11 @@ public:
     LuaRegion() : QRegion() {}
     LuaRegion(const QRegion &rgn) : QRegion(rgn) {}
 
+    QVector<QRect> rects() const
+    {
+        return QVector<QRect>(begin(), end());
+    }
+
     void unite(int x, int y, int w, int h) { *this += QRect(x, y, w, h); }
     void unite(QRect &rect) { *this += rect; }
     void unite(LuaRegion &rgn) { *this += rgn; }
@@ -222,7 +227,7 @@ public:
 
     void replace(const LuaColor &oldColor, const LuaColor &newColor);
 
-    int rand(int x, int y);
+    unsigned int rand(int x, int y);
 
     MapBmp &mBmp;
     QRegion mAltered;

@@ -81,7 +81,7 @@ public:
 private slots:
     virtual void refreshScene();
 
-    virtual void regionAltered(const QRegion &region, Layer *layer);
+    virtual void regionAltered(const QRegion &region, Tiled::Layer *layer);
 
     virtual void mapChanged();
 
@@ -111,7 +111,7 @@ private slots:
     void bmpPainted(int bmpIndex, const QRegion &region);
     void bmpXXXChanged();
 
-    void noBlendPainted(MapNoBlend *noBlend, const QRegion &rgn);
+    void noBlendPainted(Tiled::MapNoBlend *noBlend, const QRegion &rgn);
     void synchNoBlendVisible();
 
     void highlightRoomUnderPointerChanged(bool highlight);

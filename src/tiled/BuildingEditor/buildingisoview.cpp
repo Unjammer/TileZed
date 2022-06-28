@@ -43,11 +43,12 @@
 #include <qmath.h>
 #include <QApplication>
 #include <QDebug>
-#include <QGLFormat>
-#include <QOpenGLWidget>
 #include <QKeyEvent>
 #include <QScrollBar>
 #include <QStyleOptionGraphicsItem>
+#include <QSurfaceFormat>
+
+#include <QtOpenGLWidgets/QOpenGLWidget>
 
 using namespace BuildingEditor;
 using namespace Tiled;
@@ -255,8 +256,8 @@ BuildingIsoScene::BuildingIsoScene(QObject *parent) :
     connect(BuildingTilesMgr::instance(), SIGNAL(tilesetRemoved(Tiled::Tileset*)),
             SLOT(tilesetRemoved(Tiled::Tileset*)));
 
-    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tileset*)),
-            SLOT(tilesetChanged(Tileset*)));
+    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tiled::Tileset*)),
+            SLOT(tilesetChanged(Tiled::Tileset*)));
 
     connect(prefs(), SIGNAL(highlightFloorChanged(bool)),
             SLOT(highlightFloorChanged(bool)));
@@ -725,7 +726,7 @@ void BuildingIsoScene::setCursorPosition(const QPoint &pos)
         QVector<QRect> rects;
         foreach (QRegion rgn, rd.mRegions) {
             if (rgn.contains(pos)) {
-                rects += rgn.rects();
+                rects += QVector<QRect>(rgn.begin(), rgn.end());
                 break;
             }
         }
@@ -1165,7 +1166,7 @@ void BuildingIsoScene::layersUpdated(int level, const QRegion &rgn)
                 mDarkRectangle->setRect(sceneRect);
             }
         }
-        foreach (QRect r, rgn.rects())
+        for (QRect r : rgn)
             item->update(mapRenderer()->boundingRect(r, level).adjusted(0,-(128-32)*2,0,0));
     }
 }
@@ -1248,7 +1249,7 @@ void BuildingIsoView::hideEvent(QHideEvent *event)
 
 void BuildingIsoView::mousePressEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::MidButton) {
+    if (event->button() == Qt::MiddleButton) {
         setHandScrolling(true);
         return;
     }
@@ -1288,7 +1289,7 @@ void BuildingIsoView::mouseMoveEvent(QMouseEvent *event)
 
 void BuildingIsoView::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::MidButton) {
+    if (event->button() == Qt::MiddleButton) {
         setHandScrolling(false);
         return;
     }
@@ -1301,13 +1302,15 @@ void BuildingIsoView::mouseReleaseEvent(QMouseEvent *event)
  */
 void BuildingIsoView::wheelEvent(QWheelEvent *event)
 {
-    if (event->modifiers() & Qt::ControlModifier
-        && event->orientation() == Qt::Vertical)
+    QPoint numDegrees = event->angleDelta() / 8;
+    if ((event->modifiers() & Qt::ControlModifier) && (numDegrees.y() != 0))
     {
+        QPoint numSteps = numDegrees / 15;
+
         // No automatic anchoring since we'll do it manually
         setTransformationAnchor(QGraphicsView::NoAnchor);
 
-        mZoomable->handleWheelDelta(event->delta());
+        mZoomable->handleWheelDelta(numSteps.y() * 120);
 
         // Place the last known mouse scene pos below the mouse again
         QWidget *view = viewport();
@@ -1338,7 +1341,7 @@ void BuildingIsoView::clearDocument()
 void BuildingIsoView::setUseOpenGL(bool useOpenGL)
 {
 #ifndef QT_NO_OPENGL
-    if (useOpenGL && QGLFormat::hasOpenGL()) {
+    if (useOpenGL) {
         if (!qobject_cast<QOpenGLWidget*>(viewport())) {
 //            QSurfaceFormat format = QSurfaceFormat::defaultFormat();
 //            format.setDepth(false); // No need for a depth buffer

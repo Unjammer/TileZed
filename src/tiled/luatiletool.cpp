@@ -159,21 +159,21 @@ void LuaTileTool::activate(MapScene *scene)
 
     connect(mapDocument(), SIGNAL(mapChanged()), SLOT(mapChanged()));
 
-    connect(mapDocument(), SIGNAL(tilesetAdded(int,Tileset*)), SLOT(mapChanged()));
-    connect(mapDocument(), SIGNAL(tilesetRemoved(Tileset*)), SLOT(mapChanged()));
-    connect(mapDocument(), SIGNAL(tilesetNameChanged(Tileset*)), SLOT(mapChanged()));
+    connect(mapDocument(), SIGNAL(tilesetAdded(int,Tiled::Tileset*)), SLOT(mapChanged()));
+    connect(mapDocument(), SIGNAL(tilesetRemoved(Tiled::Tileset*)), SLOT(mapChanged()));
+    connect(mapDocument(), SIGNAL(tilesetNameChanged(Tiled::Tileset*)), SLOT(mapChanged()));
 
     connect(mapDocument(), SIGNAL(layerAdded(int)), SLOT(mapChanged()));
     connect(mapDocument(), SIGNAL(layerRemoved(int)), SLOT(mapChanged()));
     connect(mapDocument(), SIGNAL(layerChanged(int)), SLOT(mapChanged())); // layer renamed
-    connect(mapDocument(), SIGNAL(regionAltered(QRegion,Layer*)), SLOT(mapChanged()));
+    connect(mapDocument(), SIGNAL(regionAltered(QRegion,Tiled::Layer*)), SLOT(mapChanged()));
 
     connect(mapDocument(), SIGNAL(bmpAliasesChanged()), SLOT(mapChanged()));
     connect(mapDocument(), SIGNAL(bmpBlendsChanged()), SLOT(mapChanged()));
     connect(mapDocument(), SIGNAL(bmpRulesChanged()), SLOT(mapChanged()));
     connect(mapDocument(), SIGNAL(bmpPainted(int,QRegion)), SLOT(mapChanged()));
 
-    connect(mapDocument(), SIGNAL(noBlendPainted(MapNoBlend*,QRegion)), SLOT(mapChanged()));
+    connect(mapDocument(), SIGNAL(noBlendPainted(Tiled::MapNoBlend*,QRegion)), SLOT(mapChanged()));
 
     if (!L && !mFileName.isEmpty()) {
         mScene = 0;
@@ -849,7 +849,7 @@ void LuaTileTool::setToolTile(const char *layer, int x, int y, Tile *tile)
 
 void LuaTileTool::setToolTile(const char *layer, const QRegion &rgn, Tile *tile)
 {
-    foreach (QRect r, rgn.rects())
+    for (QRect r : rgn)
         for (int y = r.top(); y <= r.bottom(); y++)
             for (int x = r.left(); x <= r.right(); x++)
                 setToolTile(layer, x, y, tile);
@@ -906,7 +906,7 @@ void LuaTileTool::setToolNoBlend(const char *layer, int x, int y, bool noBlend)
 
 void LuaTileTool::setToolNoBlend(const char *layer, const QRegion &rgn, bool noBlend)
 {
-    foreach (QRect r, rgn.rects())
+    for (QRect r : rgn)
         for (int y = r.top(); y <= r.bottom(); y++)
             for (int x = r.left(); x <= r.right(); x++)
                 setToolNoBlend(layer, x, y, noBlend);

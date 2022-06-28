@@ -438,7 +438,7 @@ bool PackSettingsFile::write(const QString &fileName)
     settingsBlock.addValue("outputImageSize", QString::fromLatin1("%1,%2")
                            .arg(mSettings.mOutputImageSize.width())
                            .arg(mSettings.mOutputImageSize.height()));
-    settingsBlock.addValue("scale50", QLatin1Literal(mSettings.mScale50 ? "true" : "false"));
+    settingsBlock.addValue("scale50", QLatin1String(mSettings.mScale50 ? "true" : "false"));
 
     for (const TexturePackSettings::Directory &tpd : mSettings.mInputImageDirectories) {
         SimpleFileBlock dirBlock;
@@ -472,7 +472,7 @@ bool PackSettingsFile::write(const QString &fileName)
 
 bool PackSettingsFile::stringToSize(const QString &s, QSize &result)
 {
-    QStringList split = s.split(QLatin1Char(','), QString::SkipEmptyParts);
+    QStringList split = s.split(QLatin1Char(','), Qt::SkipEmptyParts);
     if (split.size() != 2) {
         mError = tr("expected w,h but got '%1'").arg(s);
         return false;

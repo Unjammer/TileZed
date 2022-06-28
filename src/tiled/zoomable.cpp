@@ -22,7 +22,7 @@
 
 #include <QComboBox>
 #include <QLineEdit>
-#include <QValidator>
+#include <QRegularExpressionValidator>
 
 #include <cmath>
 
@@ -166,7 +166,7 @@ void Zoomable::connectToComboBox(QComboBox *comboBox)
                 this, SLOT(comboEdited()));
 
         if (!mComboValidator)
-            mComboValidator = new QRegExpValidator(mComboRegExp, this);
+            mComboValidator = new QRegularExpressionValidator(mComboRegExp, this);
         mComboBox->setValidator(mComboValidator);
     }
 }
@@ -178,12 +178,12 @@ void Zoomable::comboActivated(int index)
 
 void Zoomable::comboEdited()
 {
-    int pos = mComboRegExp.indexIn(mComboBox->currentText());
-    Q_UNUSED(pos)
-    Q_ASSERT(pos != -1);
-
+    QRegularExpressionMatch rem = mComboRegExp.match(mComboBox->currentText());
+    if (rem.hasMatch() == false) {
+        return;
+    }
     qreal scale = qBound(mZoomFactors.first(),
-                         qreal(mComboRegExp.cap(1).toDouble() / 100.f),
+                         qreal(rem.captured(1).toDouble() / 100.f),
                          mZoomFactors.last());
 
     setScale(scale);

@@ -125,7 +125,7 @@ void ShadowMap::regionAltered(const QRegion &rgn, Layer *layer)
 #if 0
     int index = mMaster->layers().indexOf(layer);
     if (TileLayer *tl = mMapComposite->map()->layerAt(index)->asTileLayer()) {
-        foreach (QRect r, rgn.rects()) {
+        for (QRect r : rgn) {
             for (int x = r.x(); x <= r.right(); x++) {
                 for (int y = r.y(); y <= r.bottom(); y++) {
                     tl->setCell(x, y, layer->asTileLayer()->cellAt(x, y));
@@ -168,76 +168,6 @@ void ShadowMap::mapChanged(MapInfo *mapInfo)
 }
 
 /////
-
-class MapChange
-{
-public:
-    enum Change {
-        LayerAdded,
-        LayerRemoved,
-        LayerRenamed,
-        RegionAltered,
-        LotAdded,
-        LotRemoved,
-        LotUpdated,
-        MapChanged,
-        MapResized,
-        TilesetAdded,
-        TilesetRemoved,
-        TilesetChanged,
-        BmpPainted,
-        BmpAliasesChanged,
-        BmpRulesChanged,
-        BmpBlendsChanged,
-        NoBlendPainted,
-        Recreate
-    };
-
-    MapChange(Change change) :
-        mChange(change),
-        mTileLayer(QString(), 0, 0, 0, 0)
-    {
-
-    }
-
-    Change mChange;
-    struct LotInfo
-    {
-        MapInfo *mapInfo;
-        quintptr id;
-        QPoint pos;
-        int level;
-    };
-    LotInfo mLotInfo;
-    Tiled::Layer *mLayer;
-    int mLayerIndex;
-    QString mName;
-    struct CellEntry
-    {
-        CellEntry(int x, int y, const Cell &cell) :
-            x(x), y(y), cell(cell)
-        {
-
-        }
-
-        int x, y;
-        Tiled::Cell cell;
-    };
-    QList<CellEntry> mCells;
-    TileLayer mTileLayer;
-    Tileset *mTileset;
-    int mTilesetIndex;
-    QString mTilesetName;
-    QSize mMapSize;
-
-    QImage mBmps[2];
-    int mBmpIndex;
-    QList<BmpAlias*> mBmpAliases;
-    QList<BmpRule*> mBmpRules;
-    QList<BmpBlend*> mBmpBlends;
-    QList<MapNoBlend> mNoBlends;
-    QRegion mRegion;
-};
 
 MiniMapRenderWorker::MiniMapRenderWorker(MapInfo *mapInfo, InterruptibleThread *thread) :
     BaseWorker(thread),
@@ -297,7 +227,7 @@ void MiniMapRenderWorker::work()
     QPainter painter(&mImage);
 
     painter.setRenderHints(QPainter::SmoothPixmapTransform |
-                           QPainter::HighQualityAntialiasing);
+                           QPainter::Antialiasing);
     QTransform xform = QTransform::fromScale(scale, scale)
             .translate(-sceneRect.left(), -sceneRect.top());
     painter.setTransform(xform);
@@ -661,8 +591,8 @@ MiniMapItem::MiniMapItem(ZomboidScene *zscene, QGraphicsItem *parent)
             SLOT(layerRemoved(int)));
     connect(mScene->mapDocument(), SIGNAL(layerRenamed(int)),
             SLOT(layerRenamed(int)));
-    connect(mScene->mapDocument(), SIGNAL(regionAltered(QRegion,Layer*)),
-            SLOT(regionAltered(QRegion,Layer*)));
+    connect(mScene->mapDocument(), SIGNAL(regionAltered(QRegion,Tiled::Layer*)),
+            SLOT(regionAltered(QRegion,Tiled::Layer*)));
     connect(mScene->mapDocument(), SIGNAL(mapChanged()),
             SLOT(mapChanged()));
 
@@ -685,12 +615,12 @@ MiniMapItem::MiniMapItem(ZomboidScene *zscene, QGraphicsItem *parent)
     connect(&mScene->lotManager(), SIGNAL(lotUpdated(MapComposite*,WorldCellLot*)),
         SLOT(lotUpdated(MapComposite*,WorldCellLot*)));
 
-    connect(mScene->mapDocument(), SIGNAL(tilesetAdded(int,Tileset*)),
-            SLOT(tilesetAdded(int,Tileset*)));
-    connect(mScene->mapDocument(), SIGNAL(tilesetRemoved(Tileset*)),
-            SLOT(tilesetRemoved(Tileset*)));
-    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tileset*)),
-            SLOT(tilesetChanged(Tileset*)));
+    connect(mScene->mapDocument(), SIGNAL(tilesetAdded(int,Tiled::Tileset*)),
+            SLOT(tilesetAdded(int,Tiled::Tileset*)));
+    connect(mScene->mapDocument(), SIGNAL(tilesetRemoved(Tiled::Tileset*)),
+            SLOT(tilesetRemoved(Tiled::Tileset*)));
+    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tiled::Tileset*)),
+            SLOT(tilesetChanged(Tiled::Tileset*)));
 
     connect(mScene->mapDocument(), SIGNAL(bmpPainted(int,QRegion)),
             SLOT(bmpPainted(int,QRegion)));
@@ -701,8 +631,8 @@ MiniMapItem::MiniMapItem(ZomboidScene *zscene, QGraphicsItem *parent)
     connect(mScene->mapDocument(), SIGNAL(bmpBlendsChanged()),
             SLOT(bmpBlendsChanged()));
 
-    connect(mScene->mapDocument(), SIGNAL(noBlendPainted(MapNoBlend*,QRegion)),
-            SLOT(noBlendPainted(MapNoBlend*,QRegion)));
+    connect(mScene->mapDocument(), SIGNAL(noBlendPainted(Tiled::MapNoBlend*,QRegion)),
+            SLOT(noBlendPainted(Tiled::MapNoBlend*,QRegion)));
 
     QMap<MapObject*,MapComposite*>::const_iterator it;
     const QMap<MapObject*,MapComposite*> &map = mScene->lotManager().objectToLot();
@@ -868,7 +798,7 @@ void MiniMapItem::regionAltered(const QRegion &region, Layer *layer)
     QRect br = clipped.boundingRect();
     if (layer->asTileLayer() && (br.width() * br.height() > 50)) {
         c->mTileLayer.resize(br.size(), QPoint());
-        foreach (const QRect &r, clipped.rects()) {
+        for (const QRect &r : clipped) {
             for (int y = r.y(); y <= r.bottom(); y++) {
                 for (int x = r.x(); x <= r.right(); x++) {
                     c->mTileLayer.setCell(x-br.x(), y-br.y(),
@@ -878,7 +808,7 @@ void MiniMapItem::regionAltered(const QRegion &region, Layer *layer)
         }
         c->mTileLayer.setPosition(br.topLeft());
     } else {
-        foreach (const QRect &r, clipped.rects()) {
+        for (const QRect &r : clipped) {
             for (int y = r.y(); y <= r.bottom(); y++) {
                 for (int x = r.x(); x <= r.right(); x++) {
                     c->mCells += MapChange::CellEntry(x, y, layer->asTileLayer()->cellAt(x, y));
