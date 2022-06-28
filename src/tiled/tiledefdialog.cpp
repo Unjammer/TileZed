@@ -1928,6 +1928,7 @@ void TileDefDialog::restoreSplitterSizes(QSplitter *splitter)
     QSettings settings;
     settings.beginGroup(QLatin1String("TileDefDialog"));
     QVariant v = settings.value(tr("%1/sizes").arg(splitter->objectName()));
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     if (v.canConvert(QVariant::List)) {
         QList<int> sizes;
         foreach (QVariant v2, v.toList()) {
@@ -1935,6 +1936,15 @@ void TileDefDialog::restoreSplitterSizes(QSplitter *splitter)
         }
         splitter->setSizes(sizes);
     }
+#else
+    if (v.canConvert<QList<QVariant>>()) {
+        QList<int> sizes;
+        for (const QVariant &v2 : v.toList()) {
+            sizes += v2.toInt();
+        }
+        splitter->setSizes(sizes);
+    }
+#endif
     settings.endGroup();
 }
 

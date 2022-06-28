@@ -293,6 +293,7 @@ QWidget *ContainerOverlayDelegate::createEditor(QWidget *parent, const QStyleOpt
         return editor;
     }
     }
+    return nullptr;
 }
 
 void ContainerOverlayDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
@@ -771,8 +772,13 @@ void ContainerOverlayView::dragMoveEvent(QDragMoveEvent *event)
     QAbstractItemView::dragMoveEvent(event);
 
     if (event->isAccepted()) {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         QModelIndex index = indexAt(event->pos());
         int entryIndex = mDelegate->dropCoords(event->pos(), index);
+#else
+        QModelIndex index = indexAt(event->position().toPoint());
+        int entryIndex = mDelegate->dropCoords(event->position().toPoint(), index);
+#endif
         if (entryIndex == -1) {
             event->ignore();
             return;
