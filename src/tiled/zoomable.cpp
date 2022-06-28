@@ -157,9 +157,14 @@ void Zoomable::connectToComboBox(QComboBox *comboBox)
         foreach (qreal scale, mZoomFactors)
             mComboBox->addItem(scaleToString(scale), scale);
         syncComboBox();
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        connect(mComboBox, qOverload<int>(&QComboBox::activated),
+                this, &Zoomable::comboActivated);
+#else
         connect(mComboBox, &QComboBox::activated,
                 this, &Zoomable::comboActivated);
-
+#endif
         mComboBox->setEditable(true);
         mComboBox->setInsertPolicy(QComboBox::NoInsert);
         connect(mComboBox->lineEdit(), &QLineEdit::editingFinished,

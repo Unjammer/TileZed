@@ -121,7 +121,11 @@ void LuaToolOptionsWidget::setOptions(LuaToolOptions *options)
             w->setRange(p->mMin, p->mMax);
             w->setMinimumWidth(96);
             w->installEventFilter(this); // to disable mousewheel
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+            connect(w, qOverload<int>(&QSpinBox::valueChanged), this, &LuaToolOptionsWidget::spinBoxValueChanged);
+#else
             connect(w, &QSpinBox::valueChanged, this, &LuaToolOptionsWidget::spinBoxValueChanged);
+#endif
             mSpinBoxes[p->mName] = w;
             mLayout->addRow(p->mLabel, w);
             continue;
@@ -144,7 +148,11 @@ void LuaToolOptionsWidget::setOptions(LuaToolOptions *options)
             w->setSizeAdjustPolicy(QComboBox::AdjustToContents);
             w->addItems(p->mEnums);
             w->installEventFilter(this); // to disable mousewheel
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+            connect(w, qOverload<int>(&QComboBox::activated), this, &LuaToolOptionsWidget::comboBoxActivated);
+#else
             connect(w, &QComboBox::activated, this, &LuaToolOptionsWidget::comboBoxActivated);
+#endif
             mComboBoxes[p->mName] = w;
             mLayout->addRow(p->mLabel, w);
             continue;

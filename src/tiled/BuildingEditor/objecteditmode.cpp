@@ -87,8 +87,13 @@ ObjectEditModeToolBar::ObjectEditModeToolBar(ObjectEditMode *mode, QWidget *pare
 
     addWidget(mRoomComboBox);
     addAction(actions->actionRooms);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    connect(mRoomComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
+            this, &ObjectEditModeToolBar::roomIndexChanged);
+#else
     connect(mRoomComboBox, &QComboBox::currentIndexChanged,
             this, &ObjectEditModeToolBar::roomIndexChanged);
+#endif
 
     mFloorLabel = new QToolButton;
     mFloorLabel->setMinimumWidth(90);

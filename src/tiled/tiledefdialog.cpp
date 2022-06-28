@@ -426,7 +426,11 @@ TileDefDialog::TileDefDialog(QWidget *parent) :
             w->setRange(p->mMin, p->mMax);
             w->setMinimumWidth(96);
             w->installEventFilter(this); // to disable mousewheel
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+            connect(w, qOverload<int>(&QSpinBox::valueChanged), this, &TileDefDialog::spinBoxValueChanged);
+#else
             connect(w, &QSpinBox::valueChanged, this, &TileDefDialog::spinBoxValueChanged);
+#endif
             mSpinBoxes[p->mName] = w;
             form->addRow(p->mName, w);
             continue;
@@ -449,7 +453,11 @@ TileDefDialog::TileDefDialog(QWidget *parent) :
             w->setSizeAdjustPolicy(QComboBox::AdjustToContents);
             w->addItems(p->mEnums);
             w->installEventFilter(this); // to disable mousewheel
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+            connect(w, qOverload<int>(&QComboBox::activated), this, &TileDefDialog::comboBoxActivated);
+#else
             connect(w, &QComboBox::activated, this, &TileDefDialog::comboBoxActivated);
+#endif
             mComboBoxes[p->mName] = w;
             form->addRow(p->mName, w);
             continue;

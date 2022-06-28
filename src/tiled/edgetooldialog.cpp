@@ -51,8 +51,13 @@ EdgeToolDialog::EdgeToolDialog(QWidget *parent) :
     ui->suppressBlend->setChecked(EdgeTool::instance().suppressBlendTiles());
 
     connect(ui->edgeList, &QListWidget::currentRowChanged, this, &EdgeToolDialog::currentRowChanged);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    connect(ui->dashLen, qOverload<int>(&QSpinBox::valueChanged), this, &EdgeToolDialog::dashChanged);
+    connect(ui->dashGap, qOverload<int>(&QSpinBox::valueChanged), this, &EdgeToolDialog::dashChanged);
+#else
     connect(ui->dashLen, &QSpinBox::valueChanged, this, &EdgeToolDialog::dashChanged);
     connect(ui->dashGap, &QSpinBox::valueChanged, this, &EdgeToolDialog::dashChanged);
+#endif
     connect(ui->suppressBlend, &QAbstractButton::toggled, this, &EdgeToolDialog::suppressChanged);
 
     mVisibleLaterTimer.setSingleShot(true);

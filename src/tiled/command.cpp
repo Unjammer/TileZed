@@ -146,7 +146,11 @@ CommandProcess::CommandProcess(const Command &command, bool inTerminal)
     connect(this, qOverload<QProcess::ProcessError>(&QProcess::errorOccurred),
             this, qOverload<QProcess::ProcessError>(&CommandProcess::handleError));
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    connect(this, qOverload<int,QProcess::ExitStatus>(&QProcess::finished), this, &QObject::deleteLater);
+#else
     connect(this, &QProcess::finished, this, &QObject::deleteLater);
+#endif
 
     start(mFinalCommand);
 }

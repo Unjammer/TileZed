@@ -681,10 +681,17 @@ BuildingTilesDialog::BuildingTilesDialog(QWidget *parent) :
     layoutWidget->setLayout(hbox);
     ui->categoryLayout->insertWidget(1, layoutWidget);
     mEntryOffsetUI = layoutWidget;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    connect(mEntryOffsetSpinX, qOverload<int>(&QSpinBox::valueChanged),
+            this, &BuildingTilesDialog::entryOffsetChanged);
+    connect(mEntryOffsetSpinY, qOverload<int>(&QSpinBox::valueChanged),
+            this, &BuildingTilesDialog::entryOffsetChanged);
+#else
     connect(mEntryOffsetSpinX, &QSpinBox::valueChanged,
             this, &BuildingTilesDialog::entryOffsetChanged);
     connect(mEntryOffsetSpinY, &QSpinBox::valueChanged,
             this, &BuildingTilesDialog::entryOffsetChanged);
+#endif
 
     // Create UI for choosing furniture layer
     {
@@ -709,8 +716,13 @@ BuildingTilesDialog::BuildingTilesDialog(QWidget *parent) :
     ui->categoryLayout->insertWidget(2, layoutWidget);
     mFurnitureLayerUI = layoutWidget;
     mFurnitureLayerComboBox = cb;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    connect(mFurnitureLayerComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
+            this, &BuildingTilesDialog::furnitureLayerChanged);
+#else
     connect(mFurnitureLayerComboBox, &QComboBox::currentIndexChanged,
             this, &BuildingTilesDialog::furnitureLayerChanged);
+#endif
     }
     connect(mFurnitureGrimeCheckBox, &QAbstractButton::toggled,
             this, &BuildingTilesDialog::furnitureGrimeChanged);

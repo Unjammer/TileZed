@@ -206,8 +206,13 @@ TileMetaInfoDialog::TileMetaInfoDialog(QWidget *parent) :
     connect(ui->actionAdd, &QAction::triggered, this, qOverload<>(&TileMetaInfoDialog::addTileset));
     connect(ui->actionRemove, &QAction::triggered, this, qOverload<>(&TileMetaInfoDialog::removeTileset));
     connect(ui->actionAddToMap, &QAction::triggered, this, &TileMetaInfoDialog::addToMap);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    connect(ui->enums, qOverload<int>(&QComboBox::activated),
+            this, &TileMetaInfoDialog::enumChanged);
+#else
     connect(ui->enums, &QComboBox::activated,
             this, &TileMetaInfoDialog::enumChanged);
+#endif
 
     connect(TilesetManager::instance(), &TilesetManager::tilesetChanged,
             this, &TileMetaInfoDialog::tilesetChanged);

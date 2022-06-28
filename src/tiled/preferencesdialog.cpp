@@ -140,8 +140,13 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
 
     fromPreferences();
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    connect(mUi->languageCombo, qOverload<int>(&QComboBox::currentIndexChanged),
+            this, &PreferencesDialog::languageSelected);
+#else
     connect(mUi->languageCombo, &QComboBox::currentIndexChanged,
             this, &PreferencesDialog::languageSelected);
+#endif
     connect(mUi->openGL, &QAbstractButton::toggled, this, &PreferencesDialog::useOpenGLToggled);
     connect(mUi->gridColor, &ColorButton::colorChanged,
             Preferences::instance(), &Preferences::setGridColor);

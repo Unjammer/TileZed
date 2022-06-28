@@ -68,8 +68,13 @@ CreatePackDialog::CreatePackDialog(QWidget *parent) :
     connect(ui->btnLoad, &QAbstractButton::clicked, this, &CreatePackDialog::loadSettings);
     connect(ui->btnSave, &QAbstractButton::clicked, this, &CreatePackDialog::saveSettings);
     connect(ui->btnSaveAs, &QAbstractButton::clicked, this, &CreatePackDialog::saveSettingsAs);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    connect(ui->jumboX, qOverload<int>(&QSpinBox::valueChanged), this, &CreatePackDialog::tileSizeChangedX);
+    connect(ui->jumboY, qOverload<int>(&QSpinBox::valueChanged), this, &CreatePackDialog::tileSizeChangedY);
+#else
     connect(ui->jumboX, &QSpinBox::valueChanged, this, &CreatePackDialog::tileSizeChangedX);
     connect(ui->jumboY, &QSpinBox::valueChanged, this, &CreatePackDialog::tileSizeChangedY);
+#endif
 
     ui->texSizeCombo->setCurrentIndex(1);
 

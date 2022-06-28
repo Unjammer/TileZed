@@ -78,11 +78,19 @@ NewMapDialog::NewMapDialog(QWidget *parent) :
     font.setPointSizeF(size - 1);
     mUi->pixelSizeLabel->setFont(font);
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    connect(mUi->mapWidth, qOverload<int>(&QSpinBox::valueChanged), this, &NewMapDialog::refreshPixelSize);
+    connect(mUi->mapHeight, qOverload<int>(&QSpinBox::valueChanged), this, &NewMapDialog::refreshPixelSize);
+    connect(mUi->tileWidth, qOverload<int>(&QSpinBox::valueChanged), this, &NewMapDialog::refreshPixelSize);
+    connect(mUi->tileHeight, qOverload<int>(&QSpinBox::valueChanged), this, &NewMapDialog::refreshPixelSize);
+    connect(mUi->orientation, qOverload<int>(&QComboBox::currentIndexChanged), this, &NewMapDialog::refreshPixelSize);
+#else
     connect(mUi->mapWidth, &QSpinBox::valueChanged, this, &NewMapDialog::refreshPixelSize);
     connect(mUi->mapHeight, &QSpinBox::valueChanged, this, &NewMapDialog::refreshPixelSize);
     connect(mUi->tileWidth, &QSpinBox::valueChanged, this, &NewMapDialog::refreshPixelSize);
     connect(mUi->tileHeight, &QSpinBox::valueChanged, this, &NewMapDialog::refreshPixelSize);
     connect(mUi->orientation, &QComboBox::currentIndexChanged, this, &NewMapDialog::refreshPixelSize);
+#endif
     refreshPixelSize();
 }
 

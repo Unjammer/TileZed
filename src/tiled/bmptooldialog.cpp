@@ -168,8 +168,13 @@ BmpToolDialog::BmpToolDialog(QWidget *parent) :
     connect(ui->tilesInBlend->zoomable(), &Zoomable::scaleChanged,
             this, &BmpToolDialog::synchBlendTilesView);
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    connect(ui->brushSize, qOverload<int>(&QSpinBox::valueChanged),
+            this, &BmpToolDialog::brushSizeChanged);
+#else
     connect(ui->brushSize, &QSpinBox::valueChanged,
             this, &BmpToolDialog::brushSizeChanged);
+#endif
     connect(ui->brushSquare, &QAbstractButton::clicked,
             this, &BmpToolDialog::brushSquare);
     connect(ui->brushCircle, &QAbstractButton::clicked,

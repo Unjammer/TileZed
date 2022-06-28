@@ -49,7 +49,11 @@
 #include <QStyleOptionGraphicsItem>
 #include <QSurfaceFormat>
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#include <QOpenGLWidget>
+#else
 #include <QtOpenGLWidgets/QOpenGLWidget>
+#endif
 
 using namespace BuildingEditor;
 using namespace Tiled;
