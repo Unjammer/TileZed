@@ -695,6 +695,7 @@ void TilesetDock::refreshTilesetMenu()
 #include "colorbutton.h"
 #include "documentmanager.h"
 #include "erasetiles.h"
+#include "mainwindow.h"
 #include "map.h"
 #include "mapcomposite.h"
 #include "mapdocument.h"
@@ -839,10 +840,10 @@ TilesetDock::TilesetDock(QWidget *parent):
 
     mTilesetView->setModel(new TilesetModel(0, mTilesetView));
 
-    connect(mTilesetNamesView, SIGNAL(currentRowChanged(int)),
-            SLOT(currentTilesetChanged(int)));
-    connect(mTilesetNamesView, SIGNAL(itemChanged(QListWidgetItem*)),
-            SLOT(tilesetItemChanged(QListWidgetItem*)));
+    connect(mTilesetNamesView, &QListWidget::currentRowChanged,
+            this, &TilesetDock::currentTilesetChanged);
+    connect(mTilesetNamesView, &QListWidget::itemChanged,
+            this, &TilesetDock::tilesetItemChanged);
 
     mZoomable->setZoomFactors(QVector<qreal>() << 0.25 << 0.5 << 0.75 << 1.0
                               << 1.25 << 1.5 << 1.75 << 2.0);
@@ -872,12 +873,12 @@ TilesetDock::TilesetDock(QWidget *parent):
     Utils::setThemeIcon(mActionDeleteTileset, "edit-delete");
     Utils::setThemeIcon(mActionRenameTileset, "edit-rename");
 
-    connect(mActionNewTileset, SIGNAL(triggered()), parent, SLOT(newTileset()));
-    connect(mActionImportTileset, SIGNAL(triggered()), SLOT(importTileset()));
-    connect(mActionExportTileset, SIGNAL(triggered()), SLOT(exportTileset()));
-    connect(mActionPropertiesTileset, SIGNAL(triggered()), SLOT(editTilesetProperties()));
-    connect(mActionDeleteTileset, SIGNAL(triggered()), SLOT(removeTileset()));
-    connect(mActionRenameTileset, SIGNAL(triggered()), SLOT(renameTileset()));
+    connect(mActionNewTileset, &QAction::triggered, this, &TilesetDock::newTileset);
+    connect(mActionImportTileset, &QAction::triggered, this, &TilesetDock::importTileset);
+    connect(mActionExportTileset, &QAction::triggered, this, &TilesetDock::exportTileset);
+    connect(mActionPropertiesTileset, &QAction::triggered, this, &TilesetDock::editTilesetProperties);
+    connect(mActionDeleteTileset, &QAction::triggered, this, qOverload<>(&TilesetDock::removeTileset));
+    connect(mActionRenameTileset, &QAction::triggered, this, &TilesetDock::renameTileset);
 
     mIconTileLayer = QIcon(QLatin1String(":/images/16x16/layer-tile.png"));
     mIconTileLayerStop = QIcon(QLatin1String(":/images/16x16/layer-tile-stop.png"));
@@ -885,10 +886,10 @@ TilesetDock::TilesetDock(QWidget *parent):
     bool enabled = Preferences::instance()->autoSwitchLayer();
     mActionSwitchLayer->setChecked(enabled == false);
     mActionSwitchLayer->setIcon(enabled ? mIconTileLayer : mIconTileLayerStop);
-    connect(mActionSwitchLayer, SIGNAL(toggled(bool)),
-            SLOT(layerSwitchToggled()));
-    connect(Preferences::instance(), SIGNAL(autoSwitchLayerChanged(bool)),
-            SLOT(autoSwitchLayerChanged(bool)));
+    connect(mActionSwitchLayer, &QAction::toggled,
+            this, &TilesetDock::layerSwitchToggled);
+    connect(Preferences::instance(), &Preferences::autoSwitchLayerChanged,
+            this, &TilesetDock::autoSwitchLayerChanged);
 
     mToolBar->setIconSize(QSize(16, 16));
 
@@ -907,28 +908,28 @@ TilesetDock::TilesetDock(QWidget *parent):
     connect(Preferences::instance(), &Preferences::tilesetBackgroundColorChanged, this, &TilesetDock::tilesetBackgroundColorChanged);
 
     connect(mTilesetView->selectionModel(),
-            SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
-            SLOT(updateCurrentTiles()));
+            &QItemSelectionModel::selectionChanged,
+            this, &TilesetDock::updateCurrentTiles);
 
     mZoomable->blockSignals(true);
     mZoomable->setScale(Preferences::instance()->tilesetScale());
     mZoomable->blockSignals(false);
-    connect(mZoomable, SIGNAL(scaleChanged(qreal)), Preferences::instance(),
-            SLOT(setTilesetScale(qreal)));
+    connect(mZoomable, &Zoomable::scaleChanged, Preferences::instance(),
+            &Preferences::setTilesetScale);
 
-    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tiled::Tileset*)),
-            SLOT(tilesetChanged(Tiled::Tileset*)));
+    connect(TilesetManager::instance(), &TilesetManager::tilesetChanged,
+            this, &TilesetDock::tilesetChanged);
 
-    connect(DocumentManager::instance(), SIGNAL(documentAboutToClose(int,Tiled::Internal::MapDocument*)),
-            SLOT(documentAboutToClose(int,Tiled::Internal::MapDocument*)));
+    connect(DocumentManager::instance(), &DocumentManager::documentAboutToClose,
+            this, &TilesetDock::documentAboutToClose);
 
-    connect(this, SIGNAL(currentTileChanged(Tiled::Tile*)), SLOT(switchLayerForTile(Tiled::Tile*)));
+    connect(this, &TilesetDock::currentTileChanged, this, &TilesetDock::switchLayerForTile);
 
     mActionTilesetUp->setIcon(QIcon(QLatin1String(":/images/16x16/go-up.png")));
     mActionTilesetDown->setIcon(QIcon(QLatin1String(":/images/16x16/go-down.png")));
 
-    connect(mActionTilesetUp, SIGNAL(triggered()), SLOT(moveTilesetUp()));
-    connect(mActionTilesetDown, SIGNAL(triggered()), SLOT(moveTilesetDown()));
+    connect(mActionTilesetUp, &QAction::triggered, this, &TilesetDock::moveTilesetUp);
+    connect(mActionTilesetDown, &QAction::triggered, this, &TilesetDock::moveTilesetDown);
 
     Utils::setThemeIcon(mActionTilesetUp, "go-up");
     Utils::setThemeIcon(mActionTilesetDown, "go-down");
@@ -937,7 +938,7 @@ TilesetDock::TilesetDock(QWidget *parent):
     mActionSortByName->setCheckable(true);
     mActionSortByName->setChecked(Preferences::instance()->sortTilesets());
 
-    connect(mActionSortByName, SIGNAL(triggered()), SLOT(sortByName()));
+    connect(mActionSortByName, &QAction::triggered, this, &TilesetDock::sortByName);
 
     QVBoxLayout *tilesetNamesLayout = new QVBoxLayout();
     tilesetNamesLayout->setSpacing(5);
@@ -1000,16 +1001,16 @@ void TilesetDock::setMapDocument(MapDocument *mapDocument)
     setTilesetNamesList();
 
     if (mMapDocument) {
-        connect(mMapDocument, SIGNAL(tilesetAdded(int,Tileset*)),
-                SLOT(tilesetAdded(int,Tileset*)));
-        connect(mMapDocument, SIGNAL(tilesetRemoved(Tileset*)),
-                SLOT(tilesetRemoved(Tileset*)));
-        connect(mMapDocument, SIGNAL(tilesetMoved(int,int)),
-                SLOT(tilesetMoved(int,int)));
-        connect(mMapDocument, SIGNAL(tilesetNameChanged(Tileset*)),
-                SLOT(tilesetNameChanged(Tileset*)));
-        connect(mMapDocument, SIGNAL(tilesetFileNameChanged(Tileset*)),
-                SLOT(updateActions()));
+        connect(mMapDocument, &MapDocument::tilesetAdded,
+                this, &TilesetDock::tilesetAdded);
+        connect(mMapDocument, &MapDocument::tilesetRemoved,
+                this, &TilesetDock::tilesetRemoved);
+        connect(mMapDocument, &MapDocument::tilesetMoved,
+                this, &TilesetDock::tilesetMoved);
+        connect(mMapDocument, &MapDocument::tilesetNameChanged,
+                this, &TilesetDock::tilesetNameChanged);
+        connect(mMapDocument, &MapDocument::tilesetFileNameChanged,
+                this, &TilesetDock::updateActions);
 
         QString cacheName = mCurrentTilesets.take(mMapDocument);
         if (mTilesetByName.contains(cacheName)) {
@@ -1399,6 +1400,11 @@ void TilesetDock::tilesetNameChanged(Tileset *tileset)
     int index = mTilesets.indexOf(tileset);
     if (index >= 0)
         mTilesetNamesView->item(index)->setText(tileset->name());
+}
+
+void TilesetDock::newTileset()
+{
+    MainWindow::instance()->newTileset();
 }
 
 void TilesetDock::documentAboutToClose(int index, MapDocument *mapDocument)

@@ -8,7 +8,7 @@ UndoRedoButtons::UndoRedoButtons(QUndoStack *undoStack, QObject *parent) :
     QObject(parent),
     mUndoStack(undoStack)
 {
-    connect(mUndoStack, SIGNAL(indexChanged(int)), SLOT(updateActions()));
+    connect(mUndoStack, &QUndoStack::indexChanged, this, &UndoRedoButtons::updateActions);
 
     mUndo = new QToolButton();
     mUndo->setObjectName(QString::fromUtf8("undo"));
@@ -24,10 +24,10 @@ UndoRedoButtons::UndoRedoButtons(QUndoStack *undoStack, QObject *parent) :
     mRedo->setIcon(icon3);
     mRedo->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
-    connect(mUndo, SIGNAL(clicked()), mUndoStack, SLOT(undo()));
-    connect(mRedo, SIGNAL(clicked()), mUndoStack, SLOT(redo()));
-    connect(mUndoStack, SIGNAL(undoTextChanged(QString)), SLOT(textChanged()));
-    connect(mUndoStack, SIGNAL(redoTextChanged(QString)), SLOT(textChanged()));
+    connect(mUndo, &QAbstractButton::clicked, mUndoStack, &QUndoStack::undo);
+    connect(mRedo, &QAbstractButton::clicked, mUndoStack, &QUndoStack::redo);
+    connect(mUndoStack, &QUndoStack::undoTextChanged, this, &UndoRedoButtons::textChanged);
+    connect(mUndoStack, &QUndoStack::redoTextChanged, this, &UndoRedoButtons::textChanged);
 
     retranslateUi();
 

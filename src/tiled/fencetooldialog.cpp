@@ -49,11 +49,11 @@ FenceToolDialog::FenceToolDialog(QWidget *parent) :
 
     readSettings();
 
-    connect(ui->fenceList, SIGNAL(currentRowChanged(int)), SLOT(currentRowChanged(int)));
+    connect(ui->fenceList, &QListWidget::currentRowChanged, this, &FenceToolDialog::currentRowChanged);
 
     mVisibleLaterTimer.setSingleShot(true);
     mVisibleLaterTimer.setInterval(200);
-    connect(&mVisibleLaterTimer, SIGNAL(timeout()), SLOT(setVisibleNow()));
+    connect(&mVisibleLaterTimer, &QTimer::timeout, this, &FenceToolDialog::setVisibleNow);
 
 //    readTxt();
 }

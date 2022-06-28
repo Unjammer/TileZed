@@ -49,7 +49,7 @@ public:
     TileEditModeToolBar(QWidget *parent = 0);
 
 private slots:
-    void currentDocumentChanged(BuildingDocument *doc);
+    void currentDocumentChanged(BuildingEditor::BuildingDocument *doc);
 
     void updateActions();
 

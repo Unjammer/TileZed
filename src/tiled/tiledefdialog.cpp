@@ -287,8 +287,8 @@ TileDefDialog::TileDefDialog(QWidget *parent) :
     undoAction->setShortcut(QKeySequence::Undo);
     mUndoButton = button;
     ui->buttonLayout->insertWidget(0, button);
-    connect(mUndoGroup, SIGNAL(canUndoChanged(bool)), button, SLOT(setEnabled(bool)));
-    connect(button, SIGNAL(clicked()), undoAction, SIGNAL(triggered()));
+    connect(mUndoGroup, &QUndoGroup::canUndoChanged, button, &QWidget::setEnabled);
+    connect(button, &QAbstractButton::clicked, undoAction, &QAction::triggered);
 
     button = new QToolButton(this);
     button->setIcon(redoIcon);
@@ -299,12 +299,12 @@ TileDefDialog::TileDefDialog(QWidget *parent) :
     redoAction->setShortcut(QKeySequence::Redo);
     mRedoButton = button;
     ui->buttonLayout->insertWidget(1, button);
-    connect(mUndoGroup, SIGNAL(canRedoChanged(bool)), button, SLOT(setEnabled(bool)));
-    connect(button, SIGNAL(clicked()), redoAction, SIGNAL(triggered()));
+    connect(mUndoGroup, &QUndoGroup::canRedoChanged, button, &QWidget::setEnabled);
+    connect(button, &QAbstractButton::clicked, redoAction, &QAction::triggered);
 
-    connect(mUndoGroup, SIGNAL(undoTextChanged(QString)), SLOT(undoTextChanged(QString)));
-    connect(mUndoGroup, SIGNAL(redoTextChanged(QString)), SLOT(redoTextChanged(QString)));
-    connect(mUndoGroup, SIGNAL(cleanChanged(bool)), SLOT(updateUI()));
+    connect(mUndoGroup, &QUndoGroup::undoTextChanged, this, &TileDefDialog::undoTextChanged);
+    connect(mUndoGroup, &QUndoGroup::redoTextChanged, this, &TileDefDialog::redoTextChanged);
+    connect(mUndoGroup, &QUndoGroup::cleanChanged, this, &TileDefDialog::updateUI);
 
     /////
 
@@ -319,9 +319,9 @@ TileDefDialog::TileDefDialog(QWidget *parent) :
     ui->actionPasteProperties->setShortcut(QKeySequence::Paste);
     ui->actionReset->setShortcut(QKeySequence::Delete);
 
-    connect(ui->actionCopyProperties, SIGNAL(triggered()), SLOT(copyProperties()));
-    connect(ui->actionPasteProperties, SIGNAL(triggered()), SLOT(pasteProperties()));
-    connect(ui->actionReset, SIGNAL(triggered()), SLOT(resetDefaults()));
+    connect(ui->actionCopyProperties, &QAction::triggered, this, &TileDefDialog::copyProperties);
+    connect(ui->actionPasteProperties, &QAction::triggered, this, &TileDefDialog::pasteProperties);
+    connect(ui->actionReset, &QAction::triggered, this, qOverload<>(&TileDefDialog::resetDefaults));
 
     /////
 
@@ -334,9 +334,9 @@ TileDefDialog::TileDefDialog(QWidget *parent) :
     toolBar->addAction(ui->actionRemoveTileset);
     ui->toolBarLayout->insertWidget(0, toolBar);
 
-    connect(ui->actionGoBack, SIGNAL(triggered()), SLOT(goBack()));
-    connect(ui->actionGoForward, SIGNAL(triggered()), SLOT(goForward()));
-    connect(ui->actionRemoveTileset, SIGNAL(triggered()), SLOT(removeTileset()));
+    connect(ui->actionGoBack, &QAction::triggered, this, &TileDefDialog::goBack);
+    connect(ui->actionGoForward, &QAction::triggered, this, &TileDefDialog::goForward);
+    connect(ui->actionRemoveTileset, &QAction::triggered, this, qOverload<>(&TileDefDialog::removeTileset));
 
     /////
 
@@ -363,35 +363,35 @@ TileDefDialog::TileDefDialog(QWidget *parent) :
     ui->tiles->model()->setShowLabels(true);
     ui->tiles->model()->setHighlightLabelledItems(true);
 
-    connect(ui->tilesets, SIGNAL(currentRowChanged(int)),
-            SLOT(currentTilesetChanged(int)));
+    connect(ui->tilesets, &QListWidget::currentRowChanged,
+            this, &TileDefDialog::currentTilesetChanged);
     connect(ui->tiles->selectionModel(),
-            SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
-            SLOT(tileSelectionChanged()));
-    connect(ui->tiles, SIGNAL(tileEntered(QModelIndex)), SLOT(tileEntered(QModelIndex)));
-    connect(ui->tiles, SIGNAL(tileLeft(QModelIndex)), SLOT(tileLeft(QModelIndex)));
+            &QItemSelectionModel::selectionChanged,
+            this, &TileDefDialog::tileSelectionChanged);
+    connect(ui->tiles, &MixedTilesetView::tileEntered, this, &TileDefDialog::tileEntered);
+    connect(ui->tiles, &MixedTilesetView::tileLeft, this, &TileDefDialog::tileLeft);
 
     ui->actionNew->setShortcut(QKeySequence::New);
     ui->actionOpen->setShortcut(QKeySequence::Open);
     ui->actionSave->setShortcut(QKeySequence::Save);
     ui->actionSaveAs->setShortcut(QKeySequence::SaveAs);
 
-    connect(ui->actionNew, SIGNAL(triggered()), SLOT(fileNew()));
-    connect(ui->actionOpen, SIGNAL(triggered()), SLOT(fileOpen()));
-    connect(ui->actionSave, SIGNAL(triggered()), SLOT(fileSave()));
-    connect(ui->actionSaveAs, SIGNAL(triggered()), SLOT(fileSaveAs()));
-    connect(ui->actionAddTileset, SIGNAL(triggered()), SLOT(addTileset()));
+    connect(ui->actionNew, &QAction::triggered, this, &TileDefDialog::fileNew);
+    connect(ui->actionOpen, &QAction::triggered, this, qOverload<>(&TileDefDialog::fileOpen));
+    connect(ui->actionSave, &QAction::triggered, this, qOverload<>(&TileDefDialog::fileSave));
+    connect(ui->actionSaveAs, &QAction::triggered, this, &TileDefDialog::fileSaveAs);
+    connect(ui->actionAddTileset, &QAction::triggered, this, &TileDefDialog::addTileset);
 #ifdef TDEF_TILES_DIR
     connect(ui->actionTilesDirectory, SIGNAL(triggered()), SLOT(chooseTilesDirectory()));
 #else
     ui->actionTilesDirectory->setVisible(false);
 #endif
-    connect(ui->actionClose, SIGNAL(triggered()), SLOT(close()));
+    connect(ui->actionClose, &QAction::triggered, this, &QWidget::close);
 
-    connect(ui->actionUserGuide, SIGNAL(triggered()), SLOT(help()));
+    connect(ui->actionUserGuide, &QAction::triggered, this, &TileDefDialog::help);
 
-    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tiled::Tileset*)),
-            SLOT(tilesetChanged(Tiled::Tileset*)));
+    connect(TilesetManager::instance(), &TilesetManager::tilesetChanged,
+            this, &TileDefDialog::tilesetChanged);
 
     connect(Preferences::instance(), &Preferences::tilesetBackgroundColorChanged, this, &TileDefDialog::tilesetBackgroundColorChanged);
 
@@ -415,7 +415,7 @@ TileDefDialog::TileDefDialog(QWidget *parent) :
         if (BooleanTileDefProperty *p = prop->asBoolean()) {
             QCheckBox *w = new QCheckBox(p->mName, ui->propertySheet);
             w->setObjectName(p->mName);
-            connect(w, SIGNAL(toggled(bool)), SLOT(checkboxToggled(bool)));
+            connect(w, &QAbstractButton::toggled, this, &TileDefDialog::checkboxToggled);
             mCheckBoxes[p->mName] = w;
             form->setWidget(form->rowCount(), QFormLayout::SpanningRole, w);
             continue;
@@ -426,7 +426,7 @@ TileDefDialog::TileDefDialog(QWidget *parent) :
             w->setRange(p->mMin, p->mMax);
             w->setMinimumWidth(96);
             w->installEventFilter(this); // to disable mousewheel
-            connect(w, SIGNAL(valueChanged(int)), SLOT(spinBoxValueChanged(int)));
+            connect(w, &QSpinBox::valueChanged, this, &TileDefDialog::spinBoxValueChanged);
             mSpinBoxes[p->mName] = w;
             form->addRow(p->mName, w);
             continue;
@@ -438,7 +438,7 @@ TileDefDialog::TileDefDialog(QWidget *parent) :
             w->setEditable(true);
             w->setInsertPolicy(QComboBox::InsertAlphabetically);
             w->installEventFilter(this); // to disable mousewheel
-            connect(w->lineEdit(), SIGNAL(editingFinished()), SLOT(stringEdited()));
+            connect(w->lineEdit(), &QLineEdit::editingFinished, this, &TileDefDialog::stringEdited);
             mComboBoxes[p->mName] = w;
             form->addRow(p->mName, w);
             continue;
@@ -449,7 +449,7 @@ TileDefDialog::TileDefDialog(QWidget *parent) :
             w->setSizeAdjustPolicy(QComboBox::AdjustToContents);
             w->addItems(p->mEnums);
             w->installEventFilter(this); // to disable mousewheel
-            connect(w, SIGNAL(activated(int)), SLOT(comboBoxActivated(int)));
+            connect(w, &QComboBox::activated, this, &TileDefDialog::comboBoxActivated);
             mComboBoxes[p->mName] = w;
             form->addRow(p->mName, w);
             continue;

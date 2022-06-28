@@ -67,21 +67,21 @@ BuildingTemplatesDialog::BuildingTemplatesDialog(QWidget *parent) :
         ui->templatesList->addItem(btemplate->name());
     }
 
-    connect(ui->templatesList, SIGNAL(itemSelectionChanged()),
-            SLOT(templateSelectionChanged()));
-    connect(ui->actionAdd, SIGNAL(triggered()), SLOT(addTemplate()));
-    connect(ui->actionRemove, SIGNAL(triggered()), SLOT(removeTemplate()));
-    connect(ui->actionDuplicate, SIGNAL(triggered()), SLOT(duplicateTemplate()));
-    connect(ui->actionMoveUp, SIGNAL(triggered()), SLOT(moveUp()));
-    connect(ui->actionMoveDown, SIGNAL(triggered()), SLOT(moveDown()));
-    connect(ui->actionImport, SIGNAL(triggered()), SLOT(importTemplates()));
-    connect(ui->actionExport, SIGNAL(triggered()), SLOT(exportTemplates()));
-    connect(ui->name, SIGNAL(textEdited(QString)), SLOT(nameEdited(QString)));
-    connect(ui->tilesList, SIGNAL(itemSelectionChanged()),
-            SLOT(tileSelectionChanged()));
-    connect(ui->editRooms, SIGNAL(clicked()), SLOT(editRooms()));
-    connect(ui->tilesList, SIGNAL(activated(QModelIndex)), SLOT(chooseTile()));
-    connect(ui->chooseTile, SIGNAL(clicked()), SLOT(chooseTile()));
+    connect(ui->templatesList, &QListWidget::itemSelectionChanged,
+            this, &BuildingTemplatesDialog::templateSelectionChanged);
+    connect(ui->actionAdd, &QAction::triggered, this, &BuildingTemplatesDialog::addTemplate);
+    connect(ui->actionRemove, &QAction::triggered, this, &BuildingTemplatesDialog::removeTemplate);
+    connect(ui->actionDuplicate, &QAction::triggered, this, &BuildingTemplatesDialog::duplicateTemplate);
+    connect(ui->actionMoveUp, &QAction::triggered, this, &BuildingTemplatesDialog::moveUp);
+    connect(ui->actionMoveDown, &QAction::triggered, this, &BuildingTemplatesDialog::moveDown);
+    connect(ui->actionImport, &QAction::triggered, this, &BuildingTemplatesDialog::importTemplates);
+    connect(ui->actionExport, &QAction::triggered, this, &BuildingTemplatesDialog::exportTemplates);
+    connect(ui->name, &QLineEdit::textEdited, this, &BuildingTemplatesDialog::nameEdited);
+    connect(ui->tilesList, &QListWidget::itemSelectionChanged,
+            this, &BuildingTemplatesDialog::tileSelectionChanged);
+    connect(ui->editRooms, &QAbstractButton::clicked, this, &BuildingTemplatesDialog::editRooms);
+    connect(ui->tilesList, &QAbstractItemView::activated, this, &BuildingTemplatesDialog::chooseTile);
+    connect(ui->chooseTile, &QAbstractButton::clicked, this, &BuildingTemplatesDialog::chooseTile);
 
     ui->templatesList->setCurrentRow(0);
     ui->tilesList->setCurrentRow(0);

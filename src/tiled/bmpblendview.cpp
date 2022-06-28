@@ -520,7 +520,7 @@ BmpBlendView::BmpBlendView(QWidget *parent) :
 
     setModel(mModel);
 
-    connect(mZoomable, SIGNAL(scaleChanged(qreal)), SLOT(scaleChanged(qreal)));
+    connect(mZoomable, &Zoomable::scaleChanged, this, &BmpBlendView::scaleChanged);
 }
 
 QSize BmpBlendView::sizeHint() const

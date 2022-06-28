@@ -2341,7 +2341,7 @@ TileDefWatcher::TileDefWatcher() :
     tileDefFileChecked(false),
     watching(false)
 {
-    connect(mWatcher, SIGNAL(fileChanged(QString)), SLOT(fileChanged(QString)));
+    connect(mWatcher, &FileSystemWatcher::fileChanged, this, &TileDefWatcher::fileChanged);
 }
 
 

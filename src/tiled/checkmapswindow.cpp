@@ -52,20 +52,20 @@ CheckMapsWindow::CheckMapsWindow(QWidget *parent) :
 
     setAttribute(Qt::WA_DeleteOnClose);
 
-    connect(ui->dirBrowse, SIGNAL(clicked()), SLOT(browse()));
-    connect(ui->checkNow, SIGNAL(clicked()), SLOT(check()));
-    connect(ui->checkCurrent, SIGNAL(clicked()), SLOT(checkCurrent()));
-    connect(ui->treeWidget, SIGNAL(itemActivated(QTreeWidgetItem*,int)), SLOT(itemActivated(QTreeWidgetItem*,int)));
+    connect(ui->dirBrowse, &QAbstractButton::clicked, this, &CheckMapsWindow::browse);
+    connect(ui->checkNow, &QAbstractButton::clicked, this, qOverload<>(&CheckMapsWindow::check));
+    connect(ui->checkCurrent, &QAbstractButton::clicked, this, &CheckMapsWindow::checkCurrent);
+    connect(ui->treeWidget, &QTreeWidget::itemActivated, this, &CheckMapsWindow::itemActivated);
 
     ui->dirEdit->setText(Preferences::instance()->mapsDirectory());
 
     ui->treeWidget->setColumnCount(1);
 
-    connect(mFileSystemWatcher, SIGNAL(fileChanged(QString)), SLOT(fileChanged(QString)));
+    connect(mFileSystemWatcher, &FileSystemWatcher::fileChanged, this, &CheckMapsWindow::fileChanged);
 
     mChangedFilesTimer.setInterval(500);
     mChangedFilesTimer.setSingleShot(true);
-    connect(&mChangedFilesTimer, SIGNAL(timeout()), SLOT(fileChangedTimeout()));
+    connect(&mChangedFilesTimer, &QTimer::timeout, this, &CheckMapsWindow::fileChangedTimeout);
 }
 
 CheckMapsWindow::~CheckMapsWindow()

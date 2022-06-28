@@ -260,16 +260,16 @@ void ZLevelsModel::setMapDocument(MapDocument *mapDocument)
     if (mMapDocument) {
         mMap = mMapDocument->map();
 
-        connect(mMapDocument, SIGNAL(layerChanged(int)),
-                SLOT(layerChanged(int)));
-        connect(mMapDocument, SIGNAL(layerGroupVisibilityChanged(CompositeLayerGroup*)),
-                SLOT(layerGroupVisibilityChanged(CompositeLayerGroup*)));
-        connect(mMapDocument, SIGNAL(layerLevelChanged(int,int)),
-                SLOT(layerLevelChanged(int,int)));
-        connect(mMapDocument, SIGNAL(layerAdded(int)),
-                SLOT(layerAdded(int)));
-        connect(mMapDocument, SIGNAL(layerAboutToBeRemoved(int)),
-                SLOT(layerAboutToBeRemoved(int)));
+        connect(mMapDocument, &MapDocument::layerChanged,
+                this, &ZLevelsModel::layerChanged);
+        connect(mMapDocument, &MapDocument::layerGroupVisibilityChanged,
+                this, &ZLevelsModel::layerGroupVisibilityChanged);
+        connect(mMapDocument, &MapDocument::layerLevelChanged,
+                this, &ZLevelsModel::layerLevelChanged);
+        connect(mMapDocument, &MapDocument::layerAdded,
+                this, &ZLevelsModel::layerAdded);
+        connect(mMapDocument, &MapDocument::layerAboutToBeRemoved,
+                this, &ZLevelsModel::layerAboutToBeRemoved);
 
         mRootItem = new Item();
 

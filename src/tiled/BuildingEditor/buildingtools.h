@@ -149,8 +149,8 @@ public:
 
 signals:
     void currentEditorChanged();
-    void currentToolChanged(BaseTool *tool);
-    void statusTextChanged(BaseTool *tool);
+    void currentToolChanged(BuildingEditor::BaseTool *tool);
+    void statusTextChanged(BuildingEditor::BaseTool *tool);
 
 private slots:
     void currentToolStatusTextChanged();

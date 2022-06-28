@@ -578,42 +578,42 @@ BuildingTilesDialog::BuildingTilesDialog(QWidget *parent) :
     ui->categoryTilesView->setAcceptDrops(true);
     ui->categoryTilesView->setDropIndicatorShown(false);
     ui->categoryTilesView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    connect(ui->categoryTilesView->model(), SIGNAL(tileDropped(QString,int)),
-            SLOT(tileDropped(QString,int)));
+    connect(ui->categoryTilesView->model(), &MixedTilesetModel::tileDropped,
+            this, &BuildingTilesDialog::tileDropped);
     connect(ui->categoryTilesView->selectionModel(),
-            SIGNAL(currentChanged(QModelIndex,QModelIndex)),
-            SLOT(tileSelectionChanged()));
-    connect(ui->categoryTilesView, SIGNAL(activated(QModelIndex)),
-            SLOT(tileActivated(QModelIndex)));
+            &QItemSelectionModel::currentChanged,
+            this, &BuildingTilesDialog::tileSelectionChanged);
+    connect(ui->categoryTilesView, &QAbstractItemView::activated,
+            this, &BuildingTilesDialog::tileActivated);
 
     ui->categoryView->setZoomable(mZoomable);
     ui->categoryView->setAcceptDrops(true);
     ui->categoryView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    connect(ui->categoryView->model(), SIGNAL(tileDropped(BuildingTileEntry*,int,QString)),
-            SLOT(entryTileDropped(BuildingTileEntry*,int,QString)));
+    connect(ui->categoryView->model(), &TileCategoryModel::tileDropped,
+            this, &BuildingTilesDialog::entryTileDropped);
     connect(ui->categoryView->selectionModel(),
-            SIGNAL(currentChanged(QModelIndex,QModelIndex)),
-            SLOT(entrySelectionChanged()));
-    connect(ui->categoryView, SIGNAL(activated(QModelIndex)),
-            SLOT(entryActivated(QModelIndex)));
+            &QItemSelectionModel::currentChanged,
+            this, &BuildingTilesDialog::entrySelectionChanged);
+    connect(ui->categoryView, &QAbstractItemView::activated,
+            this, &BuildingTilesDialog::entryActivated);
 
     ui->furnitureView->setZoomable(mZoomable);
     ui->furnitureView->setAcceptDrops(true);
     ui->furnitureView->model()->setShowResolved(false);
     ui->furnitureView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     connect(ui->furnitureView->model(),
-            SIGNAL(furnitureTileDropped(FurnitureTile*,int,int,QString)),
-            SLOT(furnitureTileDropped(FurnitureTile*,int,int,QString)));
+            &FurnitureModel::furnitureTileDropped,
+            this, &BuildingTilesDialog::furnitureTileDropped);
     connect(ui->furnitureView->selectionModel(),
-            SIGNAL(currentChanged(QModelIndex,QModelIndex)),
-            SLOT(furnitureSelectionChanged()));
-    connect(ui->furnitureView, SIGNAL(activated(QModelIndex)),
-            SLOT(furnitureActivated(QModelIndex)));
+            &QItemSelectionModel::currentChanged,
+            this, &BuildingTilesDialog::furnitureSelectionChanged);
+    connect(ui->furnitureView, &QAbstractItemView::activated,
+            this, &BuildingTilesDialog::furnitureActivated);
 
-    connect(ui->categoryList, SIGNAL(currentRowChanged(int)),
-            SLOT(categoryChanged(int)));
-    connect(ui->categoryList, SIGNAL(itemChanged(QListWidgetItem*)),
-            SLOT(categoryNameEdited(QListWidgetItem*)));
+    connect(ui->categoryList, &QListWidget::currentRowChanged,
+            this, &BuildingTilesDialog::categoryChanged);
+    connect(ui->categoryList, &QListWidget::itemChanged,
+            this, &BuildingTilesDialog::categoryNameEdited);
 //    mCategory = BuildingTiles::instance()->categories().at(ui->categoryList->currentRow());
 
     ui->filterEdit->setClearButtonEnabled(true);
@@ -622,23 +622,23 @@ BuildingTilesDialog::BuildingTilesDialog(QWidget *parent) :
 
     ui->tilesetList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 //    ui->listWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-    connect(ui->tilesetList, SIGNAL(itemSelectionChanged()),
-            SLOT(tilesetSelectionChanged()));
-    connect(TileMetaInfoMgr::instance(), SIGNAL(tilesetAdded(Tiled::Tileset*)),
-            SLOT(tilesetAdded(Tiled::Tileset*)));
-    connect(TileMetaInfoMgr::instance(), SIGNAL(tilesetAboutToBeRemoved(Tiled::Tileset*)),
-            SLOT(tilesetAboutToBeRemoved(Tiled::Tileset*)));
-    connect(TileMetaInfoMgr::instance(), SIGNAL(tilesetRemoved(Tiled::Tileset*)),
-            SLOT(tilesetRemoved(Tiled::Tileset*)));
+    connect(ui->tilesetList, &QListWidget::itemSelectionChanged,
+            this, &BuildingTilesDialog::tilesetSelectionChanged);
+    connect(TileMetaInfoMgr::instance(), &TileMetaInfoMgr::tilesetAdded,
+            this, &BuildingTilesDialog::tilesetAdded);
+    connect(TileMetaInfoMgr::instance(), &TileMetaInfoMgr::tilesetAboutToBeRemoved,
+            this, &BuildingTilesDialog::tilesetAboutToBeRemoved);
+    connect(TileMetaInfoMgr::instance(), &TileMetaInfoMgr::tilesetRemoved,
+            this, &BuildingTilesDialog::tilesetRemoved);
 
-    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tiled::Tileset*)),
-            SLOT(tilesetChanged(Tiled::Tileset*)));
+    connect(TilesetManager::instance(), &TilesetManager::tilesetChanged,
+            this, &BuildingTilesDialog::tilesetChanged);
 
     ui->tilesetTilesView->setZoomable(mZoomable);
     ui->tilesetTilesView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     connect(ui->tilesetTilesView->selectionModel(),
-            SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
-            SLOT(synchUI()));
+            &QItemSelectionModel::selectionChanged,
+            this, &BuildingTilesDialog::synchUI);
 
     ui->tilesetTilesView->setDragEnabled(true);
 
@@ -649,10 +649,10 @@ BuildingTilesDialog::BuildingTilesDialog(QWidget *parent) :
     toolBar->addAction(ui->actionRemoveCategory);
     toolBar->addAction(ui->actionMoveCategoryUp);
     toolBar->addAction(ui->actionMoveCategoryDown);
-    connect(ui->actionRemoveCategory, SIGNAL(triggered()), SLOT(removeCategory()));
-    connect(ui->actionNewCategory, SIGNAL(triggered()), SLOT(newCategory()));
-    connect(ui->actionMoveCategoryUp, SIGNAL(triggered()), SLOT(moveCategoryUp()));
-    connect(ui->actionMoveCategoryDown, SIGNAL(triggered()), SLOT(moveCategoryDown()));
+    connect(ui->actionRemoveCategory, &QAction::triggered, this, qOverload<>(&BuildingTilesDialog::removeCategory));
+    connect(ui->actionNewCategory, &QAction::triggered, this, &BuildingTilesDialog::newCategory);
+    connect(ui->actionMoveCategoryUp, &QAction::triggered, this, &BuildingTilesDialog::moveCategoryUp);
+    connect(ui->actionMoveCategoryDown, &QAction::triggered, this, &BuildingTilesDialog::moveCategoryDown);
     ui->categoryListToolbarLayout->addWidget(toolBar);
     /////
 
@@ -681,10 +681,10 @@ BuildingTilesDialog::BuildingTilesDialog(QWidget *parent) :
     layoutWidget->setLayout(hbox);
     ui->categoryLayout->insertWidget(1, layoutWidget);
     mEntryOffsetUI = layoutWidget;
-    connect(mEntryOffsetSpinX, SIGNAL(valueChanged(int)),
-            SLOT(entryOffsetChanged()));
-    connect(mEntryOffsetSpinY, SIGNAL(valueChanged(int)),
-            SLOT(entryOffsetChanged()));
+    connect(mEntryOffsetSpinX, &QSpinBox::valueChanged,
+            this, &BuildingTilesDialog::entryOffsetChanged);
+    connect(mEntryOffsetSpinY, &QSpinBox::valueChanged,
+            this, &BuildingTilesDialog::entryOffsetChanged);
 
     // Create UI for choosing furniture layer
     {
@@ -709,11 +709,11 @@ BuildingTilesDialog::BuildingTilesDialog(QWidget *parent) :
     ui->categoryLayout->insertWidget(2, layoutWidget);
     mFurnitureLayerUI = layoutWidget;
     mFurnitureLayerComboBox = cb;
-    connect(mFurnitureLayerComboBox, SIGNAL(currentIndexChanged(int)),
-            SLOT(furnitureLayerChanged(int)));
+    connect(mFurnitureLayerComboBox, &QComboBox::currentIndexChanged,
+            this, &BuildingTilesDialog::furnitureLayerChanged);
     }
-    connect(mFurnitureGrimeCheckBox, SIGNAL(toggled(bool)),
-            SLOT(furnitureGrimeChanged(bool)));
+    connect(mFurnitureGrimeCheckBox, &QAbstractButton::toggled,
+            this, &BuildingTilesDialog::furnitureGrimeChanged);
 
     /////
     toolBar = new QToolBar();
@@ -726,13 +726,13 @@ BuildingTilesDialog::BuildingTilesDialog(QWidget *parent) :
     toolBar->addAction(ui->actionAddTiles);
     toolBar->addAction(ui->actionRemoveTiles);
     toolBar->addAction(ui->actionExpertMode);
-    connect(ui->actionToggleCorners, SIGNAL(triggered()), SLOT(toggleCorners()));
-    connect(ui->actionClearTiles, SIGNAL(triggered()), SLOT(clearTiles()));
-    connect(ui->actionMoveTileUp, SIGNAL(triggered()), SLOT(moveTileUp()));
-    connect(ui->actionMoveTileDown, SIGNAL(triggered()), SLOT(moveTileDown()));
-    connect(ui->actionAddTiles, SIGNAL(triggered()), SLOT(addTiles()));
-    connect(ui->actionRemoveTiles, SIGNAL(triggered()), SLOT(removeTiles()));
-    connect(ui->actionExpertMode, SIGNAL(toggled(bool)), SLOT(setExpertMode(bool)));
+    connect(ui->actionToggleCorners, &QAction::triggered, this, qOverload<>(&BuildingTilesDialog::toggleCorners));
+    connect(ui->actionClearTiles, &QAction::triggered, this, &BuildingTilesDialog::clearTiles);
+    connect(ui->actionMoveTileUp, &QAction::triggered, this, &BuildingTilesDialog::moveTileUp);
+    connect(ui->actionMoveTileDown, &QAction::triggered, this, &BuildingTilesDialog::moveTileDown);
+    connect(ui->actionAddTiles, &QAction::triggered, this, &BuildingTilesDialog::addTiles);
+    connect(ui->actionRemoveTiles, &QAction::triggered, this, &BuildingTilesDialog::removeTiles);
+    connect(ui->actionExpertMode, &QAction::toggled, this, &BuildingTilesDialog::setExpertMode);
     ui->categoryToolbarLayout->addWidget(toolBar, 1);
 
     QComboBox *scaleComboBox = new QComboBox;
@@ -757,10 +757,10 @@ BuildingTilesDialog::BuildingTilesDialog(QWidget *parent) :
     button->setShortcut(QKeySequence::Undo);
     mUndoButton = button;
     ui->buttonsLayout->insertWidget(0, button);
-    connect(mUndoGroup, SIGNAL(canUndoChanged(bool)), button, SLOT(setEnabled(bool)));
-    connect(mUndoGroup, SIGNAL(undoTextChanged(QString)), SLOT(undoTextChanged(QString)));
-    connect(mUndoGroup, SIGNAL(redoTextChanged(QString)), SLOT(redoTextChanged(QString)));
-    connect(button, SIGNAL(clicked()), undoAction, SIGNAL(triggered()));
+    connect(mUndoGroup, &QUndoGroup::canUndoChanged, button, &QWidget::setEnabled);
+    connect(mUndoGroup, &QUndoGroup::undoTextChanged, this, &BuildingTilesDialog::undoTextChanged);
+    connect(mUndoGroup, &QUndoGroup::redoTextChanged, this, &BuildingTilesDialog::redoTextChanged);
+    connect(button, &QAbstractButton::clicked, undoAction, &QAction::triggered);
 
     button = new QToolButton(this);
     button->setIcon(redoIcon);
@@ -771,10 +771,10 @@ BuildingTilesDialog::BuildingTilesDialog(QWidget *parent) :
     button->setShortcut(QKeySequence::Redo);
     mRedoButton = button;
     ui->buttonsLayout->insertWidget(1, button);
-    connect(mUndoGroup, SIGNAL(canRedoChanged(bool)), button, SLOT(setEnabled(bool)));
-    connect(button, SIGNAL(clicked()), redoAction, SIGNAL(triggered()));
+    connect(mUndoGroup, &QUndoGroup::canRedoChanged, button, &QWidget::setEnabled);
+    connect(button, &QAbstractButton::clicked, redoAction, &QAction::triggered);
 
-    connect(ui->tilesetMgr, SIGNAL(clicked()), SLOT(manageTilesets()));
+    connect(ui->tilesetMgr, &QAbstractButton::clicked, this, &BuildingTilesDialog::manageTilesets);
 
     ui->overallSplitter->setStretchFactor(1, 1);
 

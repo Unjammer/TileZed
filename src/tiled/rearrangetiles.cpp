@@ -168,7 +168,7 @@ void RearrangeTilesView::setZoomable(Zoomable *zoomable)
 {
     mZoomable = zoomable;
     if (zoomable)
-        connect(mZoomable, SIGNAL(scaleChanged(qreal)), SLOT(scaleChanged(qreal)));
+        connect(mZoomable, &Zoomable::scaleChanged, this, &RearrangeTilesView::scaleChanged);
 }
 
 void RearrangeTilesView::clear()
@@ -222,7 +222,7 @@ void RearrangeTilesView::init()
 
     setModel(mModel);
 
-    connect(mZoomable, SIGNAL(scaleChanged(qreal)), SLOT(scaleChanged(qreal)));
+    connect(mZoomable, &Zoomable::scaleChanged, this, &RearrangeTilesView::scaleChanged);
 }
 
 /////
@@ -467,18 +467,18 @@ RearrangeTiles::RearrangeTiles(QWidget *parent) :
     mZoomable->connectToComboBox(ui->scaleComboBox);
     ui->tiles1x2x->setZoomable(mZoomable);
 
-    connect(ui->actionSave, SIGNAL(triggered(bool)), SLOT(fileSave()));
-    connect(ui->actionQuit, SIGNAL(triggered(bool)), SLOT(close()));
+    connect(ui->actionSave, &QAction::triggered, this, &RearrangeTiles::fileSave);
+    connect(ui->actionQuit, &QAction::triggered, this, &QWidget::close);
 
-    connect(ui->browseTiles1x, SIGNAL(clicked()), SLOT(browse1x()));
-    connect(ui->browseTiles2x, SIGNAL(clicked()), SLOT(browse2x()));
+    connect(ui->browseTiles1x, &QAbstractButton::clicked, this, &RearrangeTiles::browse1x);
+    connect(ui->browseTiles2x, &QAbstractButton::clicked, this, &RearrangeTiles::browse2x);
 
     ui->editTiles1x->setText(Preferences::instance()->tilesDirectory());
     ui->editTiles2x->setText(Preferences::instance()->tiles2xDirectory());
 
-    connect(ui->tilesets, SIGNAL(currentRowChanged(int)),
-            SLOT(currentTilesetChanged(int)));
-    connect(ui->tiles1x2x, SIGNAL(clicked(QModelIndex)), SLOT(tileClicked(QModelIndex)));
+    connect(ui->tilesets, &QListWidget::currentRowChanged,
+            this, &RearrangeTiles::currentTilesetChanged);
+    connect(ui->tiles1x2x, &QAbstractItemView::clicked, this, &RearrangeTiles::tileClicked);
 
     setTilesetList();
 }

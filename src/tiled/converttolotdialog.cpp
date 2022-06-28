@@ -28,7 +28,7 @@ ConvertToLotDialog::ConvertToLotDialog(const MapDocument *mapDocument,
 {
     ui->setupUi(this);
 
-    connect(ui->mapBrowse, SIGNAL(clicked()), SLOT(mapBrowse()));
+    connect(ui->mapBrowse, &QAbstractButton::clicked, this, &ConvertToLotDialog::mapBrowse);
 
     // mapPath is the file path of the source map before conversion.
     QFileInfo info(mapDocument->fileName());

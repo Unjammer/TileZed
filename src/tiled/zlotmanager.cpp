@@ -40,10 +40,10 @@ using namespace Tiled::Internal;
 ZLotManager::ZLotManager()
     : mMapDocument(0)
 {
-    connect(MapManager::instance(), SIGNAL(mapLoaded(MapInfo*)),
-            SLOT(mapLoaded(MapInfo*)));
-    connect(MapManager::instance(), SIGNAL(mapFailedToLoad(MapInfo*)),
-            SLOT(mapFailedToLoad(MapInfo*)));
+    connect(MapManager::instance(), &MapManager::mapLoaded,
+            this, &ZLotManager::mapLoaded);
+    connect(MapManager::instance(), &MapManager::mapFailedToLoad,
+            this, &ZLotManager::mapFailedToLoad);
 }
 
 ZLotManager::~ZLotManager()
@@ -63,16 +63,16 @@ void ZLotManager::setMapDocument(MapDocument *mapDoc)
         mMapDocument = mapDoc;
 
         if (mMapDocument) {
-            connect(mapDocument(), SIGNAL(layerAdded(int)),
-                    this, SLOT(onLayerAdded(int)));
-            connect(mapDocument(), SIGNAL(layerAboutToBeRemoved(int)),
-                    this, SLOT(onLayerAboutToBeRemoved(int)));
-            connect(mapDocument(), SIGNAL(objectsAdded(QList<Tiled::MapObject*>)),
-                    this, SLOT(onObjectsAdded(QList<Tiled::MapObject*>)));
-            connect(mapDocument(), SIGNAL(objectsChanged(QList<Tiled::MapObject*>)),
-                    this, SLOT(onObjectsChanged(QList<Tiled::MapObject*>)));
-            connect(mapDocument(), SIGNAL(objectsRemoved(QList<Tiled::MapObject*>)),
-                this, SLOT(onObjectsRemoved(QList<Tiled::MapObject*>)));
+            connect(mapDocument(), &MapDocument::layerAdded,
+                    this, &ZLotManager::onLayerAdded);
+            connect(mapDocument(), &MapDocument::layerAboutToBeRemoved,
+                    this, &ZLotManager::onLayerAboutToBeRemoved);
+            connect(mapDocument(), &MapDocument::objectsAdded,
+                    this, &ZLotManager::onObjectsAdded);
+            connect(mapDocument(), &MapDocument::objectsChanged,
+                    this, &ZLotManager::onObjectsChanged);
+            connect(mapDocument(), &MapDocument::objectsRemoved,
+                this, &ZLotManager::onObjectsRemoved);
 
             Map *map = mapDocument()->map();
             foreach (ObjectGroup *og, map->objectGroups())
@@ -92,10 +92,10 @@ void ZLotManager::setMapDocument(MapDocument *mapDoc)
                 }
             }
 
-            connect(WorldEd::WorldEdMgr::instance(), SIGNAL(beforeWorldChanged(QString)),
-                    SLOT(beforeWorldChanged()));
-            connect(WorldEd::WorldEdMgr::instance(), SIGNAL(afterWorldChanged(QString)),
-                    SLOT(afterWorldChanged()));
+            connect(WorldEd::WorldEdMgr::instance(), &WorldEd::WorldEdMgr::beforeWorldChanged,
+                    this, &ZLotManager::beforeWorldChanged);
+            connect(WorldEd::WorldEdMgr::instance(), &WorldEd::WorldEdMgr::afterWorldChanged,
+                    this, &ZLotManager::afterWorldChanged);
 #endif
         }
     }

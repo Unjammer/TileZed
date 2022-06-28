@@ -95,14 +95,14 @@ BuildingDocument::BuildingDocument(Building *building, const QString &fileName) 
     if (layerNames.size())
         setCurrentLayer(layerNames.first());
 
-    connect(BuildingTilesMgr::instance(), SIGNAL(entryTileChanged(BuildingTileEntry*)),
-            SLOT(entryTileChanged(BuildingTileEntry*)));
+    connect(BuildingTilesMgr::instance(), qOverload<BuildingTileEntry*>(&BuildingTilesMgr::entryTileChanged),
+            this, &BuildingDocument::entryTileChanged);
     connect(FurnitureGroups::instance(),
-            SIGNAL(furnitureTileChanged(FurnitureTile*)),
-            SLOT(furnitureTileChanged(FurnitureTile*)));
+            &FurnitureGroups::furnitureTileChanged,
+            this, &BuildingDocument::furnitureTileChanged);
     connect(FurnitureGroups::instance(),
-            SIGNAL(furnitureLayerChanged(FurnitureTiles*)),
-            SLOT(furnitureLayerChanged(FurnitureTiles*)));
+            &FurnitureGroups::furnitureLayerChanged,
+            this, &BuildingDocument::furnitureLayerChanged);
 }
 
 BuildingDocument::~BuildingDocument()

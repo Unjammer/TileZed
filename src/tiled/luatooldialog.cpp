@@ -44,12 +44,12 @@ LuaToolDialog::LuaToolDialog(QWidget *parent) :
 
     readSettings();
 
-    connect(ui->options, SIGNAL(valueChanged(LuaToolOption*,QVariant)),
-            SIGNAL(valueChanged(LuaToolOption*,QVariant)));
+    connect(ui->options, &Lua::LuaToolOptionsWidget::valueChanged,
+            this, &LuaToolDialog::valueChanged);
 
     mVisibleLaterTimer.setSingleShot(true);
     mVisibleLaterTimer.setInterval(200);
-    connect(&mVisibleLaterTimer, SIGNAL(timeout()), SLOT(setVisibleNow()));
+    connect(&mVisibleLaterTimer, &QTimer::timeout, this, &LuaToolDialog::setVisibleNow);
 }
 
 LuaToolDialog::~LuaToolDialog()

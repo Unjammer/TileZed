@@ -60,12 +60,12 @@ WorldLotTool::WorldLotTool(QObject *parent) :
     mHoverLot(0),
     mShowingContextMenu(false)
 {
-    connect(WorldEd::WorldEdMgr::instance(), SIGNAL(beforeWorldChanged(QString)),
-            SLOT(beforeWorldChanged()));
-    connect(WorldEd::WorldEdMgr::instance(), SIGNAL(afterWorldChanged(QString)),
-            SLOT(afterWorldChanged()));
-    connect(WorldEd::WorldEdMgr::instance(), SIGNAL(lotVisibilityChanged(WorldCellLot*)),
-            SLOT(lotVisibilityChanged(WorldCellLot*)));
+    connect(WorldEd::WorldEdMgr::instance(), &WorldEd::WorldEdMgr::beforeWorldChanged,
+            this, &WorldLotTool::beforeWorldChanged);
+    connect(WorldEd::WorldEdMgr::instance(), &WorldEd::WorldEdMgr::afterWorldChanged,
+            this, &WorldLotTool::afterWorldChanged);
+    connect(WorldEd::WorldEdMgr::instance(), &WorldEd::WorldEdMgr::lotVisibilityChanged,
+            this, &WorldLotTool::lotVisibilityChanged);
 }
 
 WorldLotTool::~WorldLotTool()

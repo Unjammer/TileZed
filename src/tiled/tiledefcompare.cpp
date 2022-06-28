@@ -41,14 +41,14 @@ TileDefCompare::TileDefCompare(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    connect(ui->packBrowse1, SIGNAL(clicked()), SLOT(browse1()));
-    connect(ui->packBrowse2, SIGNAL(clicked()), SLOT(browse2()));
-    connect(ui->switchButton, SIGNAL(clicked(bool)), SLOT(swapPaths()));
-    connect(ui->compare, SIGNAL(clicked()), SLOT(compare()));
-    connect(ui->use1, SIGNAL(clicked()), SLOT(use1()));
-    connect(ui->use2, SIGNAL(clicked()), SLOT(use2()));
-    connect(ui->saveMerged, SIGNAL(clicked()), SLOT(saveMerged()));
-    connect(ui->listWidget, SIGNAL(currentRowChanged(int)), SLOT(currentRowChanged(int)));
+    connect(ui->packBrowse1, &QAbstractButton::clicked, this, &TileDefCompare::browse1);
+    connect(ui->packBrowse2, &QAbstractButton::clicked, this, &TileDefCompare::browse2);
+    connect(ui->switchButton, &QAbstractButton::clicked, this, &TileDefCompare::swapPaths);
+    connect(ui->compare, &QAbstractButton::clicked, this, &TileDefCompare::compare);
+    connect(ui->use1, &QAbstractButton::clicked, this, &TileDefCompare::use1);
+    connect(ui->use2, &QAbstractButton::clicked, this, &TileDefCompare::use2);
+    connect(ui->saveMerged, &QAbstractButton::clicked, this, &TileDefCompare::saveMerged);
+    connect(ui->listWidget, &QListWidget::currentRowChanged, this, &TileDefCompare::currentRowChanged);
 
     readSettings();
 }

@@ -37,12 +37,12 @@ EmbeddedMainWindow::EmbeddedMainWindow(QWidget *parent) :
 void EmbeddedMainWindow::registerDockWidget(QDockWidget *dockWidget)
 {
     Q_ASSERT(!dockWidget->objectName().isEmpty());
-    connect(dockWidget->toggleViewAction(), SIGNAL(triggered()),
-        this, SLOT(onDockActionTriggered()), Qt::QueuedConnection);
-    connect(dockWidget, SIGNAL(visibilityChanged(bool)),
-            this, SLOT(onDockVisibilityChange(bool)));
-    connect(dockWidget, SIGNAL(topLevelChanged(bool)),
-            this, SLOT(onDockTopLevelChanged()));
+    connect(dockWidget->toggleViewAction(), &QAction::triggered,
+        this, &EmbeddedMainWindow::onDockActionTriggered, Qt::QueuedConnection);
+    connect(dockWidget, &QDockWidget::visibilityChanged,
+            this, &EmbeddedMainWindow::onDockVisibilityChange);
+    connect(dockWidget, &QDockWidget::topLevelChanged,
+            this, &EmbeddedMainWindow::onDockTopLevelChanged);
     dockWidget->setProperty(KEY_DOCKWIDGET_ACTIVE_STATE, true);
 }
 

@@ -869,10 +869,10 @@ MapComposite::MapComposite(MapInfo *mapInfo, Map::Orientation orientRender,
                     }
                     if (subMapInfo) {
                         if (subMapInfo->isLoading()) {
-                            connect(MapManager::instance(), SIGNAL(mapLoaded(MapInfo*)),
-                                    SLOT(mapLoaded(MapInfo*)), Qt::UniqueConnection);
-                            connect(MapManager::instance(), SIGNAL(mapFailedToLoad(MapInfo*)),
-                                    SLOT(mapFailedToLoad(MapInfo*)), Qt::UniqueConnection);
+                            connect(MapManager::instance(), &MapManager::mapLoaded,
+                                    this, &MapComposite::mapLoaded, Qt::UniqueConnection);
+                            connect(MapManager::instance(), &MapManager::mapFailedToLoad,
+                                    this, &MapComposite::mapFailedToLoad, Qt::UniqueConnection);
                             mSubMapsLoading += SubMapLoading(subMapInfo,
                                                              object->position().toPoint()
                                                              + mOrientAdjustPos * levelOffset,
@@ -936,7 +936,7 @@ MapComposite::MapComposite(MapInfo *mapInfo, Map::Orientation orientRender,
         mSortedLayerGroups.append(mLayerGroups[level]);
     }
 
-    connect(mBmpBlender, SIGNAL(layersRecreated()), SLOT(bmpBlenderLayersRecreated()));
+    connect(mBmpBlender, &Internal::BmpBlender::layersRecreated, this, &MapComposite::bmpBlenderLayersRecreated);
     mBmpBlender->markDirty(0, 0, mMap->width() - 1, mMap->height() - 1);
     mLayerGroups[0]->setBmpBlendLayers(mBmpBlender->tileLayers());
 }
@@ -1524,10 +1524,10 @@ void MapComposite::recreate()
                     }
                     if (subMapInfo) {
                         if (subMapInfo->isLoading()) {
-                            connect(MapManager::instance(), SIGNAL(mapLoaded(MapInfo*)),
-                                    SLOT(mapLoaded(MapInfo*)), Qt::UniqueConnection);
-                            connect(MapManager::instance(), SIGNAL(mapFailedToLoad(MapInfo*)),
-                                    SLOT(mapFailedToLoad(MapInfo*)), Qt::UniqueConnection);
+                            connect(MapManager::instance(), &MapManager::mapLoaded,
+                                    this, &MapComposite::mapLoaded, Qt::UniqueConnection);
+                            connect(MapManager::instance(), &MapManager::mapFailedToLoad,
+                                    this, &MapComposite::mapFailedToLoad, Qt::UniqueConnection);
                             mSubMapsLoading += SubMapLoading(subMapInfo,
                                                              object->position().toPoint()
                                                              + mOrientAdjustPos * levelOffset,

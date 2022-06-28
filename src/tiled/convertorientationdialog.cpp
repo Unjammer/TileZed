@@ -38,9 +38,9 @@ ConvertOrientationDialog::ConvertOrientationDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    connect(ui->browseButton, SIGNAL(clicked()), SLOT(browse()));
-    connect(ui->selectAll, SIGNAL(clicked()), SLOT(selectAll()));
-    connect(ui->selectNone, SIGNAL(clicked()), SLOT(selectNone()));
+    connect(ui->browseButton, &QAbstractButton::clicked, this, &ConvertOrientationDialog::browse);
+    connect(ui->selectAll, &QAbstractButton::clicked, this, &ConvertOrientationDialog::selectAll);
+    connect(ui->selectNone, &QAbstractButton::clicked, this, &ConvertOrientationDialog::selectNone);
 
     Preferences *prefs = Preferences::instance();
     QString mapsDir = prefs->mapsDirectory();

@@ -182,33 +182,33 @@ signals:
     void currentRoomChanged();
     void currentLayerChanged();
 
-    void roomAtPositionChanged(BuildingFloor *floor, const QPoint &pos);
+    void roomAtPositionChanged(BuildingEditor::BuildingFloor *floor, const QPoint &pos);
     void roomDefinitionChanged();
 
-    void floorAdded(BuildingFloor *floor);
-    void floorRemoved(BuildingFloor *floor);
-    void floorEdited(BuildingFloor *floor);
+    void floorAdded(BuildingEditor::BuildingFloor *floor);
+    void floorRemoved(BuildingEditor::BuildingFloor *floor);
+    void floorEdited(BuildingEditor::BuildingFloor *floor);
 
-    void floorTilesChanged(BuildingFloor *floor);
-    void floorTilesChanged(BuildingFloor *floor, const QString &layerName,
+    void floorTilesChanged(BuildingEditor::BuildingFloor *floor);
+    void floorTilesChanged(BuildingEditor::BuildingFloor *floor, const QString &layerName,
                            const QRect &bounds);
 
-    void layerOpacityChanged(BuildingFloor *floor, const QString &layerName);
-    void layerVisibilityChanged(BuildingFloor *floor, const QString &layerName);
+    void layerOpacityChanged(BuildingEditor::BuildingFloor *floor, const QString &layerName);
+    void layerVisibilityChanged(BuildingEditor::BuildingFloor *floor, const QString &layerName);
 
-    void objectAdded(BuildingObject *object);
-    void objectAboutToBeRemoved(BuildingObject *object);
-    void objectRemoved(BuildingObject *object);
-    void objectMoved(BuildingObject *object);
-    void objectTileChanged(BuildingObject *object);
-    void objectChanged(BuildingObject *object);
-    void objectPicked(BuildingObject *object);
+    void objectAdded(BuildingEditor::BuildingObject *object);
+    void objectAboutToBeRemoved(BuildingEditor::BuildingObject *object);
+    void objectRemoved(BuildingEditor::BuildingObject *object);
+    void objectMoved(BuildingEditor::BuildingObject *object);
+    void objectTileChanged(BuildingEditor::BuildingObject *object);
+    void objectChanged(BuildingEditor::BuildingObject *object);
+    void objectPicked(BuildingEditor::BuildingObject *object);
 
-    void roomAdded(Room *room);
-    void roomAboutToBeRemoved(Room *room);
-    void roomRemoved(Room *room);
+    void roomAdded(BuildingEditor::Room *room);
+    void roomAboutToBeRemoved(BuildingEditor::Room *room);
+    void roomRemoved(BuildingEditor::Room *room);
     void roomsReordered();
-    void roomChanged(Room *room);
+    void roomChanged(BuildingEditor::Room *room);
 
     void buildingResized();
     void buildingRotated();
@@ -231,9 +231,9 @@ private:
     void checkUsedFurniture(FurnitureTiles *ftiles);
 
 private slots:
-    void entryTileChanged(BuildingTileEntry *entry);
-    void furnitureTileChanged(FurnitureTile *ftile);
-    void furnitureLayerChanged(FurnitureTiles *ftiles);
+    void entryTileChanged(BuildingEditor::BuildingTileEntry *entry);
+    void furnitureTileChanged(BuildingEditor::FurnitureTile *ftile);
+    void furnitureLayerChanged(BuildingEditor::FurnitureTiles *ftiles);
     
 private:
     Building *mBuilding;

@@ -47,18 +47,18 @@ BuildingPropertiesDialog::BuildingPropertiesDialog(BuildingDocument *doc,
     ui->tilesList->clear();
     ui->tilesList->addItems(BuildingTemplate::enumTileNames());
 
-    connect(ui->tilesList, SIGNAL(itemSelectionChanged()),
-            SLOT(tileSelectionChanged()));
-    connect(ui->tilesList, SIGNAL(activated(QModelIndex)), SLOT(chooseTile()));
-    connect(ui->chooseTile, SIGNAL(clicked()), SLOT(chooseTile()));
+    connect(ui->tilesList, &QListWidget::itemSelectionChanged,
+            this, &BuildingPropertiesDialog::tileSelectionChanged);
+    connect(ui->tilesList, &QAbstractItemView::activated, this, &BuildingPropertiesDialog::chooseTile);
+    connect(ui->chooseTile, &QAbstractButton::clicked, this, &BuildingPropertiesDialog::chooseTile);
 
-    connect(ui->rooms, SIGNAL(clicked()),
-            BuildingEditorWindow::instance(), SLOT(roomsDialog()));
-    connect(ui->makeTemplate, SIGNAL(clicked()),
-            BuildingEditorWindow::instance(), SLOT(templateFromBuilding()));
+    connect(ui->rooms, &QAbstractButton::clicked,
+            BuildingEditorWindow::instance(), &BuildingEditorWindow::roomsDialog);
+    connect(ui->makeTemplate, &QAbstractButton::clicked,
+            BuildingEditorWindow::instance(), &BuildingEditorWindow::templateFromBuilding);
 
-    connect(ui->buttonBox, SIGNAL(clicked(QAbstractButton*)),
-            SLOT(bbclicked(QAbstractButton*)));
+    connect(ui->buttonBox, &QDialogButtonBox::clicked,
+            this, &BuildingPropertiesDialog::bbclicked);
 
     mTiles = mDocument->building()->tiles();
 

@@ -34,7 +34,7 @@ ConfigDialog::ConfigDialog(QWidget *parent) :
     QString configPath = settings.value(KEY_CONFIG_DIR, defaultPath).toString();
     ui->configDirectory->setText(configPath);
 
-    connect(ui->configBrowse, SIGNAL(clicked()), SLOT(configBrowse()));
+    connect(ui->configBrowse, &QAbstractButton::clicked, this, &ConfigDialog::configBrowse);
 }
 
 ConfigDialog::~ConfigDialog()

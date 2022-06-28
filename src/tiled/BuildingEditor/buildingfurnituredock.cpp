@@ -83,17 +83,17 @@ BuildingFurnitureDock::BuildingFurnitureDock(QWidget *parent) :
     BuildingPreferences *prefs = BuildingPreferences::instance();
     mFurnitureView->zoomable()->setScale(prefs->tileScale());
     mFurnitureView->zoomable()->connectToComboBox(scaleCombo);
-    connect(prefs, SIGNAL(tileScaleChanged(qreal)),
-            SLOT(tileScaleChanged(qreal)));
-    connect(mFurnitureView->zoomable(), SIGNAL(scaleChanged(qreal)),
-            prefs, SLOT(setTileScale(qreal)));
+    connect(prefs, &BuildingPreferences::tileScaleChanged,
+            this, &BuildingFurnitureDock::tileScaleChanged);
+    connect(mFurnitureView->zoomable(), &Tiled::Internal::Zoomable::scaleChanged,
+            prefs, &BuildingPreferences::setTileScale);
 
-    connect(mGroupList, SIGNAL(currentRowChanged(int)), SLOT(currentGroupChanged(int)));
-    connect(mFurnitureView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
-            SLOT(currentFurnitureChanged()));
+    connect(mGroupList, &QListWidget::currentRowChanged, this, &BuildingFurnitureDock::currentGroupChanged);
+    connect(mFurnitureView->selectionModel(), &QItemSelectionModel::selectionChanged,
+            this, &BuildingFurnitureDock::currentFurnitureChanged);
 
-    connect(BuildingTilesDialog::instance(), SIGNAL(edited()),
-            SLOT(tilesDialogEdited()));
+    connect(BuildingTilesDialog::instance(), &BuildingTilesDialog::edited,
+            this, &BuildingFurnitureDock::tilesDialogEdited);
 
     retranslateUi();
 }

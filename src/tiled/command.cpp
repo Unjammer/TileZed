@@ -143,10 +143,10 @@ CommandProcess::CommandProcess(const Command &command, bool inTerminal)
 #endif
     }
 
-    connect(this, SIGNAL(error(QProcess::ProcessError)),
-            SLOT(handleError(QProcess::ProcessError)));
+    connect(this, qOverload<QProcess::ProcessError>(&QProcess::errorOccurred),
+            this, qOverload<QProcess::ProcessError>(&CommandProcess::handleError));
 
-    connect(this, SIGNAL(finished(int)), SLOT(deleteLater()));
+    connect(this, &QProcess::finished, this, &QObject::deleteLater);
 
     start(mFinalCommand);
 }

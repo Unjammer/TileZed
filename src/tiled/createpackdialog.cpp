@@ -57,19 +57,19 @@ CreatePackDialog::CreatePackDialog(QWidget *parent) :
     tb2->addAction(ui->actionRemoveTileDef);
     ui->tileDefToolbarLayout->addWidget(tb2);
 
-    connect(ui->packNameEdit, SIGNAL(textChanged(QString)), SLOT(syncUI()));
-    connect(ui->packNameBrowse, SIGNAL(clicked()), SLOT(savePackAs()));
-    connect(ui->actionAddDirectory, SIGNAL(triggered()), SLOT(addDirectory()));
-    connect(ui->actionRemoveDirectory, SIGNAL(triggered()), SLOT(removeDirectory()));
-    connect(ui->dirList, SIGNAL(itemSelectionChanged()), SLOT(syncUI()));
+    connect(ui->packNameEdit, &QLineEdit::textChanged, this, &CreatePackDialog::syncUI);
+    connect(ui->packNameBrowse, &QAbstractButton::clicked, this, &CreatePackDialog::savePackAs);
+    connect(ui->actionAddDirectory, &QAction::triggered, this, &CreatePackDialog::addDirectory);
+    connect(ui->actionRemoveDirectory, &QAction::triggered, this, &CreatePackDialog::removeDirectory);
+    connect(ui->dirList, &QListWidget::itemSelectionChanged, this, &CreatePackDialog::syncUI);
     connect(ui->tileDefList, &QListWidget::itemSelectionChanged, this, &CreatePackDialog::syncUI);
     connect(ui->actionAddTileDef, &QAction::triggered, this, &CreatePackDialog::addTileDef);
     connect(ui->actionRemoveTileDef, &QAction::triggered, this, &CreatePackDialog::removeTileDef);
-    connect(ui->btnLoad, SIGNAL(clicked()), SLOT(loadSettings()));
-    connect(ui->btnSave, SIGNAL(clicked()), SLOT(saveSettings()));
-    connect(ui->btnSaveAs, SIGNAL(clicked()), SLOT(saveSettingsAs()));
-    connect(ui->jumboX, SIGNAL(valueChanged(int)), SLOT(tileSizeChangedX(int)));
-    connect(ui->jumboY, SIGNAL(valueChanged(int)), SLOT(tileSizeChangedY(int)));
+    connect(ui->btnLoad, &QAbstractButton::clicked, this, &CreatePackDialog::loadSettings);
+    connect(ui->btnSave, &QAbstractButton::clicked, this, &CreatePackDialog::saveSettings);
+    connect(ui->btnSaveAs, &QAbstractButton::clicked, this, &CreatePackDialog::saveSettingsAs);
+    connect(ui->jumboX, &QSpinBox::valueChanged, this, &CreatePackDialog::tileSizeChangedX);
+    connect(ui->jumboY, &QSpinBox::valueChanged, this, &CreatePackDialog::tileSizeChangedY);
 
     ui->texSizeCombo->setCurrentIndex(1);
 

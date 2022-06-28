@@ -71,9 +71,9 @@ ObjectsDock::ObjectsDock(QWidget *parent)
     Utils::setThemeIcon(mActionRemoveObjects, "edit-delete");
     Utils::setThemeIcon(mActionObjectProperties, "document-properties");
 
-    connect(mActionDuplicateObjects, SIGNAL(triggered()), SLOT(duplicateObjects()));
-    connect(mActionRemoveObjects, SIGNAL(triggered()), SLOT(removeObjects()));
-    connect(mActionObjectProperties, SIGNAL(triggered()), SLOT(objectProperties()));
+    connect(mActionDuplicateObjects, &QAction::triggered, this, &ObjectsDock::duplicateObjects);
+    connect(mActionRemoveObjects, &QAction::triggered, this, &ObjectsDock::removeObjects);
+    connect(mActionObjectProperties, &QAction::triggered, this, &ObjectsDock::objectProperties);
 
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
@@ -85,8 +85,8 @@ ObjectsDock::ObjectsDock(QWidget *parent)
     QAction *newLayerAction = new QAction(this);
     newLayerAction->setIcon(QIcon(QLatin1String(":/images/16x16/document-new.png")));
     newLayerAction->setToolTip(tr("Add Object Layer"));
-    connect(newLayerAction, SIGNAL(triggered()),
-            handler->actionAddObjectGroup(), SIGNAL(triggered()));
+    connect(newLayerAction, &QAction::triggered,
+            handler->actionAddObjectGroup(), &QAction::triggered);
 
     mActionMoveToLayer = new QAction(this);
     mActionMoveToLayer->setIcon(QIcon(QLatin1String(":/images/16x16/layer-object.png")));
@@ -107,9 +107,9 @@ ObjectsDock::ObjectsDock(QWidget *parent)
     mMoveToMenu = new QMenu(this);
     button->setPopupMode(QToolButton::InstantPopup);
     button->setMenu(mMoveToMenu);
-    connect(mMoveToMenu, SIGNAL(aboutToShow()), SLOT(aboutToShowMoveToMenu()));
-    connect(mMoveToMenu, SIGNAL(triggered(QAction*)),
-            SLOT(triggeredMoveToMenu(QAction*)));
+    connect(mMoveToMenu, &QMenu::aboutToShow, this, &ObjectsDock::aboutToShowMoveToMenu);
+    connect(mMoveToMenu, &QMenu::triggered,
+            this, &ObjectsDock::triggeredMoveToMenu);
 
     toolbar->addAction(mActionObjectProperties);
 
@@ -119,11 +119,11 @@ ObjectsDock::ObjectsDock(QWidget *parent)
 
     // Workaround since a tabbed dockwidget that is not currently visible still
     // returns true for isVisible()
-    connect(this, SIGNAL(visibilityChanged(bool)),
-            mObjectsView, SLOT(setVisible(bool)));
+    connect(this, &QDockWidget::visibilityChanged,
+            mObjectsView, &QWidget::setVisible);
 
-    connect(DocumentManager::instance(), SIGNAL(documentAboutToClose(int,Tiled::Internal::MapDocument*)),
-            SLOT(documentAboutToClose(int,Tiled::Internal::MapDocument*)));
+    connect(DocumentManager::instance(), &DocumentManager::documentAboutToClose,
+            this, &ObjectsDock::documentAboutToClose);
 
     updateActions();
 }
@@ -141,8 +141,8 @@ void ObjectsDock::setMapDocument(MapDocument *mapDoc)
 
     if (mMapDocument) {
         restoreExpandedGroups(mMapDocument);
-        connect(mMapDocument, SIGNAL(selectedObjectsChanged()),
-                this, SLOT(updateActions()));
+        connect(mMapDocument, &MapDocument::selectedObjectsChanged,
+                this, &ObjectsDock::updateActions);
     }
 
     updateActions();
@@ -309,7 +309,7 @@ ObjectsView::ObjectsView(QWidget *parent)
     setSelectionBehavior(QAbstractItemView::SelectRows);
     setSelectionMode(QAbstractItemView::ExtendedSelection);
 
-    connect(this, SIGNAL(activated(QModelIndex)), SLOT(onActivated(QModelIndex)));
+    connect(this, &QAbstractItemView::activated, this, &ObjectsView::onActivated);
 }
 
 QSize ObjectsView::sizeHint() const
@@ -339,8 +339,8 @@ void ObjectsView::setMapDocument(MapDocument *mapDoc)
         header()->setResizeMode(0, QHeaderView::Stretch);
 #endif
 
-        connect(mMapDocument, SIGNAL(selectedObjectsChanged()),
-                this, SLOT(selectedObjectsChanged()));
+        connect(mMapDocument, &MapDocument::selectedObjectsChanged,
+                this, &ObjectsView::selectedObjectsChanged);
     } else {
         if (model())
             model()->setMapDocument(0);

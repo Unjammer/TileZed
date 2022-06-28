@@ -114,21 +114,21 @@ ZLevelsDock::ZLevelsDock(QWidget *parent) :
     setWidget(widget);
     retranslateUi();
 
-    connect(mOpacitySlider, SIGNAL(valueChanged(int)),
-            SLOT(setLayerOpacity(int)));
+    connect(mOpacitySlider, &QAbstractSlider::valueChanged,
+            this, &ZLevelsDock::setLayerOpacity);
     updateOpacitySlider();
 
-    connect(mVisibilitySlider, SIGNAL(valueChanged(int)),
-            SLOT(setTopmostVisibleLayer(int)));
+    connect(mVisibilitySlider, &QAbstractSlider::valueChanged,
+            this, &ZLevelsDock::setTopmostVisibleLayer);
     updateVisibilitySlider();
 
     // Workaround since a tabbed dockwidget that is not currently visible still
     // returns true for isVisible()
-    connect(this, SIGNAL(visibilityChanged(bool)),
-            mView, SLOT(setVisible(bool)));
+    connect(this, &QDockWidget::visibilityChanged,
+            mView, &QWidget::setVisible);
 
-    connect(DocumentManager::instance(), SIGNAL(documentAboutToClose(int,Tiled::Internal::MapDocument*)),
-            SLOT(documentAboutToClose(int,Tiled::Internal::MapDocument*)));
+    connect(DocumentManager::instance(), &DocumentManager::documentAboutToClose,
+            this, &ZLevelsDock::documentAboutToClose);
 
     updateActions();
 }
@@ -146,10 +146,10 @@ void ZLevelsDock::setMapDocument(MapDocument *mapDoc)
 
     if (mMapDocument) {
         restoreExpandedLevels(mMapDocument);
-        connect(mMapDocument, SIGNAL(currentLayerIndexChanged(int)),
-                this, SLOT(updateOpacitySlider()));
-        connect(mMapDocument, SIGNAL(currentLayerIndexChanged(int)),
-                this, SLOT(updateVisibilitySlider()));
+        connect(mMapDocument, &MapDocument::currentLayerIndexChanged,
+                this, &ZLevelsDock::updateOpacitySlider);
+        connect(mMapDocument, &MapDocument::currentLayerIndexChanged,
+                this, &ZLevelsDock::updateVisibilitySlider);
     }
 
     updateOpacitySlider();
@@ -293,7 +293,7 @@ ZLevelsView::ZLevelsView(QWidget *parent)
     setSelectionBehavior(QAbstractItemView::SelectRows);
 //    setSelectionMode(QAbstractItemView::ExtendedSelection);
 
-    connect(this, SIGNAL(activated(QModelIndex)), SLOT(onActivated(QModelIndex)));
+    connect(this, &QAbstractItemView::activated, this, &ZLevelsView::onActivated);
 }
 
 QSize ZLevelsView::sizeHint() const
@@ -322,10 +322,10 @@ void ZLevelsView::setMapDocument(MapDocument *mapDoc)
         header()->setResizeMode(0, QHeaderView::Stretch);
 #endif
 
-        connect(mMapDocument, SIGNAL(currentLayerIndexChanged(int)),
-                this, SLOT(currentLayerIndexChanged(int)));
-        connect(mMapDocument, SIGNAL(editLayerNameRequested()),
-                this, SLOT(editLayerName()));
+        connect(mMapDocument, &MapDocument::currentLayerIndexChanged,
+                this, &ZLevelsView::currentLayerIndexChanged);
+        connect(mMapDocument, &MapDocument::editLayerNameRequested,
+                this, &ZLevelsView::editLayerName);
     } else {
         if (model())
             model()->setMapDocument(0);

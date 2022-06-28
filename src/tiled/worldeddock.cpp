@@ -39,10 +39,10 @@ WorldCellLotModel::WorldCellLotModel(QObject *parent) :
     mRoot(0),
     mCell(0)
 {
-    connect(WorldEd::WorldEdMgr::instance(), SIGNAL(levelVisibilityChanged(WorldCellLevel*)),
-            SLOT(levelVisibilityChanged(WorldCellLevel*)));
-    connect(WorldEd::WorldEdMgr::instance(), SIGNAL(lotVisibilityChanged(WorldCellLot*)),
-            SLOT(lotVisibilityChanged(WorldCellLot*)));
+    connect(WorldEd::WorldEdMgr::instance(), &WorldEd::WorldEdMgr::levelVisibilityChanged,
+            this, &WorldCellLotModel::levelVisibilityChanged);
+    connect(WorldEd::WorldEdMgr::instance(), &WorldEd::WorldEdMgr::lotVisibilityChanged,
+            this, &WorldCellLotModel::lotVisibilityChanged);
 }
 
 WorldCellLotModel::~WorldCellLotModel()
@@ -302,24 +302,24 @@ WorldEdDock::WorldEdDock(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    connect(ui->view->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
-            SLOT(selectionChanged()));
-    connect(ui->view, SIGNAL(activated(QModelIndex)), SLOT(activated(QModelIndex)));
+    connect(ui->view->selectionModel(), &QItemSelectionModel::selectionChanged,
+            this, &WorldEdDock::selectionChanged);
+    connect(ui->view, &QAbstractItemView::activated, this, &WorldEdDock::activated);
 
-    connect(WorldEd::WorldEdMgr::instance(), SIGNAL(lotVisibilityChanged(WorldCellLot*)),
-            SLOT(visibilityChanged(WorldCellLot*)));
-    connect(WorldEd::WorldEdMgr::instance(), SIGNAL(levelVisibilityChanged(WorldCellLevel*)),
-            SLOT(visibilityChanged(WorldCellLevel*)));
+    connect(WorldEd::WorldEdMgr::instance(), &WorldEd::WorldEdMgr::lotVisibilityChanged,
+            this, qOverload<WorldCellLot*>(&WorldEdDock::visibilityChanged));
+    connect(WorldEd::WorldEdMgr::instance(), &WorldEd::WorldEdMgr::levelVisibilityChanged,
+            this, qOverload<WorldCellLevel*>(&WorldEdDock::visibilityChanged));
 
-    connect(WorldEd::WorldEdMgr::instance(), SIGNAL(beforeWorldChanged(QString)),
-           SLOT(beforeWorldChanged()));
-    connect(WorldEd::WorldEdMgr::instance(), SIGNAL(afterWorldChanged(QString)),
-            SLOT(afterWorldChanged()));
-    connect(WorldEd::WorldEdMgr::instance(), SIGNAL(selectedLotsChanged()),
-            SLOT(selectedLotsChanged()));
+    connect(WorldEd::WorldEdMgr::instance(), &WorldEd::WorldEdMgr::beforeWorldChanged,
+           this, &WorldEdDock::beforeWorldChanged);
+    connect(WorldEd::WorldEdMgr::instance(), &WorldEd::WorldEdMgr::afterWorldChanged,
+            this, &WorldEdDock::afterWorldChanged);
+    connect(WorldEd::WorldEdMgr::instance(), &WorldEd::WorldEdMgr::selectedLotsChanged,
+            this, &WorldEdDock::selectedLotsChanged);
 
-    connect(DocumentManager::instance(), SIGNAL(documentAboutToClose(int,Tiled::Internal::MapDocument*)),
-            SLOT(documentAboutToClose(int,Tiled::Internal::MapDocument*)));
+    connect(DocumentManager::instance(), &DocumentManager::documentAboutToClose,
+            this, &WorldEdDock::documentAboutToClose);
 }
 
 WorldEdDock::~WorldEdDock()

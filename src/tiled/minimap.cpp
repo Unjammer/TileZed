@@ -33,6 +33,8 @@
 #include "tileset.h"
 #include "zlevelrenderer.h"
 
+#include "worlded/worldcell.h"
+
 #include <qmath.h>
 #include <QDebug>
 #include <QElapsedTimer>
@@ -579,60 +581,60 @@ MiniMapItem::MiniMapItem(ZomboidScene *zscene, QGraphicsItem *parent)
     mRenderWorker = new MiniMapRenderWorker(mMapComposite->mapInfo(),
                                             mRenderThread);
     mRenderWorker->moveToThread(mRenderThread);
-    connect(mRenderWorker, SIGNAL(painted(QImage,QRectF)),
-            SLOT(painted(QImage,QRectF)));
-    connect(mRenderWorker, SIGNAL(imageResized(QSize)),
-            SLOT(imageResized(QSize)));
+    connect(mRenderWorker, &MiniMapRenderWorker::painted,
+            this, &MiniMapItem::painted);
+    connect(mRenderWorker, &MiniMapRenderWorker::imageResized,
+            this, &MiniMapItem::imageResized);
     mRenderThread->start();
 
-    connect(mScene->mapDocument(), SIGNAL(layerAdded(int)),
-            SLOT(layerAdded(int)));
-    connect(mScene->mapDocument(), SIGNAL(layerRemoved(int)),
-            SLOT(layerRemoved(int)));
-    connect(mScene->mapDocument(), SIGNAL(layerRenamed(int)),
-            SLOT(layerRenamed(int)));
-    connect(mScene->mapDocument(), SIGNAL(regionAltered(QRegion,Tiled::Layer*)),
-            SLOT(regionAltered(QRegion,Tiled::Layer*)));
-    connect(mScene->mapDocument(), SIGNAL(mapChanged()),
-            SLOT(mapChanged()));
+    connect(mScene->mapDocument(), &MapDocument::layerAdded,
+            this, &MiniMapItem::layerAdded);
+    connect(mScene->mapDocument(), &MapDocument::layerRemoved,
+            this, &MiniMapItem::layerRemoved);
+    connect(mScene->mapDocument(), &MapDocument::layerRenamed,
+            this, &MiniMapItem::layerRenamed);
+    connect(mScene->mapDocument(), &MapDocument::regionAltered,
+            this, &MiniMapItem::regionAltered);
+    connect(mScene->mapDocument(), &MapDocument::mapChanged,
+            this, qOverload<>(&MiniMapItem::mapChanged));
 
-    connect(MapManager::instance(), SIGNAL(mapAboutToChange(MapInfo*)),
-            SLOT(mapAboutToChange(MapInfo*)));
-    connect(MapManager::instance(), SIGNAL(mapChanged(MapInfo*)),
-            SLOT(mapChanged(MapInfo*)));
+    connect(MapManager::instance(), &MapManager::mapAboutToChange,
+            this, &MiniMapItem::mapAboutToChange);
+    connect(MapManager::instance(), &MapManager::mapChanged,
+            this, qOverload<>(&MiniMapItem::mapChanged));
 
-    connect(&mScene->lotManager(), SIGNAL(lotAdded(MapComposite*,Tiled::MapObject*)),
-        SLOT(lotAdded(MapComposite*,Tiled::MapObject*)));
-    connect(&mScene->lotManager(), SIGNAL(lotRemoved(MapComposite*,Tiled::MapObject*)),
-        SLOT(lotRemoved(MapComposite*,Tiled::MapObject*)));
-    connect(&mScene->lotManager(), SIGNAL(lotUpdated(MapComposite*,Tiled::MapObject*)),
-        SLOT(lotUpdated(MapComposite*,Tiled::MapObject*)));
+    connect(&mScene->lotManager(), qOverload<MapComposite*,Tiled::MapObject*>(&ZLotManager::lotAdded),
+        this, qOverload<MapComposite*,Tiled::MapObject*>(&MiniMapItem::lotAdded));
+    connect(&mScene->lotManager(), qOverload<MapComposite*,Tiled::MapObject*>(&ZLotManager::lotRemoved),
+        this, qOverload<MapComposite*,Tiled::MapObject*>(&MiniMapItem::lotRemoved));
+    connect(&mScene->lotManager(), qOverload<MapComposite*,Tiled::MapObject*>(&ZLotManager::lotUpdated),
+        this, qOverload<MapComposite*,Tiled::MapObject*>(&MiniMapItem::lotUpdated));
 
-    connect(&mScene->lotManager(), SIGNAL(lotAdded(MapComposite*,WorldCellLot*)),
-        SLOT(lotAdded(MapComposite*,WorldCellLot*)));
-    connect(&mScene->lotManager(), SIGNAL(lotRemoved(MapComposite*,WorldCellLot*)),
-        SLOT(lotRemoved(MapComposite*,WorldCellLot*)));
-    connect(&mScene->lotManager(), SIGNAL(lotUpdated(MapComposite*,WorldCellLot*)),
-        SLOT(lotUpdated(MapComposite*,WorldCellLot*)));
+    connect(&mScene->lotManager(), qOverload<MapComposite*,WorldCellLot*>(&ZLotManager::lotAdded),
+        this, qOverload<MapComposite*,WorldCellLot*>(&MiniMapItem::lotAdded));
+    connect(&mScene->lotManager(), qOverload<MapComposite*,WorldCellLot*>(&ZLotManager::lotRemoved),
+        this, qOverload<MapComposite*,WorldCellLot*>(&MiniMapItem::lotRemoved));
+    connect(&mScene->lotManager(), qOverload<MapComposite*,WorldCellLot*>(&ZLotManager::lotUpdated),
+        this, qOverload<MapComposite*,WorldCellLot*>(&MiniMapItem::lotUpdated));
 
-    connect(mScene->mapDocument(), SIGNAL(tilesetAdded(int,Tiled::Tileset*)),
-            SLOT(tilesetAdded(int,Tiled::Tileset*)));
-    connect(mScene->mapDocument(), SIGNAL(tilesetRemoved(Tiled::Tileset*)),
-            SLOT(tilesetRemoved(Tiled::Tileset*)));
-    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tiled::Tileset*)),
-            SLOT(tilesetChanged(Tiled::Tileset*)));
+    connect(mScene->mapDocument(), &MapDocument::tilesetAdded,
+            this, &MiniMapItem::tilesetAdded);
+    connect(mScene->mapDocument(), &MapDocument::tilesetRemoved,
+            this, &MiniMapItem::tilesetRemoved);
+    connect(TilesetManager::instance(), &TilesetManager::tilesetChanged,
+            this, &MiniMapItem::tilesetChanged);
 
-    connect(mScene->mapDocument(), SIGNAL(bmpPainted(int,QRegion)),
-            SLOT(bmpPainted(int,QRegion)));
-    connect(mScene->mapDocument(), SIGNAL(bmpAliasesChanged()),
-            SLOT(bmpAliasesChanged()));
-    connect(mScene->mapDocument(), SIGNAL(bmpRulesChanged()),
-            SLOT(bmpRulesChanged()));
-    connect(mScene->mapDocument(), SIGNAL(bmpBlendsChanged()),
-            SLOT(bmpBlendsChanged()));
+    connect(mScene->mapDocument(), &MapDocument::bmpPainted,
+            this, &MiniMapItem::bmpPainted);
+    connect(mScene->mapDocument(), &MapDocument::bmpAliasesChanged,
+            this, &MiniMapItem::bmpAliasesChanged);
+    connect(mScene->mapDocument(), &MapDocument::bmpRulesChanged,
+            this, &MiniMapItem::bmpRulesChanged);
+    connect(mScene->mapDocument(), &MapDocument::bmpBlendsChanged,
+            this, &MiniMapItem::bmpBlendsChanged);
 
-    connect(mScene->mapDocument(), SIGNAL(noBlendPainted(Tiled::MapNoBlend*,QRegion)),
-            SLOT(noBlendPainted(Tiled::MapNoBlend*,QRegion)));
+    connect(mScene->mapDocument(), &MapDocument::noBlendPainted,
+            this, &MiniMapItem::noBlendPainted);
 
     QMap<MapObject*,MapComposite*>::const_iterator it;
     const QMap<MapObject*,MapComposite*> &map = mScene->lotManager().objectToLot();
@@ -1002,12 +1004,12 @@ MiniMap::MiniMap(MapView *parent)
     mRatio = 1.5;
     mWidth = prefs->miniMapWidth();
     mHeight = mWidth / mRatio;
-    connect(prefs, SIGNAL(showMiniMapChanged(bool)), SLOT(setVisible(bool)));
-    connect(prefs, SIGNAL(miniMapWidthChanged(int)), SLOT(widthChanged(int)));
+    connect(prefs, &Preferences::showMiniMapChanged, this, &QWidget::setVisible);
+    connect(prefs, &Preferences::miniMapWidthChanged, this, &MiniMap::widthChanged);
 
     QGraphicsScene *scene = new QGraphicsScene(this);
     scene->setBackgroundBrush(prefs->backgroundColor().lighter(125));
-    connect(prefs, SIGNAL(backgroundColorChanged(QColor)), SLOT(bgColorChanged(QColor)));
+    connect(prefs, &Preferences::backgroundColorChanged, this, &MiniMap::bgColorChanged);
     // Set the sceneRect explicitly so it doesn't grow itself
     scene->setSceneRect(0, 0, 1, 1);
     setScene(scene);
@@ -1038,7 +1040,7 @@ MiniMap::MiniMap(MapView *parent)
     button->setIconSize(QSize(16, 16));
     button->setIcon(QIcon(QLatin1String(":/images/16x16/zoom-out.png")));
     button->setToolTip(tr("Make the MiniMap smaller"));
-    connect(button, SIGNAL(clicked()), SLOT(smaller()));
+    connect(button, &QAbstractButton::clicked, this, &MiniMap::smaller);
     layout->addWidget(button);
 
     button = mBiggerButton;
@@ -1047,7 +1049,7 @@ MiniMap::MiniMap(MapView *parent)
     button->setIconSize(QSize(16, 16));
     button->setIcon(QIcon(QLatin1String(":/images/16x16/zoom-in.png")));
     button->setToolTip(tr("Make the MiniMap larger"));
-    connect(button, SIGNAL(clicked()), SLOT(bigger()));
+    connect(button, &QAbstractButton::clicked, this, &MiniMap::bigger);
     layout->addWidget(button);
 
     button = new QToolButton(mButtons);
@@ -1056,7 +1058,7 @@ MiniMap::MiniMap(MapView *parent)
     button->setIconSize(QSize(16, 16));
     button->setIcon(QIcon(QLatin1String(":/images/16x16/edit-redo.png")));
     button->setToolTip(tr("Refresh the MiniMap image"));
-    connect(button, SIGNAL(clicked()), SLOT(updateImage()));
+    connect(button, &QAbstractButton::clicked, this, &MiniMap::updateImage);
     layout->addWidget(button);
 
     setGeometry(20, 20, mWidth, mHeight);
@@ -1086,7 +1088,7 @@ void MiniMap::setExtraItem(MiniMapItem *item)
 {
     mExtraItem = item;
     scene()->addItem(mExtraItem);
-    connect(item, SIGNAL(resized(QSize,QRectF)), SLOT(miniMapItemResized(QSize,QRectF)));
+    connect(item, &MiniMapItem::resized, this, &MiniMap::miniMapItemResized);
 }
 
 void MiniMap::bigger()

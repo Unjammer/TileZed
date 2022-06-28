@@ -98,10 +98,10 @@ public:
     IsoObjectEditMode(QObject *parent = 0);
 
 signals:
-    void viewAddedForDocument(BuildingDocument *doc, BuildingIsoView *view);
+    void viewAddedForDocument(BuildingEditor::BuildingDocument *doc, BuildingEditor::BuildingIsoView *view);
 
 private slots:
-    void documentAdded(BuildingDocument *doc);
+    void documentAdded(BuildingEditor::BuildingDocument *doc);
 
 private:
     ObjectEditModePerDocumentStuff *createPerDocumentStuff(BuildingDocument *doc);

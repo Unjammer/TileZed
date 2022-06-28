@@ -50,14 +50,14 @@ EdgeToolDialog::EdgeToolDialog(QWidget *parent) :
     readSettings();
     ui->suppressBlend->setChecked(EdgeTool::instance().suppressBlendTiles());
 
-    connect(ui->edgeList, SIGNAL(currentRowChanged(int)), SLOT(currentRowChanged(int)));
-    connect(ui->dashLen, SIGNAL(valueChanged(int)), SLOT(dashChanged()));
-    connect(ui->dashGap, SIGNAL(valueChanged(int)), SLOT(dashChanged()));
-    connect(ui->suppressBlend, SIGNAL(toggled(bool)), SLOT(suppressChanged(bool)));
+    connect(ui->edgeList, &QListWidget::currentRowChanged, this, &EdgeToolDialog::currentRowChanged);
+    connect(ui->dashLen, &QSpinBox::valueChanged, this, &EdgeToolDialog::dashChanged);
+    connect(ui->dashGap, &QSpinBox::valueChanged, this, &EdgeToolDialog::dashChanged);
+    connect(ui->suppressBlend, &QAbstractButton::toggled, this, &EdgeToolDialog::suppressChanged);
 
     mVisibleLaterTimer.setSingleShot(true);
     mVisibleLaterTimer.setInterval(200);
-    connect(&mVisibleLaterTimer, SIGNAL(timeout()), SLOT(setVisibleNow()));
+    connect(&mVisibleLaterTimer, &QTimer::timeout, this, &EdgeToolDialog::setVisibleNow);
 
 //    readTxt();
 }

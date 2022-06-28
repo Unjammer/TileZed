@@ -53,7 +53,7 @@ BuildingFloorsDialog::BuildingFloorsDialog(BuildingDocument *doc, QWidget *paren
     button->setShortcut(QKeySequence::Undo);
     mUndoButton = button;
     ui->undoRedoLayout->insertWidget(0, button);
-    connect(button, SIGNAL(clicked()), mDocument->undoStack(), SLOT(undo()));
+    connect(button, &QAbstractButton::clicked, mDocument->undoStack(), &QUndoStack::undo);
 
     button = new QToolButton(this);
     button->setIcon(redoIcon);
@@ -64,12 +64,12 @@ BuildingFloorsDialog::BuildingFloorsDialog(BuildingDocument *doc, QWidget *paren
     button->setShortcut(QKeySequence::Redo);
     mRedoButton = button;
     ui->undoRedoLayout->insertWidget(1, button);
-    connect(button, SIGNAL(clicked()), mDocument->undoStack(), SLOT(redo()));
+    connect(button, &QAbstractButton::clicked, mDocument->undoStack(), &QUndoStack::redo);
 
     mUndoIndex = mDocument->undoStack()->index();
-    connect(mDocument->undoStack(), SIGNAL(indexChanged(int)), SLOT(updateUI()));
-    connect(mDocument->undoStack(), SIGNAL(undoTextChanged(QString)), SLOT(undoTextChanged(QString)));
-    connect(mDocument->undoStack(), SIGNAL(redoTextChanged(QString)), SLOT(redoTextChanged(QString)));
+    connect(mDocument->undoStack(), &QUndoStack::indexChanged, this, &BuildingFloorsDialog::updateUI);
+    connect(mDocument->undoStack(), &QUndoStack::undoTextChanged, this, &BuildingFloorsDialog::undoTextChanged);
+    connect(mDocument->undoStack(), &QUndoStack::redoTextChanged, this, &BuildingFloorsDialog::redoTextChanged);
     /////
 
     QToolBar *toolBar = new QToolBar(this);
@@ -88,23 +88,23 @@ BuildingFloorsDialog::BuildingFloorsDialog(BuildingDocument *doc, QWidget *paren
     toolBar->addAction(ui->actionMoveDown);
     ui->toolbarLayout->addWidget(toolBar);
 
-    connect(ui->actionAdd, SIGNAL(triggered()), SLOT(add()));
-    connect(ui->actionRemove, SIGNAL(triggered()), SLOT(remove()));
-    connect(ui->actionDuplicate, SIGNAL(triggered()), SLOT(duplicate()));
-    connect(ui->actionMoveUp, SIGNAL(triggered()), SLOT(moveUp()));
-    connect(ui->actionMoveDown, SIGNAL(triggered()), SLOT(moveDown()));
+    connect(ui->actionAdd, &QAction::triggered, this, &BuildingFloorsDialog::add);
+    connect(ui->actionRemove, &QAction::triggered, this, &BuildingFloorsDialog::remove);
+    connect(ui->actionDuplicate, &QAction::triggered, this, &BuildingFloorsDialog::duplicate);
+    connect(ui->actionMoveUp, &QAction::triggered, this, &BuildingFloorsDialog::moveUp);
+    connect(ui->actionMoveDown, &QAction::triggered, this, &BuildingFloorsDialog::moveDown);
 
-    connect(ui->floors, SIGNAL(currentRowChanged(int)),
-            SLOT(currentFloorChanged(int)));
+    connect(ui->floors, &QListWidget::currentRowChanged,
+            this, &BuildingFloorsDialog::currentFloorChanged);
 
     ui->highlight->setChecked(BuildingPreferences::instance()->highlightFloor());
-    connect(ui->highlight, SIGNAL(toggled(bool)),
-            BuildingPreferences::instance(), SLOT(setHighlightFloor(bool)));
+    connect(ui->highlight, &QAbstractButton::toggled,
+            BuildingPreferences::instance(), &BuildingPreferences::setHighlightFloor);
 
-    connect(mDocument, SIGNAL(floorAdded(BuildingFloor*)),
-            SLOT(floorAdded(BuildingFloor*)));
-    connect(mDocument, SIGNAL(floorRemoved(BuildingFloor*)),
-            SLOT(floorRemoved(BuildingFloor*)));
+    connect(mDocument, &BuildingDocument::floorAdded,
+            this, &BuildingFloorsDialog::floorAdded);
+    connect(mDocument, &BuildingDocument::floorRemoved,
+            this, &BuildingFloorsDialog::floorRemoved);
 
     setFloorsList();
     if (BuildingFloor *floor = mDocument->currentFloor())

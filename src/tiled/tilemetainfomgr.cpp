@@ -88,8 +88,8 @@ TileMetaInfoMgr::TileMetaInfoMgr(QObject *parent) :
     mSourceRevision(0),
     mHasReadTxt(false)
 {
-    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tiled::Tileset*)),
-            SLOT(tilesetChanged(Tiled::Tileset*)));
+    connect(TilesetManager::instance(), &TilesetManager::tilesetChanged,
+            this, &TileMetaInfoMgr::tilesetChanged);
 }
 
 TileMetaInfoMgr::~TileMetaInfoMgr()

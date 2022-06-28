@@ -66,7 +66,7 @@ public:
 signals:
     
 private slots:
-    void currentDocumentChanged(BuildingDocument *doc);
+    void currentDocumentChanged(BuildingEditor::BuildingDocument *doc);
 
     void categoryScaleChanged(qreal scale);
     void categoryViewMousePressed();
@@ -89,7 +89,7 @@ private slots:
 
     void currentToolChanged();
 
-    void objectPicked(BuildingObject *object);
+    void objectPicked(BuildingEditor::BuildingObject *object);
 
     void selectCurrentCategoryTile();
 

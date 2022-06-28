@@ -641,8 +641,8 @@ BmpEraserTool::BmpEraserTool(QObject *parent) :
                      parent),
     mPainting(false)
 {
-    connect(BmpBrushTool::instance(), SIGNAL(brushChanged()),
-            SLOT(brushChanged()));
+    connect(BmpBrushTool::instance(), &BmpBrushTool::brushChanged,
+            this, &BmpEraserTool::brushChanged);
 }
 
 BmpEraserTool::~BmpEraserTool()
@@ -1226,10 +1226,10 @@ BmpWandTool::BmpWandTool(QObject *parent) :
     mMode(NoMode),
     mMouseDown(false)
 {
-    connect(BmpBrushTool::instance(), SIGNAL(ruleChanged()),
-            SLOT(bmpImageChanged()));
-    connect(BmpBrushTool::instance(), SIGNAL(restrictToSelectionChanged()),
-            SLOT(bmpImageChanged()));
+    connect(BmpBrushTool::instance(), &BmpBrushTool::ruleChanged,
+            this, &BmpWandTool::bmpImageChanged);
+    connect(BmpBrushTool::instance(), &BmpBrushTool::restrictToSelectionChanged,
+            this, &BmpWandTool::bmpImageChanged);
 }
 
 void BmpWandTool::tilePositionChanged(const QPoint &tilePos)
@@ -1400,10 +1400,10 @@ void BmpWandTool::mapDocumentChanged(MapDocument *oldDocument,
         oldDocument->disconnect(this);
 
     if (newDocument) {
-        connect(newDocument, SIGNAL(bmpPainted(int,QRegion)),
-                SLOT(bmpImageChanged()));
-        connect(newDocument, SIGNAL(mapChanged()),
-                SLOT(bmpImageChanged()));
+        connect(newDocument, &MapDocument::bmpPainted,
+                this, &BmpWandTool::bmpImageChanged);
+        connect(newDocument, &MapDocument::mapChanged,
+                this, &BmpWandTool::bmpImageChanged);
     }
 
     mFloodFill.mRegion = QRegion();
@@ -1603,10 +1603,10 @@ BmpBucketTool::BmpBucketTool(QObject *parent) :
                     QKeySequence(/*tr("R")*/),
                     parent)
 {
-    connect(BmpBrushTool::instance(), SIGNAL(ruleChanged()),
-            SLOT(bmpImageChanged()));
-    connect(BmpBrushTool::instance(), SIGNAL(restrictToSelectionChanged()),
-            SLOT(bmpImageChanged()));
+    connect(BmpBrushTool::instance(), &BmpBrushTool::ruleChanged,
+            this, &BmpBucketTool::bmpImageChanged);
+    connect(BmpBrushTool::instance(), &BmpBrushTool::restrictToSelectionChanged,
+            this, &BmpBucketTool::bmpImageChanged);
     connect(BmpBrushTool::instance(), &BmpBrushTool::fillAllInSelectionChanged,
             this, &BmpBucketTool::bmpImageChanged);
 }
@@ -1707,10 +1707,10 @@ void BmpBucketTool::mapDocumentChanged(MapDocument *oldDocument,
         oldDocument->disconnect(this);
 
     if (newDocument) {
-        connect(newDocument, SIGNAL(bmpPainted(int,QRegion)),
-                SLOT(bmpImageChanged()));
-        connect(newDocument, SIGNAL(mapChanged()),
-                SLOT(bmpImageChanged()));
+        connect(newDocument, &MapDocument::bmpPainted,
+                this, &BmpBucketTool::bmpImageChanged);
+        connect(newDocument, &MapDocument::mapChanged,
+                this, &BmpBucketTool::bmpImageChanged);
     }
 
     mFloodFill.mRegion = QRegion();
@@ -2244,8 +2244,8 @@ BmpToLayersTool::BmpToLayersTool(QObject *parent) :
                      parent),
     mPainting(false)
 {
-    connect(BmpBrushTool::instance(), SIGNAL(brushChanged()),
-            SLOT(brushChanged()));
+    connect(BmpBrushTool::instance(), &BmpBrushTool::brushChanged,
+            this, &BmpToLayersTool::brushChanged);
 }
 
 BmpToLayersTool::~BmpToLayersTool()

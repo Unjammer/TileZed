@@ -359,23 +359,23 @@ AbstractOverlayDialog::AbstractOverlayDialog(QWidget *parent) :
     redoAction->setIcon(redoIcon);
     ui->toolBar->addActions(QList<QAction*>() << undoAction << redoAction);
 
-    connect(mUndoGroup, SIGNAL(cleanChanged(bool)), SLOT(syncUI()));
+    connect(mUndoGroup, &QUndoGroup::cleanChanged, this, &AbstractOverlayDialog::syncUI);
 
     connect(ui->actionNew, &QAction::triggered, this, &AbstractOverlayDialog::fileNew);
-    connect(ui->actionOpen, SIGNAL(triggered()), SLOT(fileOpen()));
-    connect(ui->actionSave, SIGNAL(triggered()), SLOT(fileSave()));
-    connect(ui->actionSaveAs, SIGNAL(triggered()), SLOT(fileSaveAs()));
-    connect(ui->actionClose, SIGNAL(triggered()), SLOT(close()));
+    connect(ui->actionOpen, &QAction::triggered, this, qOverload<>(&AbstractOverlayDialog::fileOpen));
+    connect(ui->actionSave, &QAction::triggered, this, qOverload<>(&AbstractOverlayDialog::fileSave));
+    connect(ui->actionSaveAs, &QAction::triggered, this, &AbstractOverlayDialog::fileSaveAs);
+    connect(ui->actionClose, &QAction::triggered, this, &QWidget::close);
 
-    connect(ui->actionAddOverlay, SIGNAL(triggered()), SLOT(addOverlay()));
-    connect(ui->actionAddRoom, SIGNAL(triggered()), SLOT(addEntry()));
-    connect(ui->actionSetToNone, SIGNAL(triggered()), SLOT(setToNone()));
-    connect(ui->actionRemove, SIGNAL(triggered()), SLOT(remove()));
+    connect(ui->actionAddOverlay, &QAction::triggered, this, &AbstractOverlayDialog::addOverlay);
+    connect(ui->actionAddRoom, &QAction::triggered, this, &AbstractOverlayDialog::addEntry);
+    connect(ui->actionSetToNone, &QAction::triggered, this, &AbstractOverlayDialog::setToNone);
+    connect(ui->actionRemove, &QAction::triggered, this, &AbstractOverlayDialog::remove);
 
-    connect(ui->overlayView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
-            SLOT(syncUI()));
-    connect(ui->overlayView, SIGNAL(activated(QModelIndex)),
-           SLOT(overlayActivated(QModelIndex)));
+    connect(ui->overlayView->selectionModel(), &QItemSelectionModel::selectionChanged,
+            this, &AbstractOverlayDialog::syncUI);
+    connect(ui->overlayView, &QAbstractItemView::activated,
+           this, &AbstractOverlayDialog::overlayActivated);
     connect(ui->overlayView, &ContainerOverlayView::overlayEntryHover, this, &AbstractOverlayDialog::overlayEntryHover);
 
     connect(ui->overlayView->model(), QOverload<AbstractOverlay*,const QStringList&>::of(&ContainerOverlayModel::tileDropped),
@@ -398,27 +398,27 @@ AbstractOverlayDialog::AbstractOverlayDialog(QWidget *parent) :
 
     ui->tilesetList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 //    ui->listWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-    connect(ui->tilesetList, SIGNAL(itemSelectionChanged()),
-            SLOT(tilesetSelectionChanged()));
-    connect(ui->tilesetMgr, SIGNAL(clicked(bool)), SLOT(manageTilesets()));
+    connect(ui->tilesetList, &QListWidget::itemSelectionChanged,
+            this, &AbstractOverlayDialog::tilesetSelectionChanged);
+    connect(ui->tilesetMgr, &QAbstractButton::clicked, this, &AbstractOverlayDialog::manageTilesets);
 
-    connect(TileMetaInfoMgr::instance(), SIGNAL(tilesetAdded(Tiled::Tileset*)),
-            SLOT(tilesetAdded(Tiled::Tileset*)));
-    connect(TileMetaInfoMgr::instance(), SIGNAL(tilesetAboutToBeRemoved(Tiled::Tileset*)),
-            SLOT(tilesetAboutToBeRemoved(Tiled::Tileset*)));
-    connect(TileMetaInfoMgr::instance(), SIGNAL(tilesetRemoved(Tiled::Tileset*)),
-            SLOT(tilesetRemoved(Tiled::Tileset*)));
+    connect(TileMetaInfoMgr::instance(), &TileMetaInfoMgr::tilesetAdded,
+            this, &AbstractOverlayDialog::tilesetAdded);
+    connect(TileMetaInfoMgr::instance(), &TileMetaInfoMgr::tilesetAboutToBeRemoved,
+            this, &AbstractOverlayDialog::tilesetAboutToBeRemoved);
+    connect(TileMetaInfoMgr::instance(), &TileMetaInfoMgr::tilesetRemoved,
+            this, &AbstractOverlayDialog::tilesetRemoved);
 
-    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tiled::Tileset*)),
-            SLOT(tilesetChanged(Tiled::Tileset*)));
+    connect(TilesetManager::instance(), &TilesetManager::tilesetChanged,
+            this, &AbstractOverlayDialog::tilesetChanged);
 
     ui->tilesetTilesView->setZoomable(mZoomable);
     ui->tilesetTilesView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     connect(ui->tilesetTilesView->selectionModel(),
-            SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
-            SLOT(syncUI()));
-    connect(ui->tilesetTilesView, SIGNAL(activated(QModelIndex)),
-            SLOT(tileActivated(QModelIndex)));
+            &QItemSelectionModel::selectionChanged,
+            this, &AbstractOverlayDialog::syncUI);
+    connect(ui->tilesetTilesView, &QAbstractItemView::activated,
+            this, &AbstractOverlayDialog::tileActivated);
 
     ui->tilesetTilesView->setDragEnabled(true);
 

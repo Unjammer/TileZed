@@ -439,7 +439,7 @@ LayersPanelView::LayersPanelView(QWidget *parent) :
 
     setModel(mModel);
 
-    connect(mZoomable, SIGNAL(scaleChanged(qreal)), SLOT(scaleChanged(qreal)));
+    connect(mZoomable, &Zoomable::scaleChanged, this, &LayersPanelView::scaleChanged);
 }
 
 QSize LayersPanelView::sizeHint() const
@@ -586,12 +586,12 @@ TileLayersPanel::TileLayersPanel(QWidget *parent) :
     QComboBox *scaleCombo = new QComboBox;
     mView->zoomable()->connectToComboBox(scaleCombo);
 
-    connect(mView->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)),
-            SLOT(currentChanged()));
-    connect(mView, SIGNAL(activated(QModelIndex)), SLOT(activated(QModelIndex)));
-    connect(mView, SIGNAL(layerNameClicked(int)), SLOT(layerNameClicked(int)));
-    connect(Preferences::instance(), SIGNAL(showTileLayersPanelChanged(bool)),
-            SLOT(showTileLayersPanelChanged(bool)));
+    connect(mView->selectionModel(), &QItemSelectionModel::currentChanged,
+            this, &TileLayersPanel::currentChanged);
+    connect(mView, &QAbstractItemView::activated, this, &TileLayersPanel::activated);
+    connect(mView, &LayersPanelView::layerNameClicked, this, &TileLayersPanel::layerNameClicked);
+    connect(Preferences::instance(), &Preferences::showTileLayersPanelChanged,
+            this, &TileLayersPanel::showTileLayersPanelChanged);
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setContentsMargins(0, 0, 0, 0);
@@ -613,16 +613,16 @@ void TileLayersPanel::setDocument(MapDocument *doc)
     mView->clear();
 
     if (mDocument) {
-        connect(mDocument, SIGNAL(currentLayerIndexChanged(int)),
-                SLOT(layerIndexChanged(int)));
-        connect(mDocument, SIGNAL(layerAddedToGroup(int)), SLOT(setList()));
-        connect(mDocument, SIGNAL(layerRemovedFromGroup(int,CompositeLayerGroup*)),
-                SLOT(setList()));
-        connect(mDocument, SIGNAL(layerChanged(int)), SLOT(layerChanged(int)));
-        connect(mDocument, SIGNAL(regionAltered(QRegion,Tiled::Layer*)),
-                SLOT(regionAltered(QRegion,Tiled::Layer*)));
-        connect(mDocument, SIGNAL(noBlendPainted(Tiled::MapNoBlend*,QRegion)),
-                SLOT(noBlendPainted(Tiled::MapNoBlend*,QRegion)));
+        connect(mDocument, &MapDocument::currentLayerIndexChanged,
+                this, &TileLayersPanel::layerIndexChanged);
+        connect(mDocument, &MapDocument::layerAddedToGroup, this, &TileLayersPanel::setList);
+        connect(mDocument, &MapDocument::layerRemovedFromGroup,
+                this, &TileLayersPanel::setList);
+        connect(mDocument, &MapDocument::layerChanged, this, &TileLayersPanel::layerChanged);
+        connect(mDocument, &MapDocument::regionAltered,
+                this, &TileLayersPanel::regionAltered);
+        connect(mDocument, &MapDocument::noBlendPainted,
+                this, &TileLayersPanel::noBlendPainted);
 
         mCurrentLayerIndex = mDocument->currentLayerIndex();
         setList();

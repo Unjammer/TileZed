@@ -358,7 +358,7 @@ void MixedTilesetView::setZoomable(Zoomable *zoomable)
 {
     mZoomable = zoomable;
     if (zoomable)
-        connect(mZoomable, SIGNAL(scaleChanged(qreal)), SLOT(scaleChanged(qreal)));
+        connect(mZoomable, &Zoomable::scaleChanged, this, &MixedTilesetView::scaleChanged);
 }
 
 void MixedTilesetView::contextMenuEvent(QContextMenuEvent *event)
@@ -445,7 +445,7 @@ void MixedTilesetView::init()
 
     setModel(mModel);
 
-    connect(mZoomable, SIGNAL(scaleChanged(qreal)), SLOT(scaleChanged(qreal)));
+    connect(mZoomable, &Zoomable::scaleChanged, this, &MixedTilesetView::scaleChanged);
 
     mMousePressed = false;
 

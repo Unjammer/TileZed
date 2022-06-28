@@ -58,10 +58,10 @@ BuildingTilesetDock::BuildingTilesetDock(QWidget *parent) :
     bool enabled = Preferences::instance()->autoSwitchLayer();
     mActionSwitchLayer->setChecked(enabled == false);
     mActionSwitchLayer->setIcon(enabled ? mIconTileLayer : mIconTileLayerStop);
-    connect(mActionSwitchLayer, SIGNAL(toggled(bool)),
-            SLOT(layerSwitchToggled(bool)));
-    connect(Preferences::instance(), SIGNAL(autoSwitchLayerChanged(bool)),
-            SLOT(autoSwitchLayerChanged(bool)));
+    connect(mActionSwitchLayer, &QAction::toggled,
+            this, &BuildingTilesetDock::layerSwitchToggled);
+    connect(Preferences::instance(), &Preferences::autoSwitchLayerChanged,
+            this, &BuildingTilesetDock::autoSwitchLayerChanged);
 
     QToolBar *toolBar = new QToolBar(this);
     toolBar->setIconSize(QSize(16, 16));
@@ -82,35 +82,35 @@ BuildingTilesetDock::BuildingTilesetDock(QWidget *parent) :
     mZoomable->setScale(BuildingPreferences::instance()->tileScale());
     mZoomable->connectToComboBox(ui->scaleComboBox);
     ui->tiles->setZoomable(mZoomable);
-    connect(mZoomable, SIGNAL(scaleChanged(qreal)),
-            BuildingPreferences::instance(), SLOT(setTileScale(qreal)));
-    connect(BuildingPreferences::instance(), SIGNAL(tileScaleChanged(qreal)),
-            SLOT(tileScaleChanged(qreal)));
+    connect(mZoomable, &Zoomable::scaleChanged,
+            BuildingPreferences::instance(), &BuildingPreferences::setTileScale);
+    connect(BuildingPreferences::instance(), &BuildingPreferences::tileScaleChanged,
+            this, &BuildingTilesetDock::tileScaleChanged);
 
-    connect(ui->tilesets, SIGNAL(currentRowChanged(int)),
-            SLOT(currentTilesetChanged(int)));
+    connect(ui->tilesets, &QListWidget::currentRowChanged,
+            this, &BuildingTilesetDock::currentTilesetChanged);
 
     ui->tiles->model()->setShowHeaders(false);
-    connect(ui->tiles->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
-            SLOT(tileSelectionChanged()));
-    connect(Preferences::instance(), SIGNAL(autoSwitchLayerChanged(bool)),
-            SLOT(autoSwitchLayerChanged(bool)));
+    connect(ui->tiles->selectionModel(), &QItemSelectionModel::selectionChanged,
+            this, &BuildingTilesetDock::tileSelectionChanged);
+    connect(Preferences::instance(), &Preferences::autoSwitchLayerChanged,
+            this, &BuildingTilesetDock::autoSwitchLayerChanged);
 
-    connect(BuildingDocumentMgr::instance(), SIGNAL(currentDocumentChanged(BuildingDocument*)),
-            SLOT(currentDocumentChanged(BuildingDocument*)));
+    connect(BuildingDocumentMgr::instance(), &BuildingDocumentMgr::currentDocumentChanged,
+            this, &BuildingTilesetDock::currentDocumentChanged);
 
-    connect(TileMetaInfoMgr::instance(), SIGNAL(tilesetAdded(Tiled::Tileset*)),
-            SLOT(tilesetAdded(Tiled::Tileset*)));
-    connect(TileMetaInfoMgr::instance(), SIGNAL(tilesetAboutToBeRemoved(Tiled::Tileset*)),
-            SLOT(tilesetAboutToBeRemoved(Tiled::Tileset*)));
+    connect(TileMetaInfoMgr::instance(), &TileMetaInfoMgr::tilesetAdded,
+            this, &BuildingTilesetDock::tilesetAdded);
+    connect(TileMetaInfoMgr::instance(), &TileMetaInfoMgr::tilesetAboutToBeRemoved,
+            this, &BuildingTilesetDock::tilesetAboutToBeRemoved);
 
-    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tiled::Tileset*)),
-            SLOT(tilesetChanged(Tiled::Tileset*)));
-    connect(TilesetManager::instance(), SIGNAL(tileLayerNameChanged(Tiled::Tile*)),
-            SLOT(tileLayerNameChanged(Tiled::Tile*)));
+    connect(TilesetManager::instance(), &TilesetManager::tilesetChanged,
+            this, &BuildingTilesetDock::tilesetChanged);
+    connect(TilesetManager::instance(), &TilesetManager::tileLayerNameChanged,
+            this, &BuildingTilesetDock::tileLayerNameChanged);
 
-    connect(PickTileTool::instance(), SIGNAL(tilePicked(QString)),
-            SLOT(buildingTilePicked(QString)));
+    connect(PickTileTool::instance(), &PickTileTool::tilePicked,
+            this, &BuildingTilesetDock::buildingTilePicked);
 
     retranslateUi();
 }

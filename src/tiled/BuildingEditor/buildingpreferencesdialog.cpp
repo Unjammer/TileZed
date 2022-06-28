@@ -39,7 +39,7 @@ BuildingPreferencesDialog::BuildingPreferencesDialog(QWidget *parent) :
 
     mUseOpenGL = prefs()->useOpenGL();
     ui->useOpenGL->setChecked(mUseOpenGL);
-    connect(ui->useOpenGL, SIGNAL(toggled(bool)), SLOT(setUseOpenGL(bool)));
+    connect(ui->useOpenGL, &QAbstractButton::toggled, this, &BuildingPreferencesDialog::setUseOpenGL);
 
     ui->isometric->setChecked(!prefs()->levelIsometric());
     ui->levelIsometric->setChecked(prefs()->levelIsometric());

@@ -73,7 +73,7 @@ private:
     typedef Tiled::Tile Tile;
 
 private slots:
-    void currentDocumentChanged(BuildingDocument *document);
+    void currentDocumentChanged(BuildingEditor::BuildingDocument *document);
 
     void currentTilesetChanged(int row);
     void tileSelectionChanged();

@@ -41,16 +41,16 @@ public:
     Room *currentRoom() const;
 
 private slots:
-    void currentDocumentChanged(BuildingDocument *doc);
+    void currentDocumentChanged(BuildingEditor::BuildingDocument *doc);
 
     void currentRoomChanged();
     void roomIndexChanged(int index);
     void updateRoomComboBox();
 
-    void roomAdded(Room *room);
-    void roomRemoved(Room *room);
+    void roomAdded(BuildingEditor::Room *room);
+    void roomRemoved(BuildingEditor::Room *room);
     void roomsReordered();
-    void roomChanged(Room *room);
+    void roomChanged(BuildingEditor::Room *room);
 
     void roofTypeChanged(QAction *action);
     void roofShallowTypeChanged(QAction *action);

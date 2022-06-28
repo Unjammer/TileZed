@@ -14,10 +14,10 @@ RoomDefNameDialog::RoomDefNameDialog(const QList<ObjectGroup *> &ogList,
 {
     ui->setupUi(this);
 
-    connect(ui->names, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),
-            SLOT(currentChanged(QListWidgetItem*)));
-    connect(ui->names, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
-            SLOT(doubleClicked(QListWidgetItem*)));
+    connect(ui->names, &QListWidget::currentItemChanged,
+            this, &RoomDefNameDialog::currentChanged);
+    connect(ui->names, &QListWidget::itemDoubleClicked,
+            this, &RoomDefNameDialog::doubleClicked);
 
     ui->name->setText(name.mid(0, name.indexOf(QLatin1Char('#'))));
 

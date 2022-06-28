@@ -43,8 +43,8 @@ AddTilesetsDialog::AddTilesetsDialog(const QString &dir,
 {
     ui->setupUi(this);
 
-    connect(ui->checkAll, SIGNAL(clicked()), SLOT(checkAll()));
-    connect(ui->uncheckAll, SIGNAL(clicked()), SLOT(uncheckAll()));
+    connect(ui->checkAll, &QAbstractButton::clicked, this, &AddTilesetsDialog::checkAll);
+    connect(ui->uncheckAll, &QAbstractButton::clicked, this, &AddTilesetsDialog::uncheckAll);
 
     setPrompt(QString());
     setAllowBrowse(false);
@@ -62,7 +62,7 @@ void AddTilesetsDialog::setAllowBrowse(bool browse)
         ui->path->show();
         ui->browse->show();
         ui->path->setText(QDir::toNativeSeparators(mDirectory));
-        connect(ui->browse, SIGNAL(clicked()), SLOT(browse()));
+        connect(ui->browse, &QAbstractButton::clicked, this, &AddTilesetsDialog::browse);
     } else {
         ui->path->hide();
         ui->browse->hide();

@@ -44,7 +44,7 @@ ClipboardManager::ClipboardManager(QObject *parent) :
     mHasMap(false)
 {
     mClipboard = QApplication::clipboard();
-    connect(mClipboard, SIGNAL(dataChanged()), SLOT(updateHasMap()));
+    connect(mClipboard, &QClipboard::dataChanged, this, &ClipboardManager::updateHasMap);
 
     updateHasMap();
 }

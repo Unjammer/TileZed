@@ -68,21 +68,21 @@ RoomsDialog::RoomsDialog(const QList<Room*> &rooms, QWidget *parent) :
 
     synchUI();
 
-    connect(ui->listWidget, SIGNAL(itemSelectionChanged()),
-            SLOT(roomSelectionChanged()));
-    connect(ui->actionAdd, SIGNAL(triggered()), SLOT(addRoom()));
-    connect(ui->actionDuplicate, SIGNAL(triggered()), SLOT(duplicateRoom()));
-    connect(ui->actionRemove, SIGNAL(triggered()), SLOT(removeRoom()));
-    connect(ui->actionMoveUp, SIGNAL(triggered()), SLOT(moveRoomUp()));
-    connect(ui->actionMoveDown, SIGNAL(triggered()), SLOT(moveRoomDown()));
+    connect(ui->listWidget, &QListWidget::itemSelectionChanged,
+            this, &RoomsDialog::roomSelectionChanged);
+    connect(ui->actionAdd, &QAction::triggered, this, &RoomsDialog::addRoom);
+    connect(ui->actionDuplicate, &QAction::triggered, this, &RoomsDialog::duplicateRoom);
+    connect(ui->actionRemove, &QAction::triggered, this, &RoomsDialog::removeRoom);
+    connect(ui->actionMoveUp, &QAction::triggered, this, &RoomsDialog::moveRoomUp);
+    connect(ui->actionMoveDown, &QAction::triggered, this, &RoomsDialog::moveRoomDown);
 
-    connect(ui->name, SIGNAL(textEdited(QString)), SLOT(nameEdited(QString)));
-    connect(ui->internalName, SIGNAL(textEdited(QString)), SLOT(internalNameEdited(QString)));
-    connect(ui->color, SIGNAL(colorChanged(QColor)), SLOT(colorChanged(QColor)));
-    connect(ui->tilesList, SIGNAL(itemSelectionChanged()),
-            SLOT(tileSelectionChanged()));
-    connect(ui->tilesList, SIGNAL(activated(QModelIndex)), SLOT(chooseTile()));
-    connect(ui->chooseTile, SIGNAL(clicked()), SLOT(chooseTile()));
+    connect(ui->name, &QLineEdit::textEdited, this, &RoomsDialog::nameEdited);
+    connect(ui->internalName, &QLineEdit::textEdited, this, &RoomsDialog::internalNameEdited);
+    connect(ui->color, &Tiled::Internal::ColorButton::colorChanged, this, &RoomsDialog::colorChanged);
+    connect(ui->tilesList, &QListWidget::itemSelectionChanged,
+            this, &RoomsDialog::tileSelectionChanged);
+    connect(ui->tilesList, &QAbstractItemView::activated, this, &RoomsDialog::chooseTile);
+    connect(ui->chooseTile, &QAbstractButton::clicked, this, &RoomsDialog::chooseTile);
 
     if (rooms.count()) {
         ui->listWidget->setCurrentRow(0);

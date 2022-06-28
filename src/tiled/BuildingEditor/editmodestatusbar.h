@@ -21,7 +21,7 @@ public:
     EditModeStatusBar(const QString &prefix, QObject *parent = 0);
 
 public slots:
-    void currentToolChanged(BaseTool *tool);
+    void currentToolChanged(BuildingEditor::BaseTool *tool);
     void mouseCoordinateChanged(const QPoint &tilePos);
     void updateToolStatusText();
     void resizeCoordsLabel();

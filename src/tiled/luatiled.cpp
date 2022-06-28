@@ -1031,7 +1031,6 @@ void LuaMapBmp::replace(const LuaColor &oldColor, const LuaColor &newColor)
 unsigned int LuaMapBmp::rand(int x, int y)
 {
     return mBmp.rand(x, y);
-
 }
 
 /////

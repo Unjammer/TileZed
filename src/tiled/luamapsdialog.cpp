@@ -45,13 +45,13 @@ LuaMapsDialog::LuaMapsDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    connect(ui->browseButton, SIGNAL(clicked()), SLOT(dirBrowse()));
-    connect(ui->selectAll, SIGNAL(clicked()), SLOT(selectAll()));
-    connect(ui->selectNone, SIGNAL(clicked()), SLOT(selectNone()));
+    connect(ui->browseButton, &QAbstractButton::clicked, this, &LuaMapsDialog::dirBrowse);
+    connect(ui->selectAll, &QAbstractButton::clicked, this, &LuaMapsDialog::selectAll);
+    connect(ui->selectNone, &QAbstractButton::clicked, this, &LuaMapsDialog::selectNone);
 
-    connect(ui->backupsBrowse, SIGNAL(clicked()), SLOT(backupsBrowse()));
+    connect(ui->backupsBrowse, &QAbstractButton::clicked, this, &LuaMapsDialog::backupsBrowse);
 
-    connect(ui->scriptBrowse, SIGNAL(clicked()), SLOT(scriptBrowse()));
+    connect(ui->scriptBrowse, &QAbstractButton::clicked, this, &LuaMapsDialog::scriptBrowse);
 
     Preferences *prefs = Preferences::instance();
     QSettings settings;

@@ -102,28 +102,28 @@ MapDocumentActionHandler::MapDocumentActionHandler(QObject *parent)
     Utils::setThemeIcon(mActionMoveLayerDown, "go-down");
     Utils::setThemeIcon(mActionLayerProperties, "document-properties");
 
-    connect(mActionSelectAll, SIGNAL(triggered()), SLOT(selectAll()));
-    connect(mActionSelectNone, SIGNAL(triggered()), SLOT(selectNone()));
-    connect(mActionCropToSelection, SIGNAL(triggered()),
-            SLOT(cropToSelection()));
-    connect(mActionAddTileLayer, SIGNAL(triggered()), SLOT(addTileLayer()));
-    connect(mActionAddObjectGroup, SIGNAL(triggered()),
-            SLOT(addObjectGroup()));
-    connect(mActionAddImageLayer, SIGNAL(triggered()), SLOT(addImageLayer()));
-    connect(mActionDuplicateLayer, SIGNAL(triggered()),
-            SLOT(duplicateLayer()));
-    connect(mActionMergeLayerDown, SIGNAL(triggered()),
-            SLOT(mergeLayerDown()));
-    connect(mActionSelectPreviousLayer, SIGNAL(triggered()),
-            SLOT(selectPreviousLayer()));
-    connect(mActionSelectNextLayer, SIGNAL(triggered()),
-            SLOT(selectNextLayer()));
-    connect(mActionRenameLayer, SIGNAL(triggered()), SLOT(renameLayer()));
-    connect(mActionRemoveLayer, SIGNAL(triggered()), SLOT(removeLayer()));
-    connect(mActionMoveLayerUp, SIGNAL(triggered()), SLOT(moveLayerUp()));
-    connect(mActionMoveLayerDown, SIGNAL(triggered()), SLOT(moveLayerDown()));
-    connect(mActionToggleOtherLayers, SIGNAL(triggered()),
-            SLOT(toggleOtherLayers()));
+    connect(mActionSelectAll, &QAction::triggered, this, &MapDocumentActionHandler::selectAll);
+    connect(mActionSelectNone, &QAction::triggered, this, &MapDocumentActionHandler::selectNone);
+    connect(mActionCropToSelection, &QAction::triggered,
+            this, &MapDocumentActionHandler::cropToSelection);
+    connect(mActionAddTileLayer, &QAction::triggered, this, &MapDocumentActionHandler::addTileLayer);
+    connect(mActionAddObjectGroup, &QAction::triggered,
+            this, &MapDocumentActionHandler::addObjectGroup);
+    connect(mActionAddImageLayer, &QAction::triggered, this, &MapDocumentActionHandler::addImageLayer);
+    connect(mActionDuplicateLayer, &QAction::triggered,
+            this, &MapDocumentActionHandler::duplicateLayer);
+    connect(mActionMergeLayerDown, &QAction::triggered,
+            this, &MapDocumentActionHandler::mergeLayerDown);
+    connect(mActionSelectPreviousLayer, &QAction::triggered,
+            this, &MapDocumentActionHandler::selectPreviousLayer);
+    connect(mActionSelectNextLayer, &QAction::triggered,
+            this, &MapDocumentActionHandler::selectNextLayer);
+    connect(mActionRenameLayer, &QAction::triggered, this, &MapDocumentActionHandler::renameLayer);
+    connect(mActionRemoveLayer, &QAction::triggered, this, &MapDocumentActionHandler::removeLayer);
+    connect(mActionMoveLayerUp, &QAction::triggered, this, &MapDocumentActionHandler::moveLayerUp);
+    connect(mActionMoveLayerDown, &QAction::triggered, this, &MapDocumentActionHandler::moveLayerDown);
+    connect(mActionToggleOtherLayers, &QAction::triggered,
+            this, &MapDocumentActionHandler::toggleOtherLayers);
 
     updateActions();
     retranslateUi();
@@ -171,10 +171,10 @@ void MapDocumentActionHandler::setMapDocument(MapDocument *mapDocument)
     updateActions();
 
     if (mMapDocument) {
-        connect(mapDocument, SIGNAL(currentLayerIndexChanged(int)),
-                SLOT(updateActions()));
-        connect(mapDocument, SIGNAL(tileSelectionChanged(QRegion,QRegion)),
-                SLOT(updateActions()));
+        connect(mapDocument, &MapDocument::currentLayerIndexChanged,
+                this, &MapDocumentActionHandler::updateActions);
+        connect(mapDocument, &MapDocument::tileSelectionChanged,
+                this, &MapDocumentActionHandler::updateActions);
     }
 
     emit mapDocumentChanged(mMapDocument);

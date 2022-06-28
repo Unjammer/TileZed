@@ -22,6 +22,7 @@
 #include "buildingdocument.h"
 #include "buildingdocumentmgr.h"
 #include "buildingeditorwindow.h"
+#include "buildingfloor.h"
 #include "ui_buildingeditorwindow.h"
 #include "buildingisoview.h"
 #include "buildingorthoview.h"
@@ -86,16 +87,16 @@ ObjectEditModeToolBar::ObjectEditModeToolBar(ObjectEditMode *mode, QWidget *pare
 
     addWidget(mRoomComboBox);
     addAction(actions->actionRooms);
-    connect(mRoomComboBox, SIGNAL(currentIndexChanged(int)),
-            SLOT(roomIndexChanged(int)));
+    connect(mRoomComboBox, &QComboBox::currentIndexChanged,
+            this, &ObjectEditModeToolBar::roomIndexChanged);
 
     mFloorLabel = new QToolButton;
     mFloorLabel->setMinimumWidth(90);
     mFloorLabel->setAutoRaise(true);
     mFloorLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
     mFloorLabel->setToolTip(tr("Click to edit floors"));
-    connect(mFloorLabel, SIGNAL(clicked()),
-            BuildingEditorWindow::instance(), SLOT(floorsDialog()));
+    connect(mFloorLabel, &QAbstractButton::clicked,
+            BuildingEditorWindow::instance(), &BuildingEditorWindow::floorsDialog);
 
     addSeparator();
     addWidget(mFloorLabel);
@@ -126,7 +127,7 @@ ObjectEditModeToolBar::ObjectEditModeToolBar(ObjectEditMode *mode, QWidget *pare
                          mode->tr("Dormer (S)"));
     roofMenu->addAction(QPixmap(QLatin1String(":/BuildingEditor/icons/icon_roof_flat.png")),
                          mode->tr("Flat Top"));
-    connect(roofMenu, SIGNAL(triggered(QAction*)), SLOT(roofTypeChanged(QAction*)));
+    connect(roofMenu, &QMenu::triggered, this, &ObjectEditModeToolBar::roofTypeChanged);
 
     QToolButton *button = static_cast<QToolButton*>(widgetForAction(actions->actionRoof));
     button->setMenu(roofMenu);
@@ -147,7 +148,7 @@ ObjectEditModeToolBar::ObjectEditModeToolBar(ObjectEditMode *mode, QWidget *pare
                          mode->tr("Shallow Peak (Horizontal)"));
     roofMenu->addAction(QPixmap(QLatin1String(":/BuildingEditor/icons/icon_roof_peakNS.png")),
                          mode->tr("Shallow Peak (Vertical)"));
-    connect(roofMenu, SIGNAL(triggered(QAction*)), SLOT(roofShallowTypeChanged(QAction*)));
+    connect(roofMenu, &QMenu::triggered, this, &ObjectEditModeToolBar::roofShallowTypeChanged);
 
     button = static_cast<QToolButton*>(widgetForAction(actions->actionRoofShallow));
     button->setMenu(roofMenu);
@@ -171,15 +172,15 @@ ObjectEditModeToolBar::ObjectEditModeToolBar(ObjectEditMode *mode, QWidget *pare
                         mode->tr("Outer (SE)"));
     roofMenu->addAction(QPixmap(QLatin1String(":/BuildingEditor/icons/icon_corner_outerSW.png")),
                         mode->tr("Outer (SW)"));
-    connect(roofMenu, SIGNAL(triggered(QAction*)), SLOT(roofCornerTypeChanged(QAction*)));
+    connect(roofMenu, &QMenu::triggered, this, &ObjectEditModeToolBar::roofCornerTypeChanged);
 
     button = static_cast<QToolButton*>(widgetForAction(actions->actionRoofCorner));
     button->setMenu(roofMenu);
     button->setPopupMode(QToolButton::MenuButtonPopup);
     /////
 
-    connect(docman(), SIGNAL(currentDocumentChanged(BuildingDocument*)),
-            SLOT(currentDocumentChanged(BuildingDocument*)));
+    connect(docman(), &BuildingDocumentMgr::currentDocumentChanged,
+            this, &ObjectEditModeToolBar::currentDocumentChanged);
 }
 
 Building *ObjectEditModeToolBar::currentBuilding() const
@@ -200,19 +201,19 @@ void ObjectEditModeToolBar::currentDocumentChanged(BuildingDocument *doc)
     mCurrentDocument = doc;
 
     if (mCurrentDocument) {
-        connect(mCurrentDocument, SIGNAL(roomAdded(Room*)), SLOT(roomAdded(Room*)));
-        connect(mCurrentDocument, SIGNAL(roomRemoved(Room*)), SLOT(roomRemoved(Room*)));
-        connect(mCurrentDocument, SIGNAL(roomsReordered()), SLOT(roomsReordered()));
-        connect(mCurrentDocument, SIGNAL(roomChanged(Room*)), SLOT(roomChanged(Room*)));
+        connect(mCurrentDocument, &BuildingDocument::roomAdded, this, &ObjectEditModeToolBar::roomAdded);
+        connect(mCurrentDocument, &BuildingDocument::roomRemoved, this, &ObjectEditModeToolBar::roomRemoved);
+        connect(mCurrentDocument, &BuildingDocument::roomsReordered, this, &ObjectEditModeToolBar::roomsReordered);
+        connect(mCurrentDocument, &BuildingDocument::roomChanged, this, &ObjectEditModeToolBar::roomChanged);
 
-        connect(mCurrentDocument, SIGNAL(currentRoomChanged()), SLOT(currentRoomChanged()));
+        connect(mCurrentDocument, &BuildingDocument::currentRoomChanged, this, &ObjectEditModeToolBar::currentRoomChanged);
 
-        connect(mCurrentDocument, SIGNAL(floorAdded(BuildingFloor*)),
-                SLOT(updateActions()));
-        connect(mCurrentDocument, SIGNAL(floorRemoved(BuildingFloor*)),
-                SLOT(updateActions()));
-        connect(mCurrentDocument, SIGNAL(currentFloorChanged()),
-                SLOT(updateActions()));
+        connect(mCurrentDocument, &BuildingDocument::floorAdded,
+                this, &ObjectEditModeToolBar::updateActions);
+        connect(mCurrentDocument, &BuildingDocument::floorRemoved,
+                this, &ObjectEditModeToolBar::updateActions);
+        connect(mCurrentDocument, &BuildingDocument::currentFloorChanged,
+                this, &ObjectEditModeToolBar::updateActions);
     }
 
     updateRoomComboBox();
@@ -390,17 +391,17 @@ ObjectEditModePerDocumentStuff::ObjectEditModePerDocumentStuff(
     mMode(mode),
     mDocument(doc)
 {
-    connect(document(), SIGNAL(fileNameChanged()), SLOT(updateDocumentTab()));
-    connect(document(), SIGNAL(cleanChanged()), SLOT(updateDocumentTab()));
-    connect(document()->undoStack(), SIGNAL(cleanChanged(bool)), SLOT(updateDocumentTab()));
+    connect(document(), &BuildingDocument::fileNameChanged, this, &ObjectEditModePerDocumentStuff::updateDocumentTab);
+    connect(document(), &BuildingDocument::cleanChanged, this, &ObjectEditModePerDocumentStuff::updateDocumentTab);
+    connect(document()->undoStack(), &QUndoStack::cleanChanged, this, &ObjectEditModePerDocumentStuff::updateDocumentTab);
 
-    connect(BuildingPreferences::instance(), SIGNAL(showObjectsChanged(bool)),
-            SLOT(showObjectsChanged()));
-    connect(BuildingPreferences::instance(), SIGNAL(showLowerFloorsChanged(bool)),
-            SLOT(showLowerFloorsChanged()));
+    connect(BuildingPreferences::instance(), &BuildingPreferences::showObjectsChanged,
+            this, &ObjectEditModePerDocumentStuff::showObjectsChanged);
+    connect(BuildingPreferences::instance(), &BuildingPreferences::showLowerFloorsChanged,
+            this, &ObjectEditModePerDocumentStuff::showLowerFloorsChanged);
 
-    connect(ToolManager::instance(), SIGNAL(currentEditorChanged()),
-            SLOT(updateActions()));
+    connect(ToolManager::instance(), &ToolManager::currentEditorChanged,
+            this, &ObjectEditModePerDocumentStuff::updateActions);
 }
 
 ObjectEditModePerDocumentStuff::~ObjectEditModePerDocumentStuff()
@@ -413,20 +414,20 @@ void ObjectEditModePerDocumentStuff::activate()
 
     connect(view(), SIGNAL(mouseCoordinateChanged(QPoint)),
             mMode->mStatusBar, SLOT(mouseCoordinateChanged(QPoint)));
-    connect(zoomable(), SIGNAL(scaleChanged(qreal)),
-            SLOT(updateActions()));
+    connect(zoomable(), &Tiled::Internal::Zoomable::scaleChanged,
+            this, &ObjectEditModePerDocumentStuff::updateActions);
 
     zoomable()->connectToComboBox(mMode->mStatusBar->editorScaleComboBox);
 
 //    connect(document(), SIGNAL(cleanChanged()), SLOT(updateWindowTitle()));
 
     Ui::BuildingEditorWindow *actions = BuildingEditorWindow::instance()->actionIface();
-    connect(actions->actionZoomIn, SIGNAL(triggered()),
-            SLOT(zoomIn()));
-    connect(actions->actionZoomOut, SIGNAL(triggered()),
-            SLOT(zoomOut()));
-    connect(actions->actionNormalSize, SIGNAL(triggered()),
-            SLOT(zoomNormal()));
+    connect(actions->actionZoomIn, &QAction::triggered,
+            this, &ObjectEditModePerDocumentStuff::zoomIn);
+    connect(actions->actionZoomOut, &QAction::triggered,
+            this, &ObjectEditModePerDocumentStuff::zoomOut);
+    connect(actions->actionNormalSize, &QAction::triggered,
+            this, &ObjectEditModePerDocumentStuff::zoomNormal);
 }
 
 void ObjectEditModePerDocumentStuff::deactivate()
@@ -588,19 +589,19 @@ ObjectEditMode::ObjectEditMode(QObject *parent) :
 
     setWidget(mMainWindow);
 
-    connect(mTabWidget, SIGNAL(currentChanged(int)),
-            SLOT(currentDocumentTabChanged(int)));
-    connect(mTabWidget, SIGNAL(tabCloseRequested(int)),
-            SLOT(documentTabCloseRequested(int)));
+    connect(mTabWidget, &QTabWidget::currentChanged,
+            this, &ObjectEditMode::currentDocumentTabChanged);
+    connect(mTabWidget, &QTabWidget::tabCloseRequested,
+            this, &ObjectEditMode::documentTabCloseRequested);
 
-    connect(BuildingDocumentMgr::instance(), SIGNAL(documentAdded(BuildingEditor::BuildingDocument*)),
-            SLOT(documentAdded(BuildingEditor::BuildingDocument*)));
-    connect(BuildingDocumentMgr::instance(), SIGNAL(currentDocumentChanged(BuildingEditor::BuildingDocument*)),
-            SLOT(currentDocumentChanged(BuildingEditor::BuildingDocument*)));
-    connect(BuildingDocumentMgr::instance(), SIGNAL(documentAboutToClose(int,BuildingEditor::BuildingDocument*)),
-            SLOT(documentAboutToClose(int,BuildingEditor::BuildingDocument*)));
+    connect(BuildingDocumentMgr::instance(), &BuildingDocumentMgr::documentAdded,
+            this, &ObjectEditMode::documentAdded);
+    connect(BuildingDocumentMgr::instance(), &BuildingDocumentMgr::currentDocumentChanged,
+            this, &ObjectEditMode::currentDocumentChanged);
+    connect(BuildingDocumentMgr::instance(), &BuildingDocumentMgr::documentAboutToClose,
+            this, &ObjectEditMode::documentAboutToClose);
 
-    connect(this, SIGNAL(activeStateChanged(bool)), SLOT(onActiveStateChanged(bool)));
+    connect(this, &IMode::activeStateChanged, this, &ObjectEditMode::onActiveStateChanged);
 }
 
 Building *ObjectEditMode::currentBuilding() const

@@ -255,7 +255,7 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     undoAction->setIcon(undoIcon);
     redoAction->setIconText(tr("Redo"));
     undoAction->setIconText(tr("Undo"));
-    connect(undoGroup, SIGNAL(cleanChanged(bool)), SLOT(updateWindowTitle()));
+    connect(undoGroup, &QUndoGroup::cleanChanged, this, &MainWindow::updateWindowTitle);
 
     UndoDock *undoDock = new UndoDock(undoGroup, this);
 
@@ -376,82 +376,82 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     menuBar()->insertMenu(mUi->menuHelp->menuAction(), mLayerMenu);
 #endif
 
-    connect(mUi->actionNew, SIGNAL(triggered()), SLOT(newMap()));
-    connect(mUi->actionOpen, SIGNAL(triggered()), SLOT(openFile()));
-    connect(mUi->actionClearRecentFiles, SIGNAL(triggered()),
-            SLOT(clearRecentFiles()));
-    connect(mUi->actionSave, SIGNAL(triggered()), SLOT(saveFile()));
-    connect(mUi->actionSaveAs, SIGNAL(triggered()), SLOT(saveFileAs()));
-    connect(mUi->actionSaveAsImage, SIGNAL(triggered()), SLOT(saveAsImage()));
-    connect(mUi->actionExport, SIGNAL(triggered()), SLOT(exportAs()));
+    connect(mUi->actionNew, &QAction::triggered, this, &MainWindow::newMap);
+    connect(mUi->actionOpen, &QAction::triggered, this, qOverload<>(&MainWindow::openFile));
+    connect(mUi->actionClearRecentFiles, &QAction::triggered,
+            this, &MainWindow::clearRecentFiles);
+    connect(mUi->actionSave, &QAction::triggered, this, qOverload<>(&MainWindow::saveFile));
+    connect(mUi->actionSaveAs, &QAction::triggered, this, &MainWindow::saveFileAs);
+    connect(mUi->actionSaveAsImage, &QAction::triggered, this, &MainWindow::saveAsImage);
+    connect(mUi->actionExport, &QAction::triggered, this, &MainWindow::exportAs);
 #ifdef ZOMBOID
     connect(mUi->actionExportNewBinary, &QAction::triggered, this, &MainWindow::exportNewBinary);
 #endif
-    connect(mUi->actionClose, SIGNAL(triggered()), SLOT(closeFile()));
-    connect(mUi->actionCloseAll, SIGNAL(triggered()), SLOT(closeAllFiles()));
-    connect(mUi->actionQuit, SIGNAL(triggered()), SLOT(close()));
+    connect(mUi->actionClose, &QAction::triggered, this, &MainWindow::closeFile);
+    connect(mUi->actionCloseAll, &QAction::triggered, this, &MainWindow::closeAllFiles);
+    connect(mUi->actionQuit, &QAction::triggered, this, &QWidget::close);
 
-    connect(mUi->actionCut, SIGNAL(triggered()), SLOT(cut()));
-    connect(mUi->actionCopy, SIGNAL(triggered()), SLOT(copy()));
-    connect(mUi->actionPaste, SIGNAL(triggered()), SLOT(paste()));
-    connect(mUi->actionDelete, SIGNAL(triggered()), SLOT(delete_()));
-    connect(mUi->actionPreferences, SIGNAL(triggered()),
-            SLOT(openPreferences()));
+    connect(mUi->actionCut, &QAction::triggered, this, &MainWindow::cut);
+    connect(mUi->actionCopy, &QAction::triggered, this, &MainWindow::copy);
+    connect(mUi->actionPaste, &QAction::triggered, this, &MainWindow::paste);
+    connect(mUi->actionDelete, &QAction::triggered, this, &MainWindow::delete_);
+    connect(mUi->actionPreferences, &QAction::triggered,
+            this, &MainWindow::openPreferences);
 
-    connect(mUi->actionShowGrid, SIGNAL(toggled(bool)),
-            preferences, SLOT(setShowGrid(bool)));
-    connect(mUi->actionSnapToGrid, SIGNAL(toggled(bool)),
-            preferences, SLOT(setSnapToGrid(bool)));
-    connect(mUi->actionHighlightCurrentLayer, SIGNAL(toggled(bool)),
-            preferences, SLOT(setHighlightCurrentLayer(bool)));
+    connect(mUi->actionShowGrid, &QAction::toggled,
+            preferences, &Preferences::setShowGrid);
+    connect(mUi->actionSnapToGrid, &QAction::toggled,
+            preferences, &Preferences::setSnapToGrid);
+    connect(mUi->actionHighlightCurrentLayer, &QAction::toggled,
+            preferences, &Preferences::setHighlightCurrentLayer);
 #ifdef ZOMBOID
-    connect(mUi->actionHighlightRoomUnderPointer, SIGNAL(toggled(bool)),
-            preferences, SLOT(setHighlightRoomUnderPointer(bool)));
+    connect(mUi->actionHighlightRoomUnderPointer, &QAction::toggled,
+            preferences, &Preferences::setHighlightRoomUnderPointer);
     connect(mUi->actionShowLotFloorsOnly, &QAction::toggled, preferences, &Preferences::setShowLotFloorsOnly);
-    connect(mUi->actionShowMiniMap, SIGNAL(toggled(bool)),
-            preferences, SLOT(setShowMiniMap(bool)));
-    connect(mUi->actionShowTileLayersPanel, SIGNAL(toggled(bool)),
-            preferences, SLOT(setShowTileLayersPanel(bool)));
+    connect(mUi->actionShowMiniMap, &QAction::toggled,
+            preferences, &Preferences::setShowMiniMap);
+    connect(mUi->actionShowTileLayersPanel, &QAction::toggled,
+            preferences, &Preferences::setShowTileLayersPanel);
 #endif
-    connect(mUi->actionZoomIn, SIGNAL(triggered()), SLOT(zoomIn()));
-    connect(mUi->actionZoomOut, SIGNAL(triggered()), SLOT(zoomOut()));
-    connect(mUi->actionZoomNormal, SIGNAL(triggered()), SLOT(zoomNormal()));
+    connect(mUi->actionZoomIn, &QAction::triggered, this, &MainWindow::zoomIn);
+    connect(mUi->actionZoomOut, &QAction::triggered, this, &MainWindow::zoomOut);
+    connect(mUi->actionZoomNormal, &QAction::triggered, this, &MainWindow::zoomNormal);
 
-    connect(mUi->actionNewTileset, SIGNAL(triggered()), SLOT(newTileset()));
-    connect(mUi->actionAddExternalTileset, SIGNAL(triggered()),
-            SLOT(addExternalTileset()));
-    connect(mUi->actionResizeMap, SIGNAL(triggered()), SLOT(resizeMap()));
-    connect(mUi->actionOffsetMap, SIGNAL(triggered()), SLOT(offsetMap()));
-    connect(mUi->actionMapProperties, SIGNAL(triggered()),
-            SLOT(editMapProperties()));
-    connect(mUi->actionAutoMap, SIGNAL(triggered()), SLOT(autoMap()));
+    connect(mUi->actionNewTileset, &QAction::triggered, this, [this]{this->newTileset();});
+    connect(mUi->actionAddExternalTileset, &QAction::triggered,
+            this, &MainWindow::addExternalTileset);
+    connect(mUi->actionResizeMap, &QAction::triggered, this, &MainWindow::resizeMap);
+    connect(mUi->actionOffsetMap, &QAction::triggered, this, &MainWindow::offsetMap);
+    connect(mUi->actionMapProperties, &QAction::triggered,
+            this, &MainWindow::editMapProperties);
+    connect(mUi->actionAutoMap, &QAction::triggered, this, &MainWindow::autoMap);
 #ifdef ZOMBOID
-    connect(mUi->actionConvertToLot, SIGNAL(triggered()),
-            SLOT(convertToLot()));
-    connect(mUi->actionConvertOrientation, SIGNAL(triggered()),
-            SLOT(convertOrientation()));
-    connect(mUi->actionRoomDefGo, SIGNAL(triggered()),
-            SLOT(RoomDefGo()));
-    connect(mUi->actionRoomDefMerge, SIGNAL(triggered()),
-            SLOT(RoomDefMerge()));
-    connect(mUi->actionRoomDefRemove, SIGNAL(triggered()),
-            SLOT(RoomDefRemove()));
-    connect(mUi->actionRoomDefUnknownWalls, SIGNAL(triggered()),
-            SLOT(RoomDefUnknownWalls()));
-    connect(mUi->actionLuaScript, SIGNAL(triggered()), SLOT(LuaConsole()));
+    connect(mUi->actionConvertToLot, &QAction::triggered,
+            this, &MainWindow::convertToLot);
+    connect(mUi->actionConvertOrientation, &QAction::triggered,
+            this, &MainWindow::convertOrientation);
+    connect(mUi->actionRoomDefGo, &QAction::triggered,
+            this, &MainWindow::RoomDefGo);
+    connect(mUi->actionRoomDefMerge, &QAction::triggered,
+            this, &MainWindow::RoomDefMerge);
+    connect(mUi->actionRoomDefRemove, &QAction::triggered,
+            this, &MainWindow::RoomDefRemove);
+    connect(mUi->actionRoomDefUnknownWalls, &QAction::triggered,
+            this, &MainWindow::RoomDefUnknownWalls);
+    connect(mUi->actionLuaScript, &QAction::triggered, this, &MainWindow::LuaConsole);
 #endif
 
-    connect(mActionHandler->actionLayerProperties(), SIGNAL(triggered()),
-            SLOT(editLayerProperties()));
+    connect(mActionHandler->actionLayerProperties(), &QAction::triggered,
+            this, &MainWindow::editLayerProperties);
 
-    connect(mUi->actionAbout, SIGNAL(triggered()), SLOT(aboutTiled()));
-    connect(mUi->actionAboutQt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
+    connect(mUi->actionAbout, &QAction::triggered, this, &MainWindow::aboutTiled);
+    connect(mUi->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
 #ifdef ZOMBOID
-    connect(mUi->actionHelpContents, SIGNAL(triggered()), SLOT(helpContents()));
+    connect(mUi->actionHelpContents, &QAction::triggered, this, &MainWindow::helpContents);
 #endif
 
-    connect(mTilesetDock, SIGNAL(tilesetsDropped(QStringList)),
-            SLOT(newTilesets(QStringList)));
+    connect(mTilesetDock, &TilesetDock::tilesetsDropped,
+            this, &MainWindow::newTilesets);
 
     // Add recent file actions to the recent files menu
     for (int i = 0; i < MaxRecentFiles; ++i)
@@ -460,8 +460,8 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
          mUi->menuRecentFiles->insertAction(mUi->actionClearRecentFiles,
                                             mRecentFiles[i]);
          mRecentFiles[i]->setVisible(false);
-         connect(mRecentFiles[i], SIGNAL(triggered()),
-                 this, SLOT(openRecentFile()));
+         connect(mRecentFiles[i], &QAction::triggered,
+                 this, &MainWindow::openRecentFile);
     }
     mUi->menuRecentFiles->insertSeparator(mUi->actionClearRecentFiles);
 
@@ -498,23 +498,23 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     CreateObjectTool *polylineObjectsTool = new CreateObjectTool(
             CreateObjectTool::CreatePolyline, this);
 
-    connect(mTilesetDock, SIGNAL(currentTilesChanged(const Tiled::TileLayer*)),
-            this, SLOT(setStampBrush(const Tiled::TileLayer*)));
-    connect(mStampBrush, SIGNAL(currentTilesChanged(const Tiled::TileLayer*)),
-            this, SLOT(setStampBrush(const Tiled::TileLayer*)));
-    connect(mTilesetDock, SIGNAL(currentTileChanged(Tiled::Tile*)),
-            tileObjectsTool, SLOT(setTile(Tiled::Tile*)));
+    connect(mTilesetDock, &TilesetDock::currentTilesChanged,
+            this, &MainWindow::setStampBrush);
+    connect(mStampBrush, &StampBrush::currentTilesChanged,
+            this, &MainWindow::setStampBrush);
+    connect(mTilesetDock, &TilesetDock::currentTileChanged,
+            tileObjectsTool, &CreateObjectTool::setTile);
 #ifdef ZOMBOID
-    connect(mStampBrush, SIGNAL(tilePicked(Tiled::Tile*)),
-            SLOT(tilePicked(Tiled::Tile*)));
-    connect(mTileLayersPanel, SIGNAL(tilePicked(Tiled::Tile*)),
-            SLOT(tilePicked(Tiled::Tile*)));
+    connect(mStampBrush, &StampBrush::tilePicked,
+            this, &MainWindow::tilePicked);
+    connect(mTileLayersPanel, &TileLayersPanel::tilePicked,
+            this, &MainWindow::tilePicked);
 #endif
 
-    connect(mRandomButton, SIGNAL(toggled(bool)),
-            mStampBrush, SLOT(setRandom(bool)));
-    connect(mRandomButton, SIGNAL(toggled(bool)),
-            mBucketFillTool, SLOT(setRandom(bool)));
+    connect(mRandomButton, &QAbstractButton::toggled,
+            mStampBrush, &StampBrush::setRandom);
+    connect(mRandomButton, &QAbstractButton::toggled,
+            mBucketFillTool, &BucketFillTool::setRandom);
 
     ToolManager *toolManager = ToolManager::instance();
     toolManager->registerTool(mStampBrush);
@@ -558,16 +558,16 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
 
     QAction *brushSizeMinus = new QAction(this);
     brushSizeMinus->setShortcut(QKeySequence(QLatin1String("[")));
-    connect(brushSizeMinus, SIGNAL(triggered()), SLOT(brushSizeMinus()));
+    connect(brushSizeMinus, &QAction::triggered, this, &MainWindow::brushSizeMinus);
     addAction(brushSizeMinus);
 
     QAction *brushSizePlus = new QAction(this);
     brushSizePlus->setShortcut(QKeySequence(QLatin1String("]")));
-    connect(brushSizePlus, SIGNAL(triggered()), SLOT(brushSizePlus()));
+    connect(brushSizePlus, &QAction::triggered, this, &MainWindow::brushSizePlus);
     addAction(brushSizePlus);
 
-    connect(PickTileTool::instancePtr(), SIGNAL(tilePicked(Tiled::Tile*)),
-            SLOT(tilePicked(Tiled::Tile*)));
+    connect(PickTileTool::instancePtr(), &PickTileTool::tilePicked,
+            this, &MainWindow::tilePicked);
 #endif
 
     addToolBar(toolManager->toolBar());
@@ -580,15 +580,15 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
 #else
     statusBar()->addWidget(mStatusInfoLabel);
 #endif
-    connect(toolManager, SIGNAL(statusInfoChanged(QString)),
-            this, SLOT(updateStatusInfoLabel(QString)));
+    connect(toolManager, &ToolManager::statusInfoChanged,
+            this, &MainWindow::updateStatusInfoLabel);
 #ifdef ZOMBOID
     mCurrentLevelButton->setObjectName(QLatin1String("currentLevelButton"));
     mCurrentLayerButton->setObjectName(QLatin1String("currentLayerButton"));
-    connect(mCurrentLevelMenu, SIGNAL(aboutToShow()), SLOT(aboutToShowLevelMenu()));
-    connect(mCurrentLayerMenu, SIGNAL(aboutToShow()), SLOT(aboutToShowLayerMenu()));
-    connect(mCurrentLevelMenu, SIGNAL(triggered(QAction*)), SLOT(triggeredLevelMenu(QAction*)));
-    connect(mCurrentLayerMenu, SIGNAL(triggered(QAction*)), SLOT(triggeredLayerMenu(QAction*)));
+    connect(mCurrentLevelMenu, &QMenu::aboutToShow, this, &MainWindow::aboutToShowLevelMenu);
+    connect(mCurrentLayerMenu, &QMenu::aboutToShow, this, &MainWindow::aboutToShowLayerMenu);
+    connect(mCurrentLevelMenu, &QMenu::triggered, this, &MainWindow::triggeredLevelMenu);
+    connect(mCurrentLayerMenu, &QMenu::triggered, this, &MainWindow::triggeredLayerMenu);
     mCurrentLevelButton->setMenu(mCurrentLevelMenu);
     mCurrentLayerButton->setMenu(mCurrentLayerMenu);
     mCurrentLevelButton->setPopupMode(QToolButton::InstantPopup);
@@ -612,26 +612,26 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     mUi->menuView->addAction(mMapsDock->toggleViewAction());
 #endif
 
-    connect(mClipboardManager, SIGNAL(hasMapChanged()), SLOT(updateActions()));
+    connect(mClipboardManager, &ClipboardManager::hasMapChanged, this, &MainWindow::updateActions);
 
-    connect(mDocumentManager, SIGNAL(currentDocumentChanged(Tiled::Internal::MapDocument*)),
-            SLOT(mapDocumentChanged(Tiled::Internal::MapDocument*)));
-    connect(mDocumentManager, SIGNAL(documentCloseRequested(int)),
-            this, SLOT(closeMapDocument(int)));
+    connect(mDocumentManager, &DocumentManager::currentDocumentChanged,
+            this, &MainWindow::mapDocumentChanged);
+    connect(mDocumentManager, &DocumentManager::documentCloseRequested,
+            this, &MainWindow::closeMapDocument);
 
     QShortcut *switchToLeftDocument = new QShortcut(tr("Ctrl+PgUp"), this);
-    connect(switchToLeftDocument, SIGNAL(activated()),
-            mDocumentManager, SLOT(switchToLeftDocument()));
+    connect(switchToLeftDocument, &QShortcut::activated,
+            mDocumentManager, &DocumentManager::switchToLeftDocument);
     QShortcut *switchToLeftDocument1 = new QShortcut(tr("Ctrl+Shift+Tab"), this);
-    connect(switchToLeftDocument1, SIGNAL(activated()),
-            mDocumentManager, SLOT(switchToLeftDocument()));
+    connect(switchToLeftDocument1, &QShortcut::activated,
+            mDocumentManager, &DocumentManager::switchToLeftDocument);
 
     QShortcut *switchToRightDocument = new QShortcut(tr("Ctrl+PgDown"), this);
-    connect(switchToRightDocument, SIGNAL(activated()),
-            mDocumentManager, SLOT(switchToRightDocument()));
+    connect(switchToRightDocument, &QShortcut::activated,
+            mDocumentManager, &DocumentManager::switchToRightDocument);
     QShortcut *switchToRightDocument1 = new QShortcut(tr("Ctrl+Tab"), this);
-    connect(switchToRightDocument1, SIGNAL(activated()),
-            mDocumentManager, SLOT(switchToRightDocument()));
+    connect(switchToRightDocument1, &QShortcut::activated,
+            mDocumentManager, &DocumentManager::switchToRightDocument);
 
     new QShortcut(tr("X"), this, SLOT(flipStampHorizontally()));
     new QShortcut(tr("Y"), this, SLOT(flipStampVertically()));
@@ -639,37 +639,37 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     new QShortcut(tr("Shift+Z"), this, SLOT(rotateStampLeft()));
 
     QShortcut *copyPositionShortcut = new QShortcut(tr("Alt+C"), this);
-    connect(copyPositionShortcut, SIGNAL(activated()),
-            mActionHandler, SLOT(copyPosition()));
+    connect(copyPositionShortcut, &QShortcut::activated,
+            mActionHandler, &MapDocumentActionHandler::copyPosition);
 
 #ifdef ZOMBOID
-    connect(mUi->actionBuildingEditor, SIGNAL(triggered()),
-            SLOT(showBuildingEditor()));
-    connect(mUi->actionCheckBuildings, SIGNAL(triggered()),
-            SLOT(checkBuildings()));
-    connect(mUi->actionCheckMaps, SIGNAL(triggered()),
-            SLOT(checkMaps()));
-    connect(mUi->actionTilesetMetaInfo, SIGNAL(triggered()),
-            SLOT(tilesetMetaInfoDialog()));
-    connect(mUi->actionRearrangeTiles, SIGNAL(triggered()),
-            SLOT(rearrangeTiles()));
-    connect(mUi->actionTileProperties, SIGNAL(triggered()),
-            SLOT(tilePropertiesEditor()));
-    connect(mUi->actionCompareTileDef, SIGNAL(triggered()),
-            SLOT(compareTileDef()));
-    connect(mUi->actionPackViewer, SIGNAL(triggered()),
-            SLOT(showPackViewer()));
-    connect(mUi->actionCreatePack, SIGNAL(triggered()),
-            SLOT(createPackFile()));
-    connect(mUi->actionComparePack, SIGNAL(triggered()),
-            SLOT(comparePackFiles()));
-    connect(mUi->actionContainerOverlays, SIGNAL(triggered()),
-            SLOT(containerOverlayDialog()));
+    connect(mUi->actionBuildingEditor, &QAction::triggered,
+            this, &MainWindow::showBuildingEditor);
+    connect(mUi->actionCheckBuildings, &QAction::triggered,
+            this, &MainWindow::checkBuildings);
+    connect(mUi->actionCheckMaps, &QAction::triggered,
+            this, &MainWindow::checkMaps);
+    connect(mUi->actionTilesetMetaInfo, &QAction::triggered,
+            this, &MainWindow::tilesetMetaInfoDialog);
+    connect(mUi->actionRearrangeTiles, &QAction::triggered,
+            this, &MainWindow::rearrangeTiles);
+    connect(mUi->actionTileProperties, &QAction::triggered,
+            this, &MainWindow::tilePropertiesEditor);
+    connect(mUi->actionCompareTileDef, &QAction::triggered,
+            this, &MainWindow::compareTileDef);
+    connect(mUi->actionPackViewer, &QAction::triggered,
+            this, &MainWindow::showPackViewer);
+    connect(mUi->actionCreatePack, &QAction::triggered,
+            this, &MainWindow::createPackFile);
+    connect(mUi->actionComparePack, &QAction::triggered,
+            this, &MainWindow::comparePackFiles);
+    connect(mUi->actionContainerOverlays, &QAction::triggered,
+            this, &MainWindow::containerOverlayDialog);
     connect(mUi->actionTileOverlays, &QAction::triggered, this, &MainWindow::tileOverlayDialog);
     mUi->actionEnflatulator->setVisible(false); // !!!
-    connect(mUi->actionEnflatulator, SIGNAL(triggered()), SLOT(enflatulator()));
-    connect(mUi->actionWorldEd, SIGNAL(triggered()),
-            SLOT(launchWorldEd()));
+    connect(mUi->actionEnflatulator, &QAction::triggered, this, &MainWindow::enflatulator);
+    connect(mUi->actionWorldEd, &QAction::triggered,
+            this, &MainWindow::launchWorldEd);
 #endif
 
     updateActions();
@@ -684,10 +684,10 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
 #endif
     setupQuickStamps();
 
-    connect(AutomappingManager::instance(), SIGNAL(warningsOccurred()),
-            this, SLOT(autoMappingWarning()));
-    connect(AutomappingManager::instance(), SIGNAL(errorsOccurred()),
-            this, SLOT(autoMappingError()));
+    connect(AutomappingManager::instance(), &AutomappingManager::warningsOccurred,
+            this, &MainWindow::autoMappingWarning);
+    connect(AutomappingManager::instance(), &AutomappingManager::errorsOccurred,
+            this, &MainWindow::autoMappingError);
 }
 
 MainWindow::~MainWindow()
@@ -1640,8 +1640,8 @@ void MainWindow::showBuildingEditor()
             return;
         }
 
-        connect(mBuildingEditor, SIGNAL(tilePicked(QString)),
-                SLOT(buildingTilePicked(QString)));
+        connect(mBuildingEditor, &BuildingEditorWindow::tilePicked,
+                this, &MainWindow::buildingTilePicked);
     }
 
     mBuildingEditor->show();
@@ -3113,15 +3113,15 @@ void MainWindow::addMapDocument(MapDocument *mapDocument)
 #else
     MapView *mapView = mDocumentManager->currentMapView();
 #endif
-    connect(mapView->zoomable(), SIGNAL(scaleChanged(qreal)),
-            this, SLOT(updateZoomLabel()));
+    connect(mapView->zoomable(), &Zoomable::scaleChanged,
+            this, &MainWindow::updateZoomLabel);
 
     Preferences *prefs = Preferences::instance();
 
     MapScene *mapScene = mapView->mapScene();
     mapScene->setGridVisible(prefs->showGrid());
-    connect(prefs, SIGNAL(showGridChanged(bool)),
-            mapScene, SLOT(setGridVisible(bool)));
+    connect(prefs, &Preferences::showGridChanged,
+            mapScene, &MapScene::setGridVisible);
 
 #ifdef ZOMBOID
     if (!gStartupBlockRendering) {
@@ -3219,19 +3219,19 @@ void MainWindow::mapDocumentChanged(MapDocument *mapDocument)
     QuickStampManager::instance()->setMapDocument(mMapDocument);
 
     if (mMapDocument) {
-        connect(mMapDocument, SIGNAL(fileNameChanged()),
-                SLOT(updateWindowTitle()));
-        connect(mapDocument, SIGNAL(currentLayerIndexChanged(int)),
-                SLOT(updateActions()));
-        connect(mapDocument, SIGNAL(tileSelectionChanged(QRegion,QRegion)),
-                SLOT(updateActions()));
-        connect(mapDocument, SIGNAL(selectedObjectsChanged()),
-                SLOT(updateActions()));
+        connect(mMapDocument, &MapDocument::fileNameChanged,
+                this, &MainWindow::updateWindowTitle);
+        connect(mapDocument, &MapDocument::currentLayerIndexChanged,
+                this, &MainWindow::updateActions);
+        connect(mapDocument, &MapDocument::tileSelectionChanged,
+                this, &MainWindow::updateActions);
+        connect(mapDocument, &MapDocument::selectedObjectsChanged,
+                this, &MainWindow::updateActions);
 #ifdef ZOMBOID
-        connect(mapDocument, SIGNAL(mapChanged()),
-                SLOT(resizeStatusInfoLabel()));
-        connect(mapDocument, SIGNAL(layerRenamed(int)),
-                SLOT(updateActions()));
+        connect(mapDocument, &MapDocument::mapChanged,
+                this, &MainWindow::resizeStatusInfoLabel);
+        connect(mapDocument, &MapDocument::layerRenamed,
+                this, &MainWindow::updateActions);
 #endif
 
         if (MapView *mapView = mDocumentManager->currentMapView()) {
@@ -3258,23 +3258,23 @@ void MainWindow::setupQuickStamps()
         // Set up shortcut for selecting this quick stamp
         QShortcut *selectStamp = new QShortcut(this);
         selectStamp->setKey(keys.value(i));
-        connect(selectStamp, SIGNAL(activated()), selectMapper, SLOT(map()));
+        connect(selectStamp, &QShortcut::activated, selectMapper, qOverload<>(&QSignalMapper::map));
         selectMapper->setMapping(selectStamp, i);
 
         // Set up shortcut for saving this quick stamp
         QShortcut *saveStamp = new QShortcut(this);
         saveStamp->setKey(QKeySequence(Qt::CTRL | keys.value(i)));
-        connect(saveStamp, SIGNAL(activated()), saveMapper, SLOT(map()));
+        connect(saveStamp, &QShortcut::activated, saveMapper, qOverload<>(&QSignalMapper::map));
         saveMapper->setMapping(saveStamp, i);
     }
 
-    connect(selectMapper, SIGNAL(mappedInt(int)),
-            quickStampManager, SLOT(selectQuickStamp(int)));
-    connect(saveMapper, SIGNAL(mappedInt(int)),
-            quickStampManager, SLOT(saveQuickStamp(int)));
+    connect(selectMapper, &QSignalMapper::mappedInt,
+            quickStampManager, &QuickStampManager::selectQuickStamp);
+    connect(saveMapper, &QSignalMapper::mappedInt,
+            quickStampManager, &QuickStampManager::saveQuickStamp);
 
-    connect(quickStampManager, SIGNAL(setStampBrush(const Tiled::TileLayer*)),
-            this, SLOT(setStampBrush(const Tiled::TileLayer*)));
+    connect(quickStampManager, &QuickStampManager::setStampBrush,
+            this, &MainWindow::setStampBrush);
 }
 
 void MainWindow::closeMapDocument(int index)

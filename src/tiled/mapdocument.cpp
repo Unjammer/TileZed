@@ -82,26 +82,26 @@ MapDocument::MapDocument(Map *map, const QString &fileName):
 {
 #ifdef ZOMBOID
     mMapComposite = new MapComposite(MapManager::instance()->newFromMap(map, fileName));
-    connect(mMapComposite->bmpBlender(), SIGNAL(regionAltered(QRegion)),
-            SLOT(bmpBlenderRegionAltered(QRegion)));
-    connect(this, SIGNAL(layerAdded(int)),
-             mMapComposite->bmpBlender(), SLOT(updateWarnings()));
-    connect(this, SIGNAL(layerRenamed(int)),
-             mMapComposite->bmpBlender(), SLOT(updateWarnings()));
-    connect(this, SIGNAL(layerRemoved(int)),
-             mMapComposite->bmpBlender(), SLOT(updateWarnings()));
-    connect(MapManager::instance(), SIGNAL(mapAboutToChange(MapInfo*)),
-            SLOT(onMapAboutToChange(MapInfo*)));
-    connect(MapManager::instance(), SIGNAL(mapChanged(MapInfo*)),
-            SLOT(onMapChanged(MapInfo*)));
+    connect(mMapComposite->bmpBlender(), &BmpBlender::regionAltered,
+            this, &MapDocument::bmpBlenderRegionAltered);
+    connect(this, &MapDocument::layerAdded,
+             mMapComposite->bmpBlender(), &BmpBlender::updateWarnings);
+    connect(this, &MapDocument::layerRenamed,
+             mMapComposite->bmpBlender(), &BmpBlender::updateWarnings);
+    connect(this, &MapDocument::layerRemoved,
+             mMapComposite->bmpBlender(), &BmpBlender::updateWarnings);
+    connect(MapManager::instance(), &MapManager::mapAboutToChange,
+            this, &MapDocument::onMapAboutToChange);
+    connect(MapManager::instance(), &MapManager::mapChanged,
+            this, &MapDocument::onMapChanged);
 
     if (!mFileName.isEmpty() && Preferences::instance()->showAdjacentMaps()) {
-        connect(MapManager::instance(), SIGNAL(mapLoaded(MapInfo*)),
-                SLOT(mapLoaded(MapInfo*)));
-        connect(MapManager::instance(), SIGNAL(mapFailedToLoad(MapInfo*)),
-                SLOT(mapFailedToLoad(MapInfo*)));
-        connect(WorldEd::WorldEdMgr::instance(), SIGNAL(afterWorldChanged(QString)),
-                SLOT(initAdjacentMaps()));
+        connect(MapManager::instance(), &MapManager::mapLoaded,
+                this, &MapDocument::mapLoaded);
+        connect(MapManager::instance(), &MapManager::mapFailedToLoad,
+                this, &MapDocument::mapFailedToLoad);
+        connect(WorldEd::WorldEdMgr::instance(), &WorldEd::WorldEdMgr::afterWorldChanged,
+                this, &MapDocument::initAdjacentMaps);
         initAdjacentMaps();
     }
 #endif
@@ -130,25 +130,25 @@ MapDocument::MapDocument(Map *map, const QString &fileName):
     mLayerModel->setMapDocument(this);
 
     // Forward signals emitted from the layer model
-    connect(mLayerModel, SIGNAL(layerAdded(int)), SLOT(onLayerAdded(int)));
-    connect(mLayerModel, SIGNAL(layerAboutToBeRemoved(int)),
-            SLOT(onLayerAboutToBeRemoved(int)));
-    connect(mLayerModel, SIGNAL(layerRemoved(int)), SLOT(onLayerRemoved(int)));
-    connect(mLayerModel, SIGNAL(layerChanged(int)), SIGNAL(layerChanged(int)));
+    connect(mLayerModel, &LayerModel::layerAdded, this, &MapDocument::onLayerAdded);
+    connect(mLayerModel, &LayerModel::layerAboutToBeRemoved,
+            this, &MapDocument::onLayerAboutToBeRemoved);
+    connect(mLayerModel, &LayerModel::layerRemoved, this, &MapDocument::onLayerRemoved);
+    connect(mLayerModel, &LayerModel::layerChanged, this, &MapDocument::layerChanged);
 #ifdef ZOMBOID
-    connect(mLayerModel, SIGNAL(layerRenamed(int)), SLOT(onLayerRenamed(int)));
+    connect(mLayerModel, &LayerModel::layerRenamed, this, &MapDocument::onLayerRenamed);
     mMaxVisibleLayer = map->layerCount();
 
-    connect(mMapComposite, SIGNAL(layerGroupAdded(int)),
-            SIGNAL(layerGroupAdded(int)));
-    connect(mMapComposite, SIGNAL(layerAddedToGroup(int)),
-            SIGNAL(layerAddedToGroup(int)));
-    connect(mMapComposite, SIGNAL(layerAboutToBeRemovedFromGroup(int)),
-            SIGNAL(layerAboutToBeRemovedFromGroup(int)));
-    connect(mMapComposite, SIGNAL(layerRemovedFromGroup(int,CompositeLayerGroup*)),
-            SIGNAL(layerRemovedFromGroup(int,CompositeLayerGroup*)));
-    connect(mMapComposite, SIGNAL(layerLevelChanged(int,int)),
-            SIGNAL(layerLevelChanged(int,int)));
+    connect(mMapComposite, &MapComposite::layerGroupAdded,
+            this, &MapDocument::layerGroupAdded);
+    connect(mMapComposite, &MapComposite::layerAddedToGroup,
+            this, &MapDocument::layerAddedToGroup);
+    connect(mMapComposite, &MapComposite::layerAboutToBeRemovedFromGroup,
+            this, &MapDocument::layerAboutToBeRemovedFromGroup);
+    connect(mMapComposite, &MapComposite::layerRemovedFromGroup,
+            this, &MapDocument::layerRemovedFromGroup);
+    connect(mMapComposite, &MapComposite::layerLevelChanged,
+            this, &MapDocument::layerLevelChanged);
 #endif
 
 #ifdef ZOMBOID
@@ -157,24 +157,24 @@ MapDocument::MapDocument(Map *map, const QString &fileName):
 
     // Forward signals emitted from the map object model
     mMapObjectModel->setMapDocument(this);
-    connect(mMapObjectModel, SIGNAL(objectsAdded(QList<Tiled::MapObject*>)),
-            SIGNAL(objectsAdded(QList<Tiled::MapObject*>)));
-    connect(mMapObjectModel, SIGNAL(objectsChanged(QList<Tiled::MapObject*>)),
-            SIGNAL(objectsChanged(QList<Tiled::MapObject*>)));
-    connect(mMapObjectModel, SIGNAL(objectsAboutToBeRemoved(QList<Tiled::MapObject*>)),
-            SIGNAL(objectsAboutToBeRemoved(QList<Tiled::MapObject*>)));
-    connect(mMapObjectModel, SIGNAL(objectsRemoved(QList<Tiled::MapObject*>)),
-            SLOT(onObjectsRemoved(QList<Tiled::MapObject*>)));
+    connect(mMapObjectModel, &MapObjectModel::objectsAdded,
+            this, &MapDocument::objectsAdded);
+    connect(mMapObjectModel, &MapObjectModel::objectsChanged,
+            this, &MapDocument::objectsChanged);
+    connect(mMapObjectModel, &MapObjectModel::objectsAboutToBeRemoved,
+            this, &MapDocument::objectsAboutToBeRemoved);
+    connect(mMapObjectModel, &MapObjectModel::objectsRemoved,
+            this, &MapDocument::onObjectsRemoved);
 
-    connect(mUndoStack, SIGNAL(cleanChanged(bool)), SIGNAL(modifiedChanged()));
+    connect(mUndoStack, &QUndoStack::cleanChanged, this, &MapDocument::modifiedChanged);
 
     // Register tileset references
     TilesetManager *tilesetManager = TilesetManager::instance();
     tilesetManager->addReferences(mMap->tilesets());
 
 #ifdef ZOMBOID
-    connect(tilesetManager, SIGNAL(tileLayerNameChanged(Tiled::Tile*)),
-            SIGNAL(tileLayerNameChanged(Tiled::Tile*)));
+    connect(tilesetManager, &TilesetManager::tileLayerNameChanged,
+            this, &MapDocument::tileLayerNameChanged);
 
     mMapComposite->setShowLotFloorsOnly(Preferences::instance()->showLotFloorsOnly());
 #endif

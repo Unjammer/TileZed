@@ -42,8 +42,8 @@ CommandButton::CommandButton(QWidget *parent)
     setPopupMode(QToolButton::MenuButtonPopup);
     setMenu(mMenu);
 
-    connect(mMenu, SIGNAL(aboutToShow()), SLOT(populateMenu()));
-    connect(this, SIGNAL(clicked()), SLOT(runCommand()));
+    connect(mMenu, &QMenu::aboutToShow, this, &CommandButton::populateMenu);
+    connect(this, &QAbstractButton::clicked, this, &CommandButton::runCommand);
 }
 
 void CommandButton::runCommand()
@@ -69,7 +69,7 @@ void CommandButton::runCommand()
             msgBox.setEscapeButton(QMessageBox::Ok);
 
             QAbstractButton *button = msgBox.buttons().last();
-            connect(button, SIGNAL(clicked()), SLOT(showDialog()));
+            connect(button, &QAbstractButton::clicked, this, &CommandButton::showDialog);
 
             msgBox.exec();
             return;
@@ -101,7 +101,7 @@ void CommandButton::populateMenu()
         QAction *action = new QAction(command.name, this);
         action->setStatusTip(command.command);
         action->setData(command.toQVariant());
-        connect(action, SIGNAL(triggered()), SLOT(runCommand()));
+        connect(action, &QAction::triggered, this, &CommandButton::runCommand);
         mMenu->addAction(action);
     }
 
@@ -110,7 +110,7 @@ void CommandButton::populateMenu()
 
     // Add "Edit Commands..." action
     QAction *action = new QAction(tr("Edit Commands..."), this);
-    connect(action, SIGNAL(triggered()), SLOT(showDialog()));
+    connect(action, &QAction::triggered, this, &CommandButton::showDialog);
     mMenu->addAction(action);
 }
 

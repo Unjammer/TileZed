@@ -85,7 +85,7 @@ private:
     void switchMode(IMode *mode);
 
 signals:
-    void currentModeAboutToChange(IMode *mode);
+    void currentModeAboutToChange(BuildingEditor::IMode *mode);
     void currentModeChanged();
 
 private slots:

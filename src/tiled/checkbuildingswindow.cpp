@@ -41,18 +41,18 @@ CheckBuildingsWindow::CheckBuildingsWindow(QWidget *parent) :
 
     setAttribute(Qt::WA_DeleteOnClose);
 
-    connect(ui->dirBrowse, SIGNAL(clicked()), SLOT(browse()));
-    connect(ui->checkNow, SIGNAL(clicked()), SLOT(check()));
+    connect(ui->dirBrowse, &QAbstractButton::clicked, this, &CheckBuildingsWindow::browse);
+    connect(ui->checkNow, &QAbstractButton::clicked, this, qOverload<>(&CheckBuildingsWindow::check));
     connect(ui->buttonFixSelected, &QPushButton::clicked, this, &CheckBuildingsWindow::fixSelected);
-    connect(ui->treeWidget, SIGNAL(itemActivated(QTreeWidgetItem*,int)), SLOT(itemActivated(QTreeWidgetItem*,int)));
+    connect(ui->treeWidget, &QTreeWidget::itemActivated, this, &CheckBuildingsWindow::itemActivated);
 
-    connect(ui->checkInteriorOutside, SIGNAL(clicked()), SLOT(syncList()));
-    connect(ui->checkSwitches, SIGNAL(clicked()), SLOT(syncList()));
-    connect(ui->checkRoomLight, SIGNAL(clicked()), SLOT(syncList()));
-    connect(ui->checkGrime, SIGNAL(clicked()), SLOT(syncList()));
-    connect(ui->checkSink, SIGNAL(clicked()), SLOT(syncList()));
-    connect(ui->check2x, SIGNAL(clicked()), SLOT(syncList()));
-    connect(ui->checkRearrangeGrid, &QCheckBox::clicked, this, QOverload<>::of(&CheckBuildingsWindow::syncList));
+    connect(ui->checkInteriorOutside, &QAbstractButton::clicked, this, qOverload<>(&CheckBuildingsWindow::syncList));
+    connect(ui->checkSwitches, &QAbstractButton::clicked, this, qOverload<>(&CheckBuildingsWindow::syncList));
+    connect(ui->checkRoomLight, &QAbstractButton::clicked, this, qOverload<>(&CheckBuildingsWindow::syncList));
+    connect(ui->checkGrime, &QAbstractButton::clicked, this, qOverload<>(&CheckBuildingsWindow::syncList));
+    connect(ui->checkSink, &QAbstractButton::clicked, this, qOverload<>(&CheckBuildingsWindow::syncList));
+    connect(ui->check2x, &QAbstractButton::clicked, this, qOverload<>(&CheckBuildingsWindow::syncList));
+    connect(ui->checkRearrangeGrid, &QCheckBox::clicked, this, qOverload<>(&CheckBuildingsWindow::syncList));
 
     ui->dirEdit->setText(BuildingPreferences::instance()->mapsDirectory());
 //    ui->dirEdit->setText(QLatin1String("C:/Users/Tim/Desktop/ProjectZomboid/Buildings"));
@@ -64,11 +64,11 @@ CheckBuildingsWindow::CheckBuildingsWindow(QWidget *parent) :
     ui->treeWidget->setColumnCount(1);
     connect(ui->treeWidget->selectionModel(), &QItemSelectionModel::selectionChanged, this, &CheckBuildingsWindow::selectionChanged);
 
-    connect(mFileSystemWatcher, SIGNAL(fileChanged(QString)), SLOT(fileChanged(QString)));
+    connect(mFileSystemWatcher, &FileSystemWatcher::fileChanged, this, &CheckBuildingsWindow::fileChanged);
 
     mChangedFilesTimer.setInterval(500);
     mChangedFilesTimer.setSingleShot(true);
-    connect(&mChangedFilesTimer, SIGNAL(timeout()), SLOT(fileChangedTimeout()));
+    connect(&mChangedFilesTimer, &QTimer::timeout, this, &CheckBuildingsWindow::fileChangedTimeout);
 }
 
 CheckBuildingsWindow::~CheckBuildingsWindow()

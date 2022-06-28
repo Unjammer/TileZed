@@ -18,7 +18,7 @@ PackExtractDialog::PackExtractDialog(PackFile &packFile, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    connect(ui->outputBrowse, SIGNAL(clicked()), SLOT(browse()));
+    connect(ui->outputBrowse, &QAbstractButton::clicked, this, &PackExtractDialog::browse);
     connect(ui->radioSingle, &QRadioButton::toggled, this, &PackExtractDialog::radioToggled);
 
     ui->radioMultiple->setChecked(true);

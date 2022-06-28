@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
     w.show();
 #ifdef ZOMBOID
     a.setActivationWindow(&w);
-    w.connect(&a, SIGNAL(messageReceived(QString)), SLOT(openFile(QString)));
+    w.connect(&a, &QtSingleApplication::messageReceived, &w, qOverload<const QString&>(&MainWindow::openFile));
     w.readSettings();
 
     if (!w.InitConfigFiles())
@@ -209,8 +209,8 @@ int main(int argc, char *argv[])
             WorldEd::WorldEdMgr::instance()->addProject(f);
 #endif // ZOMBOID
 
-    QObject::connect(&a, SIGNAL(fileOpenRequest(QString)),
-                     &w, SLOT(openFile(QString)));
+    QObject::connect(&a, &TiledApplication::fileOpenRequest,
+                     &w, qOverload<const QString&>(&MainWindow::openFile));
 
     if (!commandLine.filesToOpen().isEmpty()) {
 #ifdef ZOMBOID

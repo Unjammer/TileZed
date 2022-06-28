@@ -127,20 +127,20 @@ LayerDock::LayerDock(QWidget *parent):
     setWidget(widget);
     retranslateUi();
 
-    connect(mOpacitySlider, SIGNAL(valueChanged(int)),
-            this, SLOT(setLayerOpacity(int)));
+    connect(mOpacitySlider, &QAbstractSlider::valueChanged,
+            this, &LayerDock::setLayerOpacity);
     updateOpacitySlider();
 
 #ifdef ZOMBOID
-    connect(mZomboidLayerSlider, SIGNAL(valueChanged(int)),
-            this, SLOT(setZomboidLayer(int)));
+    connect(mZomboidLayerSlider, &QAbstractSlider::valueChanged,
+            this, &LayerDock::setZomboidLayer);
     updateZomboidLayerSlider();
 #endif
 
     // Workaround since a tabbed dockwidget that is not currently visible still
     // returns true for isVisible()
-    connect(this, SIGNAL(visibilityChanged(bool)),
-            mLayerView, SLOT(setVisible(bool)));
+    connect(this, &QDockWidget::visibilityChanged,
+            mLayerView, &QWidget::setVisible);
 }
 
 void LayerDock::setMapDocument(MapDocument *mapDocument)
@@ -154,11 +154,11 @@ void LayerDock::setMapDocument(MapDocument *mapDocument)
     mMapDocument = mapDocument;
 
     if (mMapDocument) {
-        connect(mMapDocument, SIGNAL(currentLayerIndexChanged(int)),
-                this, SLOT(updateOpacitySlider()));
+        connect(mMapDocument, &MapDocument::currentLayerIndexChanged,
+                this, &LayerDock::updateOpacitySlider);
 #ifdef ZOMBOID
-        connect(mMapDocument, SIGNAL(currentLayerIndexChanged(int)),
-                this, SLOT(updateZomboidLayerSlider()));
+        connect(mMapDocument, &MapDocument::currentLayerIndexChanged,
+                this, &LayerDock::updateZomboidLayerSlider);
 #endif
     }
 
@@ -282,8 +282,8 @@ void LayerView::setMapDocument(MapDocument *mapDocument)
     if (mMapDocument) {
         mMapDocument->disconnect(this);
         QItemSelectionModel *s = selectionModel();
-        disconnect(s, SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),
-                   this, SLOT(currentRowChanged(QModelIndex)));
+        disconnect(s, &QItemSelectionModel::currentRowChanged,
+                   this, &LayerView::currentRowChanged);
     }
 
     mMapDocument = mapDocument;
@@ -291,14 +291,14 @@ void LayerView::setMapDocument(MapDocument *mapDocument)
     if (mMapDocument) {
         setModel(mMapDocument->layerModel());
 
-        connect(mMapDocument, SIGNAL(currentLayerIndexChanged(int)),
-                this, SLOT(currentLayerIndexChanged(int)));
-        connect(mMapDocument, SIGNAL(editLayerNameRequested()),
-                this, SLOT(editLayerName()));
+        connect(mMapDocument, &MapDocument::currentLayerIndexChanged,
+                this, &LayerView::currentLayerIndexChanged);
+        connect(mMapDocument, &MapDocument::editLayerNameRequested,
+                this, &LayerView::editLayerName);
 
         QItemSelectionModel *s = selectionModel();
-        connect(s, SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),
-                this, SLOT(currentRowChanged(QModelIndex)));
+        connect(s, &QItemSelectionModel::currentRowChanged,
+                this, &LayerView::currentRowChanged);
 
         currentLayerIndexChanged(mMapDocument->currentLayerIndex());
     } else {

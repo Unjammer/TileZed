@@ -43,6 +43,7 @@
 #include <QMessageBox>
 #include <QSettings>
 #include <QUrl>
+#include <mapComposite.h>
 
 using namespace Tiled;
 using namespace Tiled::Internal;
@@ -151,51 +152,51 @@ BmpToolDialog::BmpToolDialog(QWidget *parent) :
 
     ui->tabWidget->setCurrentIndex(0);
 
-    connect(ui->tableView->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)),
-            SLOT(currentRuleChanged(QModelIndex)));
+    connect(ui->tableView->selectionModel(), &QItemSelectionModel::currentChanged,
+            this, &BmpToolDialog::currentRuleChanged);
 
-    connect(ui->expandCollapse, SIGNAL(clicked()),
-            SLOT(expandCollapse()));
+    connect(ui->expandCollapse, &QAbstractButton::clicked,
+            this, &BmpToolDialog::expandCollapse);
     ui->tableView->zoomable()->connectToComboBox(ui->scaleCombo);
 
-    connect(ui->blendView, SIGNAL(blendHighlighted(Tiled::BmpBlend*,int)),
-            SLOT(blendHighlighted(Tiled::BmpBlend*,int)));
+    connect(ui->blendView, &BmpBlendView::blendHighlighted,
+            this, &BmpToolDialog::blendHighlighted);
     ui->blendView->zoomable()->connectToComboBox(ui->blendScaleCombo);
 
     ui->tilesInBlend->model()->setShowHeaders(false);
     ui->tilesInBlend->setZoomable(ui->blendView->zoomable());
-    connect(ui->tilesInBlend->zoomable(), SIGNAL(scaleChanged(qreal)),
-            SLOT(synchBlendTilesView()));
+    connect(ui->tilesInBlend->zoomable(), &Zoomable::scaleChanged,
+            this, &BmpToolDialog::synchBlendTilesView);
 
-    connect(ui->brushSize, SIGNAL(valueChanged(int)),
-            SLOT(brushSizeChanged(int)));
-    connect(ui->brushSquare, SIGNAL(clicked()),
-            SLOT(brushSquare()));
-    connect(ui->brushCircle, SIGNAL(clicked()),
-            SLOT(brushCircle()));
-    connect(ui->restrictToSelection, SIGNAL(toggled(bool)),
-            SLOT(restrictToSelection(bool)));
+    connect(ui->brushSize, &QSpinBox::valueChanged,
+            this, &BmpToolDialog::brushSizeChanged);
+    connect(ui->brushSquare, &QAbstractButton::clicked,
+            this, &BmpToolDialog::brushSquare);
+    connect(ui->brushCircle, &QAbstractButton::clicked,
+            this, &BmpToolDialog::brushCircle);
+    connect(ui->restrictToSelection, &QAbstractButton::toggled,
+            this, &BmpToolDialog::restrictToSelection);
     connect(ui->fillAllInSelectedArea, &QCheckBox::toggled,
             this, &BmpToolDialog::fillAllInSelection);
-    connect(ui->toggleOverlayLayers, SIGNAL(clicked()),
-            SLOT(toggleOverlayLayers()));
-    connect(ui->showBMPTiles, SIGNAL(toggled(bool)),
-            SLOT(showBMPTiles(bool)));
-    connect(ui->showMapTiles, SIGNAL(toggled(bool)),
-            SLOT(showMapTiles(bool)));
+    connect(ui->toggleOverlayLayers, &QAbstractButton::clicked,
+            this, &BmpToolDialog::toggleOverlayLayers);
+    connect(ui->showBMPTiles, &QAbstractButton::toggled,
+            this, &BmpToolDialog::showBMPTiles);
+    connect(ui->showMapTiles, &QAbstractButton::toggled,
+            this, &BmpToolDialog::showMapTiles);
     connect(ui->blendEdgesEverywhere, &QCheckBox::toggled, this, &BmpToolDialog::blendEdgesEverywhere);
 
-    connect(ui->reloadRules, SIGNAL(clicked()), SLOT(reloadRules()));
-    connect(ui->importRules, SIGNAL(clicked()), SLOT(importRules()));
-    connect(ui->exportRules, SIGNAL(clicked()), SLOT(exportRules()));
-    connect(ui->trashRules, SIGNAL(clicked()), SLOT(trashRules()));
+    connect(ui->reloadRules, &QAbstractButton::clicked, this, &BmpToolDialog::reloadRules);
+    connect(ui->importRules, &QAbstractButton::clicked, this, &BmpToolDialog::importRules);
+    connect(ui->exportRules, &QAbstractButton::clicked, this, &BmpToolDialog::exportRules);
+    connect(ui->trashRules, &QAbstractButton::clicked, this, &BmpToolDialog::trashRules);
 
-    connect(ui->reloadBlends, SIGNAL(clicked()), SLOT(reloadBlends()));
-    connect(ui->importBlends, SIGNAL(clicked()), SLOT(importBlends()));
-    connect(ui->exportBlends, SIGNAL(clicked()), SLOT(exportBlends()));
-    connect(ui->trashBlends, SIGNAL(clicked()), SLOT(trashBlends()));
+    connect(ui->reloadBlends, &QAbstractButton::clicked, this, &BmpToolDialog::reloadBlends);
+    connect(ui->importBlends, &QAbstractButton::clicked, this, &BmpToolDialog::importBlends);
+    connect(ui->exportBlends, &QAbstractButton::clicked, this, &BmpToolDialog::exportBlends);
+    connect(ui->trashBlends, &QAbstractButton::clicked, this, &BmpToolDialog::trashBlends);
 
-    connect(ui->help, SIGNAL(clicked()), SLOT(help()));
+    connect(ui->help, &QAbstractButton::clicked, this, &BmpToolDialog::help);
 
     QSettings settings;
     settings.beginGroup(QLatin1String("BmpToolDialog"));
@@ -226,13 +227,13 @@ BmpToolDialog::BmpToolDialog(QWidget *parent) :
 
     mVisibleLaterTimer.setSingleShot(true);
     mVisibleLaterTimer.setInterval(200);
-    connect(&mVisibleLaterTimer, SIGNAL(timeout()), SLOT(setVisibleNow()));
+    connect(&mVisibleLaterTimer, &QTimer::timeout, this, &BmpToolDialog::setVisibleNow);
 
-    connect(BmpBrushTool::instance(), SIGNAL(brushChanged()),
-            SLOT(brushChanged()));
+    connect(BmpBrushTool::instance(), &BmpBrushTool::brushChanged,
+            this, &BmpToolDialog::brushChanged);
 
-    connect(DocumentManager::instance(), SIGNAL(documentAboutToClose(int,Tiled::Internal::MapDocument*)),
-            SLOT(documentAboutToClose(int,Tiled::Internal::MapDocument*)));
+    connect(DocumentManager::instance(), &DocumentManager::documentAboutToClose,
+            this, &BmpToolDialog::documentAboutToClose);
 }
 
 BmpToolDialog::~BmpToolDialog()
@@ -562,16 +563,16 @@ void BmpToolDialog::setDocument(MapDocument *doc)
         ui->showMapTiles->setChecked(mDocument->mapComposite()->showMapTiles());
         ui->blendEdgesEverywhere->setChecked(mDocument->map()->bmpSettings()->isBlendEdgesEverywhere());
 
-        connect(mDocument, SIGNAL(bmpAliasesChanged()), SLOT(bmpRulesChanged())); // XXXXX
-        connect(mDocument, SIGNAL(bmpRulesChanged()), SLOT(bmpRulesChanged()));
-        connect(mDocument, SIGNAL(bmpBlendsChanged()), SLOT(bmpBlendsChanged()));
+        connect(mDocument, &MapDocument::bmpAliasesChanged, this, &BmpToolDialog::bmpRulesChanged); // XXXXX
+        connect(mDocument, &MapDocument::bmpRulesChanged, this, &BmpToolDialog::bmpRulesChanged);
+        connect(mDocument, &MapDocument::bmpBlendsChanged, this, &BmpToolDialog::bmpBlendsChanged);
         connect(mDocument, &MapDocument::bmpBlendEdgesEverywhereChanged, this, &BmpToolDialog::bmpBlendEdgesEverywhereChanged);
-        connect(mDocument->mapComposite()->bmpBlender(), SIGNAL(warningsChanged()),
-                SLOT(warningsChanged()));
+        connect(mDocument->mapComposite()->bmpBlender(), &BmpBlender::warningsChanged,
+                this, &BmpToolDialog::warningsChanged);
 
         // This is to handle unknown pixels in the BMP images being erased.
-        connect(ui->tabWidget, SIGNAL(currentChanged(int)),
-                mDocument->mapComposite()->bmpBlender(), SLOT(updateWarnings()));
+        connect(ui->tabWidget, &QTabWidget::currentChanged,
+                mDocument->mapComposite()->bmpBlender(), &BmpBlender::updateWarnings);
     }
 
     warningsChanged();

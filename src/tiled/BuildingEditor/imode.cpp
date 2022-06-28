@@ -56,8 +56,8 @@ ModeManager::ModeManager(Core::Internal::FancyTabWidget *tabWidget, QObject *par
     mTabWidget(tabWidget),
     mCurrentMode(0)
 {
-    connect(mTabWidget, SIGNAL(currentAboutToShow(int)), SLOT(currentTabAboutToChange(int)));
-    connect(mTabWidget, SIGNAL(currentChanged(int)), SLOT(currentTabChanged(int)));
+    connect(mTabWidget, &Core::Internal::FancyTabWidget::currentAboutToShow, this, &ModeManager::currentTabAboutToChange);
+    connect(mTabWidget, &Core::Internal::FancyTabWidget::currentChanged, this, &ModeManager::currentTabChanged);
 }
 
 void ModeManager::addMode(IMode *mode)
@@ -71,13 +71,13 @@ void ModeManager::addMode(IMode *mode)
     QAction *action = new QAction(this);
     action->setShortcut(key);
     mActions += action;
-    connect(action, SIGNAL(triggered()), SLOT(modeActionTriggered()));
+    connect(action, &QAction::triggered, this, &ModeManager::modeActionTriggered);
     action->setWhatsThis(tr("<p style='white-space:pre'>Switch to <b>%1</b> mode").arg(mode->displayName()));
     mTabWidget->setTabToolTip(mModes.size() - 1,
                               QString::fromLatin1("%1\n<span style=\"color: gray; font-size: small\">%2</span>")
                               .arg(action->whatsThis()).arg(key.toString(QKeySequence::NativeText)));
 
-    connect(mode, SIGNAL(enabledStateChanged(bool)), SLOT(enabledStateChanged(bool)));
+    connect(mode, &IMode::enabledStateChanged, this, &ModeManager::enabledStateChanged);
 
     BuildingEditorWindow::instance()->addAction(action);
 }

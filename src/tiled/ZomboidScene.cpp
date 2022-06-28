@@ -37,6 +37,8 @@
 #include "zlevelsmodel.h"
 #include "zlotmanager.h"
 
+#include "worlded/worldcell.h"
+
 #include <QGraphicsSceneMouseEvent>
 
 using namespace Tiled;
@@ -106,19 +108,19 @@ ZomboidScene::ZomboidScene(QObject *parent)
     , mMapBuildings(new MapBuildings)
     , mMapBuildingsInvalid(true)
 {
-    connect(&mLotManager, SIGNAL(lotAdded(MapComposite*,Tiled::MapObject*)),
-        this, SLOT(onLotAdded(MapComposite*,Tiled::MapObject*)));
-    connect(&mLotManager, SIGNAL(lotRemoved(MapComposite*,Tiled::MapObject*)),
-        this, SLOT(onLotRemoved(MapComposite*,Tiled::MapObject*)));
-    connect(&mLotManager, SIGNAL(lotUpdated(MapComposite*,Tiled::MapObject*)),
-        this, SLOT(onLotUpdated(MapComposite*,Tiled::MapObject*)));
+    connect(&mLotManager, qOverload<MapComposite*,Tiled::MapObject*>(&ZLotManager::lotAdded),
+        this, qOverload<MapComposite*,Tiled::MapObject*>(&ZomboidScene::onLotAdded));
+    connect(&mLotManager, qOverload<MapComposite*,Tiled::MapObject*>(&ZLotManager::lotRemoved),
+        this, qOverload<MapComposite*,Tiled::MapObject*>(&ZomboidScene::onLotRemoved));
+    connect(&mLotManager, qOverload<MapComposite*,Tiled::MapObject*>(&ZLotManager::lotUpdated),
+        this, qOverload<MapComposite*,Tiled::MapObject*>(&ZomboidScene::onLotUpdated));
 
-    connect(&mLotManager, SIGNAL(lotAdded(MapComposite*,WorldCellLot*)),
-            SLOT(onLotUpdated(MapComposite*,WorldCellLot*)));
-    connect(&mLotManager, SIGNAL(lotRemoved(MapComposite*,WorldCellLot*)),
-            SLOT(onLotUpdated(MapComposite*,WorldCellLot*)));
-    connect(&mLotManager, SIGNAL(lotUpdated(MapComposite*,WorldCellLot*)),
-            SLOT(onLotUpdated(MapComposite*,WorldCellLot*)));
+    connect(&mLotManager, qOverload<MapComposite*,WorldCellLot*>(&ZLotManager::lotAdded),
+            this, qOverload<MapComposite*,WorldCellLot*>(&ZomboidScene::onLotUpdated));
+    connect(&mLotManager, qOverload<MapComposite*,WorldCellLot*>(&ZLotManager::lotRemoved),
+            this, qOverload<MapComposite*,WorldCellLot*>(&ZomboidScene::onLotUpdated));
+    connect(&mLotManager, qOverload<MapComposite*,WorldCellLot*>(&ZLotManager::lotUpdated),
+            this, qOverload<MapComposite*,WorldCellLot*>(&ZomboidScene::onLotUpdated));
 
     QPen pen(QColor(128, 128, 128, 128));
     pen.setWidth(28); // only good for isometric 64x32 tiles!
@@ -148,36 +150,36 @@ void ZomboidScene::setMapDocument(MapDocument *mapDoc)
     mLotManager.setMapDocument(mapDocument());
 
     if (mapDocument()) {
-        connect(mMapDocument, SIGNAL(regionAltered(QRegion,Tiled::Layer*)),
-                SLOT(regionAltered(QRegion,Tiled::Layer*)));
-        connect(mMapDocument, SIGNAL(layerGroupAdded(int)), SLOT(layerGroupAdded(int)));
-        connect(mMapDocument, SIGNAL(layerGroupVisibilityChanged(CompositeLayerGroup*)), SLOT(layerGroupVisibilityChanged(CompositeLayerGroup*)));
-        connect(mMapDocument, SIGNAL(layerAddedToGroup(int)), SLOT(layerAddedToGroup(int)));
-        connect(mMapDocument, SIGNAL(layerRemovedFromGroup(int,CompositeLayerGroup*)), SLOT(layerRemovedFromGroup(int,CompositeLayerGroup*)));
-        connect(mMapDocument, SIGNAL(layerLevelChanged(int,int)), SLOT(layerLevelChanged(int,int)));
-        connect(mMapDocument, SIGNAL(mapCompositeChanged()),
-                SLOT(mapCompositeChanged()));
+        connect(mMapDocument, &MapDocument::regionAltered,
+                this, &ZomboidScene::regionAltered);
+        connect(mMapDocument, &MapDocument::layerGroupAdded, this, &ZomboidScene::layerGroupAdded);
+        connect(mMapDocument, &MapDocument::layerGroupVisibilityChanged, this, &ZomboidScene::layerGroupVisibilityChanged);
+        connect(mMapDocument, &MapDocument::layerAddedToGroup, this, &ZomboidScene::layerAddedToGroup);
+        connect(mMapDocument, &MapDocument::layerRemovedFromGroup, this, &ZomboidScene::layerRemovedFromGroup);
+        connect(mMapDocument, &MapDocument::layerLevelChanged, this, &ZomboidScene::layerLevelChanged);
+        connect(mMapDocument, &MapDocument::mapCompositeChanged,
+                this, &ZomboidScene::mapCompositeChanged);
 
-        connect(mMapDocument, SIGNAL(objectsAdded(QList<Tiled::MapObject*>)),
-                SLOT(invalidateMapBuildings()));
-        connect(mMapDocument, SIGNAL(objectsRemoved(QList<Tiled::MapObject*>)),
-                SLOT(invalidateMapBuildings()));
-        connect(mMapDocument, SIGNAL(objectsChanged(QList<Tiled::MapObject*>)),
-                SLOT(invalidateMapBuildings()));
+        connect(mMapDocument, &MapDocument::objectsAdded,
+                this, &ZomboidScene::invalidateMapBuildings);
+        connect(mMapDocument, &MapDocument::objectsRemoved,
+                this, &ZomboidScene::invalidateMapBuildings);
+        connect(mMapDocument, &MapDocument::objectsChanged,
+                this, &ZomboidScene::invalidateMapBuildings);
 
-        connect(mMapDocument->mapComposite()->bmpBlender(), SIGNAL(layersRecreated()),
-                SLOT(bmpBlenderLayersRecreated()));
-        connect(mMapDocument, SIGNAL(bmpPainted(int,QRegion)), SLOT(bmpPainted(int,QRegion)));
-        connect(mMapDocument, SIGNAL(bmpAliasesChanged()), SLOT(bmpXXXChanged()));
-        connect(mMapDocument, SIGNAL(bmpRulesChanged()), SLOT(bmpXXXChanged()));
-        connect(mMapDocument, SIGNAL(bmpBlendsChanged()), SLOT(bmpXXXChanged()));
+        connect(mMapDocument->mapComposite()->bmpBlender(), &BmpBlender::layersRecreated,
+                this, &ZomboidScene::bmpBlenderLayersRecreated);
+        connect(mMapDocument, &MapDocument::bmpPainted, this, &ZomboidScene::bmpPainted);
+        connect(mMapDocument, &MapDocument::bmpAliasesChanged, this, &ZomboidScene::bmpXXXChanged);
+        connect(mMapDocument, &MapDocument::bmpRulesChanged, this, &ZomboidScene::bmpXXXChanged);
+        connect(mMapDocument, &MapDocument::bmpBlendsChanged, this, &ZomboidScene::bmpXXXChanged);
 
-        connect(mMapDocument, SIGNAL(noBlendPainted(Tiled::MapNoBlend*,QRegion)), SLOT(noBlendPainted(Tiled::MapNoBlend*,QRegion)));
-        connect(mMapDocument, SIGNAL(currentLayerIndexChanged(int)), SLOT(synchNoBlendVisible()));
-        connect(ToolManager::instance(), SIGNAL(selectedToolChanged(Tiled::Internal::AbstractTool*)), SLOT(synchNoBlendVisible()));
+        connect(mMapDocument, &MapDocument::noBlendPainted, this, &ZomboidScene::noBlendPainted);
+        connect(mMapDocument, &MapDocument::currentLayerIndexChanged, this, &ZomboidScene::synchNoBlendVisible);
+        connect(ToolManager::instance(), &ToolManager::selectedToolChanged, this, &ZomboidScene::synchNoBlendVisible);
 
-        connect(Preferences::instance(), SIGNAL(highlightRoomUnderPointerChanged(bool)),
-                SLOT(highlightRoomUnderPointerChanged(bool)));
+        connect(Preferences::instance(), &Preferences::highlightRoomUnderPointerChanged,
+                this, &ZomboidScene::highlightRoomUnderPointerChanged);
         connect(Preferences::instance(), &Preferences::showLotFloorsOnlyChanged, this, &ZomboidScene::showLotFloorsOnlyChanged);
     }
 }

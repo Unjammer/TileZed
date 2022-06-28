@@ -46,11 +46,11 @@ ChooseBuildingTileDialog::ChooseBuildingTileDialog(const QString &prompt,
     ui->tableView->setZoomable(mZoomable);
     mZoomable->connectToComboBox(ui->scaleCombo);
 
-    connect(ui->tilesButton, SIGNAL(clicked()), SLOT(tilesDialog()));
+    connect(ui->tilesButton, &QAbstractButton::clicked, this, &ChooseBuildingTileDialog::tilesDialog);
 
     setTilesList(mCategory, initialTile);
 
-    connect(ui->tableView, SIGNAL(activated(QModelIndex)), SLOT(accept()));
+    connect(ui->tableView, &QAbstractItemView::activated, this, &ChooseBuildingTileDialog::accept);
 
     QSettings &settings = BuildingPreferences::instance()->settings();
     settings.beginGroup(QLatin1String("ChooseBuildingTileDialog"));

@@ -156,21 +156,21 @@ void EditPolygonTool::activate(MapScene *scene)
     // TODO: Could be more optimal by separating the updating of handles from
     // the creation and removal of handles depending on changes in the
     // selection, and by only updating the handles of the objects that changed.
-    connect(mapDocument(), SIGNAL(objectsChanged(QList<Tiled::MapObject*>)),
-            this, SLOT(updateHandles()));
-    connect(scene, SIGNAL(selectedObjectItemsChanged()),
-            this, SLOT(updateHandles()));
+    connect(mapDocument(), &MapDocument::objectsChanged,
+            this, &EditPolygonTool::updateHandles);
+    connect(scene, &MapScene::selectedObjectItemsChanged,
+            this, &EditPolygonTool::updateHandles);
 
-    connect(mapDocument(), SIGNAL(objectsRemoved(QList<Tiled::MapObject*>)),
-            this, SLOT(objectsRemoved(QList<Tiled::MapObject*>)));
+    connect(mapDocument(), &MapDocument::objectsRemoved,
+            this, &EditPolygonTool::objectsRemoved);
 }
 
 void EditPolygonTool::deactivate(MapScene *scene)
 {
-    disconnect(mapDocument(), SIGNAL(objectsChanged(QList<Tiled::MapObject*>)),
-               this, SLOT(updateHandles()));
-    disconnect(scene, SIGNAL(selectedObjectItemsChanged()),
-               this, SLOT(updateHandles()));
+    disconnect(mapDocument(), &MapDocument::objectsChanged,
+               this, &EditPolygonTool::updateHandles);
+    disconnect(scene, &MapScene::selectedObjectItemsChanged,
+               this, &EditPolygonTool::updateHandles);
 
     // Delete all handles
     QMapIterator<MapObjectItem*, QList<PointHandle*> > i(mHandles);
@@ -599,9 +599,9 @@ void EditPolygonTool::showHandleContextMenu(PointHandle *clickedHandle,
     joinNodesAction->setEnabled(n > 1);
     splitSegmentsAction->setEnabled(n > 1);
 
-    connect(deleteNodesAction, SIGNAL(triggered()), SLOT(deleteNodes()));
-    connect(joinNodesAction, SIGNAL(triggered()), SLOT(joinNodes()));
-    connect(splitSegmentsAction, SIGNAL(triggered()), SLOT(splitSegments()));
+    connect(deleteNodesAction, &QAction::triggered, this, &EditPolygonTool::deleteNodes);
+    connect(joinNodesAction, &QAction::triggered, this, &EditPolygonTool::joinNodes);
+    connect(splitSegmentsAction, &QAction::triggered, this, &EditPolygonTool::splitSegments);
 
     menu.exec(screenPos);
 }

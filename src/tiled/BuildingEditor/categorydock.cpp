@@ -114,35 +114,35 @@ CategoryDock::CategoryDock(QWidget *parent) :
     BuildingPreferences *prefs = BuildingPreferences::instance();
 
     mCategoryZoomable->connectToComboBox(ui->scaleComboBox);
-    connect(mCategoryZoomable, SIGNAL(scaleChanged(qreal)),
-            prefs, SLOT(setTileScale(qreal)));
-    connect(prefs, SIGNAL(tileScaleChanged(qreal)),
-            SLOT(categoryScaleChanged(qreal)));
+    connect(mCategoryZoomable, &Tiled::Internal::Zoomable::scaleChanged,
+            prefs, &BuildingPreferences::setTileScale);
+    connect(prefs, &BuildingPreferences::tileScaleChanged,
+            this, &CategoryDock::categoryScaleChanged);
 
-    connect(ui->categoryList, SIGNAL(itemSelectionChanged()),
-            SLOT(categorySelectionChanged()));
-    connect(ui->categoryList, SIGNAL(activated(QModelIndex)),
-            SLOT(categoryActivated(QModelIndex)));
+    connect(ui->categoryList, &QListWidget::itemSelectionChanged,
+            this, &CategoryDock::categorySelectionChanged);
+    connect(ui->categoryList, &QAbstractItemView::activated,
+            this, &CategoryDock::categoryActivated);
 
     ui->tilesetView->setZoomable(mCategoryZoomable);
     connect(ui->tilesetView->selectionModel(),
-            SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
-            SLOT(tileSelectionChanged()));
-    connect(ui->tilesetView, SIGNAL(mousePressed()), SLOT(categoryViewMousePressed()));
+            &QItemSelectionModel::selectionChanged,
+            this, &CategoryDock::tileSelectionChanged);
+    connect(ui->tilesetView, &Tiled::Internal::MixedTilesetView::mousePressed, this, &CategoryDock::categoryViewMousePressed);
 
     ui->furnitureView->setZoomable(mCategoryZoomable);
     connect(ui->furnitureView->selectionModel(),
-            SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
-            SLOT(furnitureSelectionChanged()));
+            &QItemSelectionModel::selectionChanged,
+            this, &CategoryDock::furnitureSelectionChanged);
 
     QIcon clearIcon(QLatin1String(":/images/16x16/edit-clear.png"));
     mActionClearUsed->setIcon(clearIcon);
     mActionClearUsed->setText(tr("Remove unused entries"));
-    connect(mActionClearUsed, SIGNAL(triggered()), SLOT(resetUsedTiles()));
+    connect(mActionClearUsed, &QAction::triggered, this, &CategoryDock::resetUsedTiles);
     mUsedContextMenu->addAction(mActionClearUsed);
 
-    connect(ToolManager::instance(), SIGNAL(currentToolChanged(BaseTool*)),
-            SLOT(currentToolChanged()));
+    connect(ToolManager::instance(), &ToolManager::currentToolChanged,
+            this, &CategoryDock::currentToolChanged);
 
     /////
 
@@ -169,11 +169,11 @@ CategoryDock::CategoryDock(QWidget *parent) :
 
     // This will create the Tiles dialog.  It must come after reading all the
     // config files.
-    connect(BuildingTilesDialog::instance(), SIGNAL(edited()),
-            SLOT(tilesDialogEdited()));
+    connect(BuildingTilesDialog::instance(), &BuildingTilesDialog::edited,
+            this, &CategoryDock::tilesDialogEdited);
 
-    connect(BuildingDocumentMgr::instance(), SIGNAL(currentDocumentChanged(BuildingDocument*)),
-            SLOT(currentDocumentChanged(BuildingDocument*)));
+    connect(BuildingDocumentMgr::instance(), &BuildingDocumentMgr::currentDocumentChanged,
+            this, &CategoryDock::currentDocumentChanged);
 }
 
 void CategoryDock::currentDocumentChanged(BuildingDocument *doc)
@@ -184,16 +184,16 @@ void CategoryDock::currentDocumentChanged(BuildingDocument *doc)
     mCurrentDocument = doc;
 
     if (mCurrentDocument) {
-        connect(mCurrentDocument, SIGNAL(currentRoomChanged()),
-                SLOT(currentRoomChanged()));
-        connect(mCurrentDocument, SIGNAL(usedFurnitureChanged()),
-                SLOT(usedFurnitureChanged()));
-        connect(mCurrentDocument, SIGNAL(usedTilesChanged()),
-                SLOT(usedTilesChanged()));
-        connect(mCurrentDocument, SIGNAL(selectedObjectsChanged()),
-                SLOT(selectCurrentCategoryTile()));
-        connect(mCurrentDocument, SIGNAL(objectPicked(BuildingObject*)),
-                SLOT(objectPicked(BuildingObject*)));
+        connect(mCurrentDocument, &BuildingDocument::currentRoomChanged,
+                this, &CategoryDock::currentRoomChanged);
+        connect(mCurrentDocument, &BuildingDocument::usedFurnitureChanged,
+                this, &CategoryDock::usedFurnitureChanged);
+        connect(mCurrentDocument, &BuildingDocument::usedTilesChanged,
+                this, &CategoryDock::usedTilesChanged);
+        connect(mCurrentDocument, &BuildingDocument::selectedObjectsChanged,
+                this, &CategoryDock::selectCurrentCategoryTile);
+        connect(mCurrentDocument, &BuildingDocument::objectPicked,
+                this, &CategoryDock::objectPicked);
     }
 
     if (ui->categoryList->currentRow() < 2)
@@ -321,7 +321,7 @@ void CategoryDock::categorySelectionChanged()
             ui->tilesetView->scrollToTop();
             ui->categoryStack->setCurrentIndex(0);
 
-            connect(mActionClearUsed, SIGNAL(triggered()), SLOT(resetUsedTiles()));
+            connect(mActionClearUsed, &QAction::triggered, this, &CategoryDock::resetUsedTiles);
             ui->tilesetView->setContextMenu(mUsedContextMenu);
         } else if (row == 1) { // Used Furniture
             if (!mCurrentDocument) return;
@@ -340,7 +340,7 @@ void CategoryDock::categorySelectionChanged()
             ui->furnitureView->scrollToTop();
             ui->categoryStack->setCurrentIndex(1);
 
-            connect(mActionClearUsed, SIGNAL(triggered()), SLOT(resetUsedFurniture()));
+            connect(mActionClearUsed, &QAction::triggered, this, &CategoryDock::resetUsedFurniture);
             ui->furnitureView->setContextMenu(mUsedContextMenu);
         } else if ((mCategory = categoryAt(row))) {
 #if 1

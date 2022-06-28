@@ -50,12 +50,12 @@ CurbToolDialog::CurbToolDialog(QWidget *parent) :
     readSettings();
     ui->suppressBlend->setChecked(CurbTool::instance().suppressBlendTiles());
 
-    connect(ui->curbList, SIGNAL(currentRowChanged(int)), SLOT(currentRowChanged(int)));
-    connect(ui->suppressBlend, SIGNAL(toggled(bool)), SLOT(suppressChanged(bool)));
+    connect(ui->curbList, &QListWidget::currentRowChanged, this, &CurbToolDialog::currentRowChanged);
+    connect(ui->suppressBlend, &QAbstractButton::toggled, this, &CurbToolDialog::suppressChanged);
 
     mVisibleLaterTimer.setSingleShot(true);
     mVisibleLaterTimer.setInterval(200);
-    connect(&mVisibleLaterTimer, SIGNAL(timeout()), SLOT(setVisibleNow()));
+    connect(&mVisibleLaterTimer, &QTimer::timeout, this, &CurbToolDialog::setVisibleNow);
 
 //    readTxt();
 }

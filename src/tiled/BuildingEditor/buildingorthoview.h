@@ -506,7 +506,7 @@ public:
 signals:
     void documentChanged();
 
-protected slots:
+public slots:
     void buildingResized();
     void buildingRotated();
 

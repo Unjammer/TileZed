@@ -110,7 +110,7 @@ void LuaToolOptionsWidget::setOptions(LuaToolOptions *options)
         if (BooleanLuaToolOption *p = prop->asBoolean()) {
             QCheckBox *w = new QCheckBox(p->mLabel, this);
             w->setObjectName(p->mName);
-            connect(w, SIGNAL(toggled(bool)), SLOT(checkboxToggled(bool)));
+            connect(w, &QAbstractButton::toggled, this, &LuaToolOptionsWidget::checkboxToggled);
             mCheckBoxes[p->mName] = w;
             mLayout->setWidget(mLayout->rowCount(), QFormLayout::SpanningRole, w);
             continue;
@@ -121,7 +121,7 @@ void LuaToolOptionsWidget::setOptions(LuaToolOptions *options)
             w->setRange(p->mMin, p->mMax);
             w->setMinimumWidth(96);
             w->installEventFilter(this); // to disable mousewheel
-            connect(w, SIGNAL(valueChanged(int)), SLOT(spinBoxValueChanged(int)));
+            connect(w, &QSpinBox::valueChanged, this, &LuaToolOptionsWidget::spinBoxValueChanged);
             mSpinBoxes[p->mName] = w;
             mLayout->addRow(p->mLabel, w);
             continue;
@@ -133,7 +133,7 @@ void LuaToolOptionsWidget::setOptions(LuaToolOptions *options)
             w->setEditable(true);
             w->setInsertPolicy(QComboBox::InsertAlphabetically);
             w->installEventFilter(this); // to disable mousewheel
-            connect(w->lineEdit(), SIGNAL(editingFinished()), SLOT(stringEdited()));
+            connect(w->lineEdit(), &QLineEdit::editingFinished, this, &LuaToolOptionsWidget::stringEdited);
             mComboBoxes[p->mName] = w;
             mLayout->addRow(p->mLabel, w);
             continue;
@@ -144,7 +144,7 @@ void LuaToolOptionsWidget::setOptions(LuaToolOptions *options)
             w->setSizeAdjustPolicy(QComboBox::AdjustToContents);
             w->addItems(p->mEnums);
             w->installEventFilter(this); // to disable mousewheel
-            connect(w, SIGNAL(activated(int)), SLOT(comboBoxActivated(int)));
+            connect(w, &QComboBox::activated, this, &LuaToolOptionsWidget::comboBoxActivated);
             mComboBoxes[p->mName] = w;
             mLayout->addRow(p->mLabel, w);
             continue;
@@ -157,7 +157,7 @@ void LuaToolOptionsWidget::setOptions(LuaToolOptions *options)
             w->setSizePolicy(policy);
             w->addItems(p->mItems);
             w->installEventFilter(this); // to disable mousewheel
-            connect(w, SIGNAL(currentRowChanged(int)), SLOT(listRowChanged(int)));
+            connect(w, &QListWidget::currentRowChanged, this, &LuaToolOptionsWidget::listRowChanged);
             mListWidgets[p->mName] = w;
             mLayout->addRow(w);
             continue;

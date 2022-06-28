@@ -38,12 +38,12 @@ WorldEdMgr *WorldEdMgr::instance()
 WorldEdMgr::WorldEdMgr(QObject *parent) :
     QObject(parent)
 {
-    connect(&mWatcher, SIGNAL(fileChanged(QString)), SLOT(fileChanged(QString)));
+    connect(&mWatcher, &Tiled::Internal::FileSystemWatcher::fileChanged, this, &WorldEdMgr::fileChanged);
 
     mChangedFilesTimer.setInterval(500);
     mChangedFilesTimer.setSingleShot(true);
-    connect(&mChangedFilesTimer, SIGNAL(timeout()),
-            SLOT(fileChangedTimeout()));
+    connect(&mChangedFilesTimer, &QTimer::timeout,
+            this, &WorldEdMgr::fileChangedTimeout);
 }
 
 WorldEdMgr::~WorldEdMgr()

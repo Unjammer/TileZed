@@ -40,8 +40,8 @@ AbstractTool::AbstractTool(const QString &name, const QIcon &icon,
     , mMapDocument(0)
 {
     MapDocumentActionHandler *handler = MapDocumentActionHandler::instance();
-    connect(handler, SIGNAL(mapDocumentChanged(Tiled::Internal::MapDocument*)),
-            SLOT(setMapDocument(Tiled::Internal::MapDocument*)));
+    connect(handler, &MapDocumentActionHandler::mapDocumentChanged,
+            this, &AbstractTool::setMapDocument);
 }
 
 /**
@@ -83,10 +83,10 @@ void AbstractTool::setMapDocument(MapDocument *mapDocument)
         return;
 
     if (mMapDocument) {
-        disconnect(mMapDocument, SIGNAL(layerChanged(int)),
-                   this, SLOT(updateEnabledState()));
-        disconnect(mMapDocument, SIGNAL(currentLayerIndexChanged(int)),
-                   this, SLOT(updateEnabledState()));
+        disconnect(mMapDocument, &MapDocument::layerChanged,
+                   this, &AbstractTool::updateEnabledState);
+        disconnect(mMapDocument, &MapDocument::currentLayerIndexChanged,
+                   this, &AbstractTool::updateEnabledState);
     }
 
     MapDocument *oldDocument = mMapDocument;
@@ -94,10 +94,10 @@ void AbstractTool::setMapDocument(MapDocument *mapDocument)
     mapDocumentChanged(oldDocument, mMapDocument);
 
     if (mMapDocument) {
-        connect(mMapDocument, SIGNAL(layerChanged(int)),
-                this, SLOT(updateEnabledState()));
-        connect(mMapDocument, SIGNAL(currentLayerIndexChanged(int)),
-                this, SLOT(updateEnabledState()));
+        connect(mMapDocument, &MapDocument::layerChanged,
+                this, &AbstractTool::updateEnabledState);
+        connect(mMapDocument, &MapDocument::currentLayerIndexChanged,
+                this, &AbstractTool::updateEnabledState);
     }
     updateEnabledState();
 }

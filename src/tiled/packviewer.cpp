@@ -63,13 +63,13 @@ PackViewer::PackViewer(QWidget *parent) :
     mZoomable = new Zoomable(this);
     mZoomable->setZoomFactors(QVector<qreal>() << 0.25 << 0.5 << 1.0 << 2.0 << 4.0);
     mZoomable->connectToComboBox(ui->scaleCombo);
-    connect(mZoomable, SIGNAL(scaleChanged(qreal)), SLOT(scaleChanged(qreal)));
+    connect(mZoomable, &Zoomable::scaleChanged, this, &PackViewer::scaleChanged);
 
-    connect(ui->actionOpen, SIGNAL(triggered()), SLOT(openPack()));
-    connect(ui->listWidget, SIGNAL(itemSelectionChanged()), SLOT(itemSelectionChanged()));
-    connect(ui->actionBackgroundColor, SIGNAL(triggered()), SLOT(chooseBackgroundColor()));
-    connect(ui->actionExtractImages, SIGNAL(triggered()), SLOT(extractImages()));
-    connect(ui->actionClose, SIGNAL(triggered()), SLOT(close()));
+    connect(ui->actionOpen, &QAction::triggered, this, &PackViewer::openPack);
+    connect(ui->listWidget, &QListWidget::itemSelectionChanged, this, &PackViewer::itemSelectionChanged);
+    connect(ui->actionBackgroundColor, &QAction::triggered, this, &PackViewer::chooseBackgroundColor);
+    connect(ui->actionExtractImages, &QAction::triggered, this, &PackViewer::extractImages);
+    connect(ui->actionClose, &QAction::triggered, this, &QWidget::close);
 
     QSettings settings;
     QVariant v = settings.value(KEY_BG, QColor(Qt::lightGray));

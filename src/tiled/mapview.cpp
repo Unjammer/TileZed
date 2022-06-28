@@ -62,7 +62,7 @@ MapView::MapView(QWidget *parent)
     // See currentDocumentChanged().
     setUseOpenGL(prefs->useOpenGL());
 #endif
-    connect(prefs, SIGNAL(useOpenGLChanged(bool)), SLOT(setUseOpenGL(bool)));
+    connect(prefs, &Preferences::useOpenGLChanged, this, &MapView::setUseOpenGL);
 #endif
 
     QWidget *v = viewport();
@@ -78,7 +78,7 @@ MapView::MapView(QWidget *parent)
     // Adjustment for antialiasing is done by the items that need it
     setOptimizationFlags(QGraphicsView::DontAdjustForAntialiasing);
 
-    connect(mZoomable, SIGNAL(scaleChanged(qreal)), SLOT(adjustScale(qreal)));
+    connect(mZoomable, &Zoomable::scaleChanged, this, &MapView::adjustScale);
 }
 
 MapView::~MapView()

@@ -23,6 +23,7 @@
 #include "buildingmap.h"
 #include "buildingobjects.h"
 #include "buildingpreferences.h"
+#include "buildingtemplates.h"
 #include "buildingtiles.h"
 #include "buildingtiletools.h"
 #include "buildingtools.h"
@@ -112,10 +113,10 @@ TileModeGridItem::TileModeGridItem(BuildingDocument *doc, MapRenderer *renderer)
     mEditingTiles(false)
 {
     setVisible(BuildingPreferences::instance()->showGrid());
-    connect(BuildingPreferences::instance(), SIGNAL(gridColorChanged(QColor)),
-            SLOT(gridColorChanged()));
-    connect(BuildingPreferences::instance(), SIGNAL(showGridChanged(bool)),
-            SLOT(showGridChanged(bool)));
+    connect(BuildingPreferences::instance(), &BuildingPreferences::gridColorChanged,
+            this, &TileModeGridItem::gridColorChanged);
+    connect(BuildingPreferences::instance(), &BuildingPreferences::showGridChanged,
+            this, &TileModeGridItem::showGridChanged);
 
     setFlag(QGraphicsItem::ItemUsesExtendedStyleOption);
     synchWithBuilding();
@@ -165,10 +166,10 @@ TileModeSelectionItem::TileModeSelectionItem(BuildingIsoScene *scene) :
 {
     setZValue(1000);
 
-    connect(document(), SIGNAL(tileSelectionChanged(QRegion)),
-            SLOT(tileSelectionChanged(QRegion)));
-    connect(document(), SIGNAL(currentFloorChanged()),
-            SLOT(currentLevelChanged()));
+    connect(document(), &BuildingDocument::tileSelectionChanged,
+            this, &TileModeSelectionItem::tileSelectionChanged);
+    connect(document(), &BuildingDocument::currentFloorChanged,
+            this, &TileModeSelectionItem::currentLevelChanged);
 
     updateBoundingRect();
 }
@@ -249,25 +250,25 @@ BuildingIsoScene::BuildingIsoScene(QObject *parent) :
     mDarkRectangle->setVisible(false);
     addItem(mDarkRectangle);
 
-    connect(BuildingTilesMgr::instance(), SIGNAL(tilesetAdded(Tiled::Tileset*)),
-            SLOT(tilesetAdded(Tiled::Tileset*)));
-    connect(BuildingTilesMgr::instance(), SIGNAL(tilesetAboutToBeRemoved(Tiled::Tileset*)),
-            SLOT(tilesetAboutToBeRemoved(Tiled::Tileset*)));
-    connect(BuildingTilesMgr::instance(), SIGNAL(tilesetRemoved(Tiled::Tileset*)),
-            SLOT(tilesetRemoved(Tiled::Tileset*)));
+    connect(BuildingTilesMgr::instance(), &BuildingTilesMgr::tilesetAdded,
+            this, &BuildingIsoScene::tilesetAdded);
+    connect(BuildingTilesMgr::instance(), &BuildingTilesMgr::tilesetAboutToBeRemoved,
+            this, &BuildingIsoScene::tilesetAboutToBeRemoved);
+    connect(BuildingTilesMgr::instance(), &BuildingTilesMgr::tilesetRemoved,
+            this, &BuildingIsoScene::tilesetRemoved);
 
-    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tiled::Tileset*)),
-            SLOT(tilesetChanged(Tiled::Tileset*)));
+    connect(TilesetManager::instance(), &TilesetManager::tilesetChanged,
+            this, &BuildingIsoScene::tilesetChanged);
 
-    connect(prefs(), SIGNAL(highlightFloorChanged(bool)),
-            SLOT(highlightFloorChanged(bool)));
-    connect(prefs(), SIGNAL(highlightRoomChanged(bool)),
-            SLOT(highlightRoomChanged(bool)));
-    connect(prefs(), SIGNAL(showLowerFloorsChanged(bool)),
-            SLOT(showLowerFloorsChanged(bool)));
+    connect(prefs(), &BuildingPreferences::highlightFloorChanged,
+            this, &BuildingIsoScene::highlightFloorChanged);
+    connect(prefs(), &BuildingPreferences::highlightRoomChanged,
+            this, &BuildingIsoScene::highlightRoomChanged);
+    connect(prefs(), &BuildingPreferences::showLowerFloorsChanged,
+            this, &BuildingIsoScene::showLowerFloorsChanged);
 
-    connect(ToolManager::instance(), SIGNAL(currentToolChanged(BaseTool*)),
-            SLOT(currentToolChanged(BaseTool*)));
+    connect(ToolManager::instance(), &ToolManager::currentToolChanged,
+            this, &BuildingIsoScene::currentToolChanged);
 }
 
 BuildingIsoScene::~BuildingIsoScene()
@@ -344,57 +345,57 @@ void BuildingIsoScene::setDocument(BuildingDocument *doc)
     setSceneRect(mBuildingMap->mapComposite()->boundingRect(mBuildingMap->mapRenderer()));
     mDarkRectangle->setRect(sceneRect());
 
-    connect(mDocument, SIGNAL(currentFloorChanged()),
-            SLOT(currentFloorChanged()));
-    connect(mDocument, SIGNAL(currentLayerChanged()),
-            SLOT(currentLayerChanged()));
+    connect(mDocument, &BuildingDocument::currentFloorChanged,
+            this, &BuildingIsoScene::currentFloorChanged);
+    connect(mDocument, &BuildingDocument::currentLayerChanged,
+            this, &BuildingIsoScene::currentLayerChanged);
 
-    connect(mDocument, SIGNAL(roomChanged(Room*)), SLOT(roomChanged(Room*)));
-    connect(mDocument, SIGNAL(roomAtPositionChanged(BuildingFloor*,QPoint)),
-            SLOT(roomAtPositionChanged(BuildingFloor*,QPoint)));
+    connect(mDocument, &BuildingDocument::roomChanged, this, &BuildingIsoScene::roomChanged);
+    connect(mDocument, &BuildingDocument::roomAtPositionChanged,
+            this, &BuildingIsoScene::roomAtPositionChanged);
 
-    connect(mDocument, SIGNAL(roomDefinitionChanged()),
-            SLOT(roomDefinitionChanged()));
+    connect(mDocument, &BuildingDocument::roomDefinitionChanged,
+            this, &BuildingIsoScene::roomDefinitionChanged);
 
-    connect(mDocument, SIGNAL(floorAdded(BuildingFloor*)),
-            SLOT(floorAdded(BuildingFloor*)));
-    connect(mDocument, SIGNAL(floorRemoved(BuildingFloor*)),
-            SLOT(floorRemoved(BuildingFloor*)));
-    connect(mDocument, SIGNAL(floorEdited(BuildingFloor*)),
-            SLOT(floorEdited(BuildingFloor*)));
+    connect(mDocument, &BuildingDocument::floorAdded,
+            this, &BuildingIsoScene::floorAdded);
+    connect(mDocument, &BuildingDocument::floorRemoved,
+            this, &BuildingIsoScene::floorRemoved);
+    connect(mDocument, &BuildingDocument::floorEdited,
+            this, &BuildingIsoScene::floorEdited);
 
-    connect(mDocument, SIGNAL(floorTilesChanged(BuildingFloor*)),
-            SLOT(floorTilesChanged(BuildingFloor*)));
-    connect(mDocument, SIGNAL(floorTilesChanged(BuildingFloor*,QString,QRect)),
-            SLOT(floorTilesChanged(BuildingFloor*,QString,QRect)));
+    connect(mDocument, qOverload<BuildingFloor*>(&BuildingDocument::floorTilesChanged),
+            this, qOverload<BuildingFloor*>(&BuildingIsoScene::floorTilesChanged));
+    connect(mDocument, qOverload<BuildingFloor*,const QString&,const QRect&>(&BuildingDocument::floorTilesChanged),
+            this, qOverload<BuildingFloor*,const QString&,const QRect&>(&BuildingIsoScene::floorTilesChanged));
 
-    connect(mDocument, SIGNAL(layerOpacityChanged(BuildingFloor*,QString)),
-            SLOT(layerOpacityChanged(BuildingFloor*,QString)));
-    connect(mDocument, SIGNAL(layerVisibilityChanged(BuildingFloor*,QString)),
-            SLOT(layerVisibilityChanged(BuildingFloor*,QString)));
+    connect(mDocument, &BuildingDocument::layerOpacityChanged,
+            this, &BuildingIsoScene::layerOpacityChanged);
+    connect(mDocument, &BuildingDocument::layerVisibilityChanged,
+            this, &BuildingIsoScene::layerVisibilityChanged);
 
-    connect(mDocument, SIGNAL(objectAdded(BuildingObject*)),
-            SLOT(objectAdded(BuildingObject*)));
-    connect(mDocument, SIGNAL(objectAboutToBeRemoved(BuildingObject*)),
-            SLOT(objectAboutToBeRemoved(BuildingObject*)));
-    connect(mDocument, SIGNAL(objectRemoved(BuildingObject*)),
-            SLOT(objectRemoved(BuildingObject*)));
-    connect(mDocument, SIGNAL(objectMoved(BuildingObject*)),
-            SLOT(objectMoved(BuildingObject*)));
-    connect(mDocument, SIGNAL(objectTileChanged(BuildingObject*)),
-            SLOT(objectTileChanged(BuildingObject*)));
-    connect(mDocument, SIGNAL(objectChanged(BuildingObject*)),
-            SLOT(objectMoved(BuildingObject*)));
+    connect(mDocument, &BuildingDocument::objectAdded,
+            this, &BuildingIsoScene::objectAdded);
+    connect(mDocument, &BuildingDocument::objectAboutToBeRemoved,
+            this, &BuildingIsoScene::objectAboutToBeRemoved);
+    connect(mDocument, &BuildingDocument::objectRemoved,
+            this, &BuildingIsoScene::objectRemoved);
+    connect(mDocument, &BuildingDocument::objectMoved,
+            this, &BuildingIsoScene::objectMoved);
+    connect(mDocument, &BuildingDocument::objectTileChanged,
+            this, &BuildingIsoScene::objectTileChanged);
+    connect(mDocument, &BuildingDocument::objectChanged,
+            this, &BuildingIsoScene::objectMoved);
 
-    connect(mDocument, SIGNAL(selectedObjectsChanged()),
-            SLOT(selectedObjectsChanged()));
+    connect(mDocument, &BuildingDocument::selectedObjectsChanged,
+            this, &BuildingBaseScene::selectedObjectsChanged);
 
-    connect(mDocument, SIGNAL(buildingResized()), SLOT(buildingResized()));
-    connect(mDocument, SIGNAL(buildingRotated()), SLOT(buildingRotated()));
+    connect(mDocument, &BuildingDocument::buildingResized, this, &BuildingIsoScene::buildingResized);
+    connect(mDocument, &BuildingDocument::buildingRotated, this, &BuildingIsoScene::buildingRotated);
 
-    connect(mDocument, SIGNAL(roomAdded(Room*)), SLOT(roomAdded(Room*)));
-    connect(mDocument, SIGNAL(roomRemoved(Room*)), SLOT(roomRemoved(Room*)));
-    connect(mDocument, SIGNAL(roomChanged(Room*)), SLOT(roomChanged(Room*)));
+    connect(mDocument, &BuildingDocument::roomAdded, this, &BuildingIsoScene::roomAdded);
+    connect(mDocument, &BuildingDocument::roomRemoved, this, &BuildingIsoScene::roomRemoved);
+    connect(mDocument, &BuildingDocument::roomChanged, this, &BuildingIsoScene::roomChanged);
 
     emit documentChanged();
 }
@@ -757,11 +758,11 @@ void BuildingIsoScene::BuildingToMap()
     }
 
     mBuildingMap = new BuildingMap(building());
-    connect(mBuildingMap, SIGNAL(aboutToRecreateLayers()), SLOT(aboutToRecreateLayers()));
-    connect(mBuildingMap, SIGNAL(layersRecreated()), SLOT(layersRecreated()));
-    connect(mBuildingMap, SIGNAL(mapResized()), SLOT(mapResized()));
-    connect(mBuildingMap, SIGNAL(layersUpdated(int,QRegion)),
-            SLOT(layersUpdated(int,QRegion)));
+    connect(mBuildingMap, &BuildingMap::aboutToRecreateLayers, this, &BuildingIsoScene::aboutToRecreateLayers);
+    connect(mBuildingMap, &BuildingMap::layersRecreated, this, &BuildingIsoScene::layersRecreated);
+    connect(mBuildingMap, &BuildingMap::mapResized, this, &BuildingIsoScene::mapResized);
+    connect(mBuildingMap, &BuildingMap::layersUpdated,
+            this, &BuildingIsoScene::layersUpdated);
 
     mRenderer->asIso()->mMapRenderer = mBuildingMap->mapRenderer();
 
@@ -1180,7 +1181,7 @@ BuildingIsoView::BuildingIsoView(QWidget *parent) :
 {
     BuildingPreferences *prefs = BuildingPreferences::instance();
     setUseOpenGL(prefs->useOpenGL());
-    connect(prefs, SIGNAL(useOpenGLChanged(bool)), SLOT(setUseOpenGL(bool)));
+    connect(prefs, &BuildingPreferences::useOpenGLChanged, this, &BuildingIsoView::setUseOpenGL);
 
     QWidget *v = viewport();
 
@@ -1195,7 +1196,7 @@ BuildingIsoView::BuildingIsoView(QWidget *parent) :
     // Adjustment for antialiasing is done by the items that need it
     setOptimizationFlags(QGraphicsView::DontAdjustForAntialiasing);
 
-    connect(mZoomable, SIGNAL(scaleChanged(qreal)), SLOT(adjustScale(qreal)));
+    connect(mZoomable, &Zoomable::scaleChanged, this, &BuildingIsoView::adjustScale);
 
     // Install an event filter so that we can get key events on behalf of the
     // active tool without having to have the current focus.

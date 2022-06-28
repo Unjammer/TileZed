@@ -246,6 +246,8 @@ private slots:
     void tilesetMoved(int from, int to);
     void tilesetNameChanged(Tiled::Tileset *tileset);
 
+    void newTileset();
+
     void removeTileset();
     void removeTileset(int index);
     void moveTileset(int from, int to);

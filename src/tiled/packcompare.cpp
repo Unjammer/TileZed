@@ -30,9 +30,9 @@ PackCompare::PackCompare(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    connect(ui->packBrowse1, SIGNAL(clicked()), SLOT(browse1()));
-    connect(ui->packBrowse2, SIGNAL(clicked()), SLOT(browse2()));
-    connect(ui->compare, SIGNAL(clicked()), SLOT(compare()));
+    connect(ui->packBrowse1, &QAbstractButton::clicked, this, &PackCompare::browse1);
+    connect(ui->packBrowse2, &QAbstractButton::clicked, this, &PackCompare::browse2);
+    connect(ui->compare, &QAbstractButton::clicked, this, &PackCompare::compare);
 }
 
 PackCompare::~PackCompare()

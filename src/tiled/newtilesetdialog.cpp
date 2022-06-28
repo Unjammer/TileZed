@@ -71,10 +71,10 @@ NewTilesetDialog::NewTilesetDialog(const QString &path, QWidget *parent) :
     mUi->offsetX->setValue(offset.x());
     mUi->offsetY->setValue(offset.y());
 
-    connect(mUi->browseButton, SIGNAL(clicked()), SLOT(browse()));
-    connect(mUi->name, SIGNAL(textEdited(QString)), SLOT(nameEdited(QString)));
-    connect(mUi->name, SIGNAL(textChanged(QString)), SLOT(updateOkButton()));
-    connect(mUi->image, SIGNAL(textChanged(QString)), SLOT(updateOkButton()));
+    connect(mUi->browseButton, &QAbstractButton::clicked, this, &NewTilesetDialog::browse);
+    connect(mUi->name, &QLineEdit::textEdited, this, &NewTilesetDialog::nameEdited);
+    connect(mUi->name, &QLineEdit::textChanged, this, &NewTilesetDialog::updateOkButton);
+    connect(mUi->image, &QLineEdit::textChanged, this, &NewTilesetDialog::updateOkButton);
 
     // Set the image and name fields if the given path is a file
     const QFileInfo fileInfo(path);

@@ -285,16 +285,16 @@ QMenu *CommandDataModel::contextMenu(QWidget *parent, const QModelIndex &index)
             QAction *action = menu->addAction(tr("Move Up"));
             QSignalMapper *mapper = new QSignalMapper(action);
             mapper->setMapping(action, row);
-            connect(action, SIGNAL(triggered()), mapper, SLOT(map()));
-            connect(mapper, SIGNAL(mapped(int)), SLOT(moveUp(int)));
+            connect(action, &QAction::triggered, mapper, qOverload<>(&QSignalMapper::map));
+            connect(mapper, &QSignalMapper::mappedInt, this, &CommandDataModel::moveUp);
         }
 
         if (row+1 < mCommands.size()) {
             QAction *action = menu->addAction(tr("Move Down"));
             QSignalMapper *mapper = new QSignalMapper(action);
             mapper->setMapping(action, row + 1);
-            connect(action, SIGNAL(triggered()), mapper, SLOT(map()));
-            connect(mapper, SIGNAL(mappedInt(int)), SLOT(moveUp(int)));
+            connect(action, &QAction::triggered, mapper, qOverload<>(&QSignalMapper::map));
+            connect(mapper, &QSignalMapper::mappedInt, this, &CommandDataModel::moveUp);
         }
 
         menu->addSeparator();
@@ -303,8 +303,8 @@ QMenu *CommandDataModel::contextMenu(QWidget *parent, const QModelIndex &index)
             QAction *action = menu->addAction(tr("Execute"));
             QSignalMapper *mapper = new QSignalMapper(action);
             mapper->setMapping(action, row);
-            connect(action, SIGNAL(triggered()), mapper, SLOT(map()));
-            connect(mapper, SIGNAL(mappedInt(int)), SLOT(execute(int)));
+            connect(action, &QAction::triggered, mapper, qOverload<>(&QSignalMapper::map));
+            connect(mapper, &QSignalMapper::mappedInt, this, &CommandDataModel::execute);
         }
 
 #if defined(Q_WS_X11) || defined(Q_WS_MAC)
@@ -312,8 +312,8 @@ QMenu *CommandDataModel::contextMenu(QWidget *parent, const QModelIndex &index)
             QAction *action = menu->addAction(tr("Execute in Terminal"));
             QSignalMapper *mapper = new QSignalMapper(action);
             mapper->setMapping(action, row);
-            connect(action, SIGNAL(triggered()), mapper, SLOT(map()));
-            connect(mapper, SIGNAL(mappedInt(int)), SLOT(executeInTerminal(int)));
+            connect(action, &QAction::triggered, mapper, qOverload<>(&QSignalMapper::map));
+            connect(mapper, &QSignalMapper::mappedInt, this, &CommandDataModel::executeInTerminal);
         }
 #endif
 
@@ -323,8 +323,8 @@ QMenu *CommandDataModel::contextMenu(QWidget *parent, const QModelIndex &index)
             QAction *action = menu->addAction(tr("Delete"));
             QSignalMapper *mapper = new QSignalMapper(action);
             mapper->setMapping(action, row);
-            connect(action, SIGNAL(triggered()), mapper, SLOT(map()));
-            connect(mapper, SIGNAL(mappedInt(int)), SLOT(remove(int)));
+            connect(action, &QAction::triggered, mapper, qOverload<>(&QSignalMapper::map));
+            connect(mapper, &QSignalMapper::mappedInt, this, &CommandDataModel::remove);
         }
     }
 

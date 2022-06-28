@@ -321,7 +321,7 @@ void TileCategoryView::setZoomable(Zoomable *zoomable)
 {
     mZoomable = zoomable;
     if (zoomable)
-        connect(mZoomable, SIGNAL(scaleChanged(qreal)), SLOT(scaleChanged(qreal)));
+        connect(mZoomable, &Zoomable::scaleChanged, this, &TileCategoryView::scaleChanged);
 }
 
 void TileCategoryView::clear()
@@ -393,15 +393,15 @@ void TileCategoryView::init()
 
     setModel(mModel);
 
-    connect(mZoomable, SIGNAL(scaleChanged(qreal)), SLOT(scaleChanged(qreal)));
+    connect(mZoomable, &Zoomable::scaleChanged, this, &TileCategoryView::scaleChanged);
 
-    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tiled::Tileset*)),
-            SLOT(tilesetChanged(Tiled::Tileset*)));
+    connect(TilesetManager::instance(), &TilesetManager::tilesetChanged,
+            this, &TileCategoryView::tilesetChanged);
 
-    connect(TileMetaInfoMgr::instance(), SIGNAL(tilesetAdded(Tiled::Tileset*)),
-            SLOT(tilesetAdded(Tiled::Tileset*)));
-    connect(TileMetaInfoMgr::instance(), SIGNAL(tilesetRemoved(Tiled::Tileset*)),
-            SLOT(tilesetRemoved(Tiled::Tileset*)));
+    connect(TileMetaInfoMgr::instance(), &TileMetaInfoMgr::tilesetAdded,
+            this, &TileCategoryView::tilesetAdded);
+    connect(TileMetaInfoMgr::instance(), &TileMetaInfoMgr::tilesetRemoved,
+            this, &TileCategoryView::tilesetRemoved);
 }
 
 /////

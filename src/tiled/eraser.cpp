@@ -42,8 +42,8 @@ Eraser::Eraser(QObject *parent)
     , mErasing(false)
 {
 #ifdef ZOMBOID
-    connect(Preferences::instance(), SIGNAL(eraserBrushSizeChanged(int)),
-            SLOT(brushSizeChanged(int)));
+    connect(Preferences::instance(), &Preferences::eraserBrushSizeChanged,
+            this, &Eraser::brushSizeChanged);
 #endif
 }
 

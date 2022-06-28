@@ -32,8 +32,8 @@ ChooseTemplatesDialog::ChooseTemplatesDialog(const QList<BuildingTemplate *> &te
 
     ui->prompt->setText(prompt);
 
-    connect(ui->checkAll, SIGNAL(clicked()), SLOT(checkAll()));
-    connect(ui->uncheckAll, SIGNAL(clicked()), SLOT(uncheckAll()));
+    connect(ui->checkAll, &QAbstractButton::clicked, this, &ChooseTemplatesDialog::checkAll);
+    connect(ui->uncheckAll, &QAbstractButton::clicked, this, &ChooseTemplatesDialog::uncheckAll);
 
     setList();
 }

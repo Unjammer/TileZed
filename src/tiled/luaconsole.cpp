@@ -47,15 +47,15 @@ LuaConsole::LuaConsole(QWidget *parent) :
 
     ui->setupUi(this);
 
-    connect(ui->actionRun_Script, SIGNAL(triggered()), SLOT(runScript()));
-    connect(ui->actionRunAgain, SIGNAL(triggered()), SLOT(runAgain()));
-    connect(ui->btnRunAgain, SIGNAL(clicked()), SLOT(runAgain()));
-    connect(ui->actionRunInDirectory, SIGNAL(triggered()), SLOT(runInDirectory()));
-    connect(ui->actionRunOnWorld, SIGNAL(triggered()), SLOT(runOnWorld()));
+    connect(ui->actionRun_Script, &QAction::triggered, this, &LuaConsole::runScript);
+    connect(ui->actionRunAgain, &QAction::triggered, this, &LuaConsole::runAgain);
+    connect(ui->btnRunAgain, &QAbstractButton::clicked, this, &LuaConsole::runAgain);
+    connect(ui->actionRunInDirectory, &QAction::triggered, this, &LuaConsole::runInDirectory);
+    connect(ui->actionRunOnWorld, &QAction::triggered, this, &LuaConsole::runOnWorld);
 
-    connect(ui->clear, SIGNAL(clicked()), SLOT(clear()));
+    connect(ui->clear, &QAbstractButton::clicked, this, &LuaConsole::clear);
 
-    connect(ui->actionHelpContents, SIGNAL(triggered()), SLOT(helpContents()));
+    connect(ui->actionHelpContents, &QAction::triggered, this, &LuaConsole::helpContents);
 }
 
 LuaConsole::~LuaConsole()

@@ -466,8 +466,8 @@ EnflatulatorDialog::EnflatulatorDialog(QWidget *parent) :
     toolBar->addAction(mWNTool->mAction);
     ui->toolBarLayout->addWidget(toolBar, 1);
 
-    connect(ui->chooseImage, SIGNAL(clicked()), SLOT(chooseIsoImage()));
-    connect(mShapeTool, SIGNAL(faceChanged()), SLOT(faceChanged()));
+    connect(ui->chooseImage, &QAbstractButton::clicked, this, &EnflatulatorDialog::chooseIsoImage);
+    connect(mShapeTool, &EnflatulatorTool::faceChanged, this, &EnflatulatorDialog::faceChanged);
 
     if (EnflatulatorShape *shape = new EnflatulatorShape) {
         shape->mLabel = QLatin1String("Counter");
@@ -544,10 +544,10 @@ EnflatulatorDialog::EnflatulatorDialog(QWidget *parent) :
         ui->shapeList->addItem(shape->mLabel);
     }
 
-    connect(ui->shapeList, SIGNAL(currentRowChanged(int)), SLOT(currentShapeChanged(int)));
+    connect(ui->shapeList, &QListWidget::currentRowChanged, this, &EnflatulatorDialog::currentShapeChanged);
 
-    connect(mShapeTool->mAction, SIGNAL(toggled(bool)), SLOT(toolToggled(bool)));
-    connect(mWNTool->mAction, SIGNAL(toggled(bool)), SLOT(toolToggled(bool)));
+    connect(mShapeTool->mAction, &QAction::toggled, this, &EnflatulatorDialog::toolToggled);
+    connect(mWNTool->mAction, &QAction::toggled, this, &EnflatulatorDialog::toolToggled);
     ui->isoView->mScene->activateTool(mShapeTool);
 }
 

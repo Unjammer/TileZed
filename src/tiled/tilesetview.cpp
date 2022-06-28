@@ -186,13 +186,13 @@ TilesetView::TilesetView(QWidget *parent)
     Preferences *prefs = Preferences::instance();
     mDrawGrid = prefs->showTilesetGrid();
 
-    connect(mZoomable, SIGNAL(scaleChanged(qreal)), SLOT(adjustScale()));
-    connect(prefs, SIGNAL(showTilesetGridChanged(bool)),
-            SLOT(setDrawGrid(bool)));
+    connect(mZoomable, &Zoomable::scaleChanged, this, &TilesetView::adjustScale);
+    connect(prefs, &Preferences::showTilesetGridChanged,
+            this, &TilesetView::setDrawGrid);
 #ifdef ZOMBOID
     mShowLayerNames = prefs->autoSwitchLayer();
-    connect(prefs, SIGNAL(autoSwitchLayerChanged(bool)),
-            SLOT(autoSwitchLayerChanged(bool)));
+    connect(prefs, &Preferences::autoSwitchLayerChanged,
+            this, &TilesetView::autoSwitchLayerChanged);
 #endif
 }
 
@@ -238,13 +238,13 @@ TilesetView::TilesetView(MapDocument *mapDocument, Zoomable *zoomable, QWidget *
     Preferences *prefs = Preferences::instance();
     mDrawGrid = prefs->showTilesetGrid();
 
-    connect(mZoomable, SIGNAL(scaleChanged(qreal)), SLOT(adjustScale()));
-    connect(prefs, SIGNAL(showTilesetGridChanged(bool)),
-            SLOT(setDrawGrid(bool)));
+    connect(mZoomable, &Zoomable::scaleChanged, this, &TilesetView::adjustScale);
+    connect(prefs, &Preferences::showTilesetGridChanged,
+            this, &TilesetView::setDrawGrid);
 #ifdef ZOMBOID
     mShowLayerNames = prefs->autoSwitchLayer();
-    connect(prefs, SIGNAL(autoSwitchLayerChanged(bool)),
-            SLOT(autoSwitchLayerChanged(bool)));
+    connect(prefs, &Preferences::autoSwitchLayerChanged,
+            this, &TilesetView::autoSwitchLayerChanged);
 #endif
 }
 
@@ -410,8 +410,8 @@ void TilesetView::contextMenuEvent(QContextMenuEvent *event)
     toggleGrid->setChecked(mDrawGrid);
 
     Preferences *prefs = Preferences::instance();
-    connect(toggleGrid, SIGNAL(toggled(bool)),
-            prefs, SLOT(setShowTilesetGrid(bool)));
+    connect(toggleGrid, &QAction::toggled,
+            prefs, &Preferences::setShowTilesetGrid);
 
 #ifdef ZOMBOID
     QAction *action = menu.exec(event->globalPos());

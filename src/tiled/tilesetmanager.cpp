@@ -84,22 +84,22 @@ TilesetManager::TilesetManager():
         mImageReaderThreads[i] = new InterruptibleThread;
         mImageReaderWorkers[i] = new TilesetImageReaderWorker(i, mImageReaderThreads[i]);
         mImageReaderWorkers[i]->moveToThread(mImageReaderThreads[i]);
-        connect(mImageReaderWorkers[i], SIGNAL(imageLoaded(Tiled::Tileset*,Tiled::Tileset*)),
-                SLOT(imageLoaded(Tiled::Tileset*,Tiled::Tileset*)));
+        connect(mImageReaderWorkers[i], &TilesetImageReaderWorker::imageLoaded,
+                this, qOverload<Tiled::Tileset*,Tiled::Tileset*>(&TilesetManager::imageLoaded));
         mImageReaderThreads[i]->start();
     }
 
     mReloadTilesetsOnChange = Preferences::instance()->reloadTilesetsOnChange();
 #endif
 
-    connect(mWatcher, SIGNAL(fileChanged(QString)),
-            this, SLOT(fileChanged(QString)));
+    connect(mWatcher, &FileSystemWatcher::fileChanged,
+            this, &TilesetManager::fileChanged);
 
     mChangedFilesTimer.setInterval(500);
     mChangedFilesTimer.setSingleShot(true);
 
-    connect(&mChangedFilesTimer, SIGNAL(timeout()),
-            this, SLOT(fileChangedTimeout()));
+    connect(&mChangedFilesTimer, &QTimer::timeout,
+            this, &TilesetManager::fileChangedTimeout);
 }
 
 TilesetManager::~TilesetManager()

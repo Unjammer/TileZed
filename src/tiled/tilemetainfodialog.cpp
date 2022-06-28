@@ -163,8 +163,8 @@ TileMetaInfoDialog::TileMetaInfoDialog(QWidget *parent) :
     button->setShortcut(QKeySequence::Undo);
     mUndoButton = button;
     ui->undoRedoLayout->addWidget(button);
-    connect(mUndoGroup, SIGNAL(canUndoChanged(bool)), button, SLOT(setEnabled(bool)));
-    connect(button, SIGNAL(clicked()), undoAction, SIGNAL(triggered()));
+    connect(mUndoGroup, &QUndoGroup::canUndoChanged, button, &QWidget::setEnabled);
+    connect(button, &QAbstractButton::clicked, undoAction, &QAction::triggered);
 
     button = new QToolButton(this);
     button->setIcon(redoIcon);
@@ -175,11 +175,11 @@ TileMetaInfoDialog::TileMetaInfoDialog(QWidget *parent) :
     button->setShortcut(QKeySequence::Redo);
     mRedoButton = button;
     ui->undoRedoLayout->addWidget(button);
-    connect(mUndoGroup, SIGNAL(canRedoChanged(bool)), button, SLOT(setEnabled(bool)));
-    connect(button, SIGNAL(clicked()), redoAction, SIGNAL(triggered()));
+    connect(mUndoGroup, &QUndoGroup::canRedoChanged, button, &QWidget::setEnabled);
+    connect(button, &QAbstractButton::clicked, redoAction, &QAction::triggered);
 
-    connect(mUndoGroup, SIGNAL(undoTextChanged(QString)), SLOT(undoTextChanged(QString)));
-    connect(mUndoGroup, SIGNAL(redoTextChanged(QString)), SLOT(redoTextChanged(QString)));
+    connect(mUndoGroup, &QUndoGroup::undoTextChanged, this, &TileMetaInfoDialog::undoTextChanged);
+    connect(mUndoGroup, &QUndoGroup::redoTextChanged, this, &TileMetaInfoDialog::redoTextChanged);
 
     /////
 
@@ -197,20 +197,20 @@ TileMetaInfoDialog::TileMetaInfoDialog(QWidget *parent) :
     ui->filterEdit->setEnabled(false);
     connect(ui->filterEdit, &QLineEdit::textEdited, this, &TileMetaInfoDialog::tilesetFilterEdited);
 
-    connect(ui->browseTiles, SIGNAL(clicked()), SLOT(browse()));
-    connect(ui->tilesets, SIGNAL(currentRowChanged(int)),
-            SLOT(currentTilesetChanged(int)));
+    connect(ui->browseTiles, &QAbstractButton::clicked, this, &TileMetaInfoDialog::browse);
+    connect(ui->tilesets, &QListWidget::currentRowChanged,
+            this, &TileMetaInfoDialog::currentTilesetChanged);
     connect(ui->tiles->selectionModel(),
-            SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
-            SLOT(tileSelectionChanged()));
-    connect(ui->actionAdd, SIGNAL(triggered()), SLOT(addTileset()));
-    connect(ui->actionRemove, SIGNAL(triggered()), SLOT(removeTileset()));
-    connect(ui->actionAddToMap, SIGNAL(triggered()), SLOT(addToMap()));
-    connect(ui->enums, SIGNAL(activated(int)),
-            SLOT(enumChanged(int)));
+            &QItemSelectionModel::selectionChanged,
+            this, &TileMetaInfoDialog::tileSelectionChanged);
+    connect(ui->actionAdd, &QAction::triggered, this, qOverload<>(&TileMetaInfoDialog::addTileset));
+    connect(ui->actionRemove, &QAction::triggered, this, qOverload<>(&TileMetaInfoDialog::removeTileset));
+    connect(ui->actionAddToMap, &QAction::triggered, this, &TileMetaInfoDialog::addToMap);
+    connect(ui->enums, &QComboBox::activated,
+            this, &TileMetaInfoDialog::enumChanged);
 
-    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tiled::Tileset*)),
-            SLOT(tilesetChanged(Tiled::Tileset*)));
+    connect(TilesetManager::instance(), &TilesetManager::tilesetChanged,
+            this, &TileMetaInfoDialog::tilesetChanged);
 
     // Hack - force the tileset-names-list font to be updated now, because
     // setTilesetList() uses its font metrics to determine the maximum item

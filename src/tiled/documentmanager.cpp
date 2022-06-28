@@ -67,15 +67,15 @@ DocumentManager::DocumentManager(QObject *parent)
     mTabWidget->setDocumentMode(true);
     mTabWidget->setTabsClosable(true);
 
-    connect(mTabWidget, SIGNAL(currentChanged(int)),
-            SLOT(currentIndexChanged()));
-    connect(mTabWidget, SIGNAL(tabCloseRequested(int)),
-            SIGNAL(documentCloseRequested(int)));
+    connect(mTabWidget, &QTabWidget::currentChanged,
+            this, &DocumentManager::currentIndexChanged);
+    connect(mTabWidget, &QTabWidget::tabCloseRequested,
+            this, &DocumentManager::documentCloseRequested);
 
     ToolManager *toolManager = ToolManager::instance();
     setSelectedTool(toolManager->selectedTool());
-    connect(toolManager, SIGNAL(selectedToolChanged(Tiled::Internal::AbstractTool*)),
-            SLOT(setSelectedTool(Tiled::Internal::AbstractTool*)));
+    connect(toolManager, &ToolManager::selectedToolChanged,
+            this, &DocumentManager::setSelectedTool);
 }
 
 DocumentManager::~DocumentManager()
@@ -190,8 +190,8 @@ void DocumentManager::addDocument(MapDocument *mapDocument)
 #else
     mTabWidget->setTabToolTip(documentIndex, mapDocument->fileName());
 #endif
-    connect(mapDocument, SIGNAL(fileNameChanged()), SLOT(updateDocumentTab()));
-    connect(mapDocument, SIGNAL(modifiedChanged()), SLOT(updateDocumentTab()));
+    connect(mapDocument, &MapDocument::fileNameChanged, this, &DocumentManager::updateDocumentTab);
+    connect(mapDocument, &MapDocument::modifiedChanged, this, &DocumentManager::updateDocumentTab);
 #ifndef ZOMBOID
     switchToDocument(documentIndex);
     centerViewOn(0, 0);

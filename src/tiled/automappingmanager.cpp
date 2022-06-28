@@ -226,8 +226,8 @@ void AutomappingManager::setMapDocument(MapDocument *mapDocument)
     mMapDocument = mapDocument;
 
     if (mMapDocument)
-        connect(mMapDocument, SIGNAL(regionEdited(QRegion,Tiled::Layer*)),
-                this, SLOT(autoMap(QRegion,Tiled::Layer*)));
+        connect(mMapDocument, &MapDocument::regionEdited,
+                this, qOverload<QRegion,Tiled::Layer*>(&AutomappingManager::autoMap));
     mLoaded = false;
 }
 

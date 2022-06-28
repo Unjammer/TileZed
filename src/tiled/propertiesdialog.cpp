@@ -62,10 +62,10 @@ PropertiesDialog::PropertiesDialog(const QString &kind,
     deleteShortcut->setContext(Qt::WidgetShortcut);
     alternativeDeleteShortcut->setContext(Qt::WidgetShortcut);
 
-    connect(deleteShortcut, SIGNAL(activated()),
-            this, SLOT(deleteSelectedProperties()));
-    connect(alternativeDeleteShortcut, SIGNAL(activated()),
-            this, SLOT(deleteSelectedProperties()));
+    connect(deleteShortcut, &QShortcut::activated,
+            this, &PropertiesDialog::deleteSelectedProperties);
+    connect(alternativeDeleteShortcut, &QShortcut::activated,
+            this, &PropertiesDialog::deleteSelectedProperties);
 
     setWindowTitle(tr("%1 Properties").arg(mKind));
 }

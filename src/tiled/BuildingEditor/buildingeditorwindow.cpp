@@ -107,12 +107,12 @@ EditorWindowPerDocumentStuff::EditorWindowPerDocumentStuff(BuildingDocument *doc
     mIsoView(0),
     mTileView(0)
 {
-    connect(document()->undoStack(), SIGNAL(cleanChanged(bool)), SLOT(autoSaveCheck()));
-    connect(document()->undoStack(), SIGNAL(indexChanged(int)), SLOT(autoSaveCheck()));
+    connect(document()->undoStack(), &QUndoStack::cleanChanged, this, &EditorWindowPerDocumentStuff::autoSaveCheck);
+    connect(document()->undoStack(), &QUndoStack::indexChanged, this, &EditorWindowPerDocumentStuff::autoSaveCheck);
 
     mAutoSaveTimer.setSingleShot(true);
     mAutoSaveTimer.setInterval(2.5 * 60 * 1000); // 2.5 minutes
-    connect(&mAutoSaveTimer, SIGNAL(timeout()), SLOT(autoSaveTimeout()));
+    connect(&mAutoSaveTimer, &QTimer::timeout, this, &EditorWindowPerDocumentStuff::autoSaveTimeout);
 }
 
 EditorWindowPerDocumentStuff::~EditorWindowPerDocumentStuff()
@@ -278,12 +278,12 @@ BuildingEditorWindow::BuildingEditorWindow(QWidget *parent) :
 
     BuildingPreferences *prefs = BuildingPreferences::instance();
 
-    connect(docman(), SIGNAL(documentAdded(BuildingEditor::BuildingDocument*)),
-            SLOT(documentAdded(BuildingEditor::BuildingDocument*)));
-    connect(docman(), SIGNAL(documentAboutToClose(int,BuildingEditor::BuildingDocument*)),
-            SLOT(documentAboutToClose(int,BuildingEditor::BuildingDocument*)));
-    connect(docman(), SIGNAL(currentDocumentChanged(BuildingEditor::BuildingDocument*)),
-            SLOT(currentDocumentChanged(BuildingEditor::BuildingDocument*)));
+    connect(docman(), &BuildingDocumentMgr::documentAdded,
+            this, &BuildingEditorWindow::documentAdded);
+    connect(docman(), &BuildingDocumentMgr::documentAboutToClose,
+            this, &BuildingEditorWindow::documentAboutToClose);
+    connect(docman(), &BuildingDocumentMgr::currentDocumentChanged,
+            this, &BuildingEditorWindow::currentDocumentChanged);
 
     PencilTool::instance()->setAction(ui->actionPecil);
     SelectMoveRoomsTool::instance()->setAction(ui->actionSelectRooms);
@@ -301,16 +301,16 @@ BuildingEditorWindow::BuildingEditorWindow(QWidget *parent) :
     SelectTileTool::instance()->setAction(ui->actionSelectTiles);
     PickTileTool::instance()->setAction(ui->actionPickTiles);
 
-    connect(PickTileTool::instance(), SIGNAL(tilePicked(QString)),
-            SIGNAL(tilePicked(QString)));
+    connect(PickTileTool::instance(), &PickTileTool::tilePicked,
+            this, &BuildingEditorWindow::tilePicked);
 
-    connect(ToolManager::instance(), SIGNAL(currentEditorChanged()),
-            SLOT(currentEditorChanged()));
+    connect(ToolManager::instance(), &ToolManager::currentEditorChanged,
+            this, &BuildingEditorWindow::currentEditorChanged);
 
-    connect(ui->actionUpLevel, SIGNAL(triggered()),
-            SLOT(upLevel()));
-    connect(ui->actionDownLevel, SIGNAL(triggered()),
-            SLOT(downLevel()));
+    connect(ui->actionUpLevel, &QAction::triggered,
+            this, &BuildingEditorWindow::upLevel);
+    connect(ui->actionDownLevel, &QAction::triggered,
+            this, &BuildingEditorWindow::downLevel);
 
     QAction *undoAction = mUndoGroup->createUndoAction(this, tr("Undo"));
     QAction *redoAction = mUndoGroup->createRedoAction(this, tr("Redo"));
@@ -346,23 +346,23 @@ BuildingEditorWindow::BuildingEditorWindow(QWidget *parent) :
     ui->actionDelete->setShortcuts(QKeySequence::Delete);
     ui->actionSelectAll->setShortcuts(QKeySequence::SelectAll);
     ui->actionSelectNone->setShortcut(tr("Ctrl+Shift+A"));
-    connect(ui->actionCut, SIGNAL(triggered()), SLOT(editCut()));
-    connect(ui->actionCopy, SIGNAL(triggered()), SLOT(editCopy()));
-    connect(ui->actionPaste, SIGNAL(triggered()), SLOT(editPaste()));
-    connect(ui->actionDelete, SIGNAL(triggered()), SLOT(editDelete()));
-    connect(ui->actionSelectAll, SIGNAL(triggered()), SLOT(selectAll()));
-    connect(ui->actionSelectNone, SIGNAL(triggered()), SLOT(selectNone()));
+    connect(ui->actionCut, &QAction::triggered, this, &BuildingEditorWindow::editCut);
+    connect(ui->actionCopy, &QAction::triggered, this, &BuildingEditorWindow::editCopy);
+    connect(ui->actionPaste, &QAction::triggered, this, &BuildingEditorWindow::editPaste);
+    connect(ui->actionDelete, &QAction::triggered, this, &BuildingEditorWindow::editDelete);
+    connect(ui->actionSelectAll, &QAction::triggered, this, &BuildingEditorWindow::selectAll);
+    connect(ui->actionSelectNone, &QAction::triggered, this, &BuildingEditorWindow::selectNone);
 
-    connect(mUndoGroup, SIGNAL(cleanChanged(bool)), SLOT(updateWindowTitle()));
+    connect(mUndoGroup, &QUndoGroup::cleanChanged, this, &BuildingEditorWindow::updateWindowTitle);
 
-    connect(ui->actionPreferences, SIGNAL(triggered()), SLOT(preferences()));
+    connect(ui->actionPreferences, &QAction::triggered, this, &BuildingEditorWindow::preferences);
 
-    connect(ui->actionNewBuilding, SIGNAL(triggered()), SLOT(newBuilding()));
-    connect(ui->actionOpen, SIGNAL(triggered()), SLOT(openBuilding()));
-    connect(ui->actionSave, SIGNAL(triggered()), SLOT(saveBuilding()));
-    connect(ui->actionSaveAs, SIGNAL(triggered()), SLOT(saveBuildingAs()));
+    connect(ui->actionNewBuilding, &QAction::triggered, this, &BuildingEditorWindow::newBuilding);
+    connect(ui->actionOpen, &QAction::triggered, this, &BuildingEditorWindow::openBuilding);
+    connect(ui->actionSave, &QAction::triggered, this, &BuildingEditorWindow::saveBuilding);
+    connect(ui->actionSaveAs, &QAction::triggered, this, &BuildingEditorWindow::saveBuildingAs);
 
-    connect(ui->actionExportTMX, SIGNAL(triggered()), SLOT(exportTMX()));
+    connect(ui->actionExportTMX, &QAction::triggered, this, &BuildingEditorWindow::exportTMX);
     ui->actionExportTMX->setVisible(false);
     connect(ui->actionExportNewBinary, &QAction::triggered, this, &BuildingEditorWindow::exportNewBinary);
 
@@ -371,38 +371,38 @@ BuildingEditorWindow::BuildingEditorWindow(QWidget *parent) :
     ui->actionSave->setShortcuts(QKeySequence::Save);
     ui->actionSaveAs->setShortcuts(QKeySequence::SaveAs);
 
-    connect(ui->actionClose, SIGNAL(triggered()), SLOT(close()));
+    connect(ui->actionClose, &QAction::triggered, this, &QWidget::close);
     setWindowFlags(windowFlags() & ~Qt::WA_DeleteOnClose);
 
     ui->actionShowGrid->setChecked(prefs->showGrid());
-    connect(ui->actionShowGrid, SIGNAL(toggled(bool)),
-            prefs, SLOT(setShowGrid(bool)));
-    connect(prefs, SIGNAL(showGridChanged(bool)),
-            ui->actionShowGrid, SLOT(setChecked(bool)));
+    connect(ui->actionShowGrid, &QAction::toggled,
+            prefs, &BuildingPreferences::setShowGrid);
+    connect(prefs, &BuildingPreferences::showGridChanged,
+            ui->actionShowGrid, &QAction::setChecked);
 
     ui->actionHighlightFloor->setChecked(prefs->highlightFloor());
-    connect(ui->actionHighlightFloor, SIGNAL(toggled(bool)),
-            prefs, SLOT(setHighlightFloor(bool)));
-    connect(prefs, SIGNAL(highlightFloorChanged(bool)),
-            ui->actionHighlightFloor, SLOT(setChecked(bool)));
+    connect(ui->actionHighlightFloor, &QAction::toggled,
+            prefs, &BuildingPreferences::setHighlightFloor);
+    connect(prefs, &BuildingPreferences::highlightFloorChanged,
+            ui->actionHighlightFloor, &QAction::setChecked);
 
     ui->actionHighlightRoom->setChecked(prefs->highlightRoom());
-    connect(ui->actionHighlightRoom, SIGNAL(toggled(bool)),
-            prefs, SLOT(setHighlightRoom(bool)));
-    connect(prefs, SIGNAL(highlightRoomChanged(bool)),
-            ui->actionHighlightRoom, SLOT(setChecked(bool)));
+    connect(ui->actionHighlightRoom, &QAction::toggled,
+            prefs, &BuildingPreferences::setHighlightRoom);
+    connect(prefs, &BuildingPreferences::highlightRoomChanged,
+            ui->actionHighlightRoom, &QAction::setChecked);
 
     ui->actionShowLowerFloors->setChecked(prefs->showLowerFloors());
-    connect(ui->actionShowLowerFloors, SIGNAL(toggled(bool)),
-            prefs, SLOT(setShowLowerFloors(bool)));
-    connect(prefs, SIGNAL(showLowerFloorsChanged(bool)),
-            ui->actionShowLowerFloors, SLOT(setChecked(bool)));
+    connect(ui->actionShowLowerFloors, &QAction::toggled,
+            prefs, &BuildingPreferences::setShowLowerFloors);
+    connect(prefs, &BuildingPreferences::showLowerFloorsChanged,
+            ui->actionShowLowerFloors, &QAction::setChecked);
 
     ui->actionShowObjects->setChecked(prefs->showObjects());
-    connect(ui->actionShowObjects, SIGNAL(toggled(bool)),
-            prefs, SLOT(setShowObjects(bool)));
-    connect(prefs, SIGNAL(showObjectsChanged(bool)),
-            SLOT(showObjectsChanged(bool)));
+    connect(ui->actionShowObjects, &QAction::toggled,
+            prefs, &BuildingPreferences::setShowObjects);
+    connect(prefs, &BuildingPreferences::showObjectsChanged,
+            this, &BuildingEditorWindow::showObjectsChanged);
 
     QList<QKeySequence> keys = QKeySequence::keyBindings(QKeySequence::ZoomIn);
     keys += QKeySequence(tr("Ctrl+="));
@@ -419,32 +419,32 @@ BuildingEditorWindow::BuildingEditorWindow(QWidget *parent) :
     keys += QKeySequence(tr("0"));
     ui->actionNormalSize->setShortcuts(keys);
 
-    connect(ui->actionCropToMinimum, SIGNAL(triggered()), SLOT(cropToMinimum()));
-    connect(ui->actionCropToSelection, SIGNAL(triggered()), SLOT(cropToSelection()));
-    connect(ui->actionResize, SIGNAL(triggered()), SLOT(resizeBuilding()));
-    connect(ui->actionFlipHorizontal, SIGNAL(triggered()), SLOT(flipHorizontal()));
-    connect(ui->actionFlipVertical, SIGNAL(triggered()), SLOT(flipVertical()));
-    connect(ui->actionRotateRight, SIGNAL(triggered()), SLOT(rotateRight()));
-    connect(ui->actionRotateLeft, SIGNAL(triggered()), SLOT(rotateLeft()));
+    connect(ui->actionCropToMinimum, &QAction::triggered, this, &BuildingEditorWindow::cropToMinimum);
+    connect(ui->actionCropToSelection, &QAction::triggered, this, &BuildingEditorWindow::cropToSelection);
+    connect(ui->actionResize, &QAction::triggered, this, &BuildingEditorWindow::resizeBuilding);
+    connect(ui->actionFlipHorizontal, &QAction::triggered, this, &BuildingEditorWindow::flipHorizontal);
+    connect(ui->actionFlipVertical, &QAction::triggered, this, &BuildingEditorWindow::flipVertical);
+    connect(ui->actionRotateRight, &QAction::triggered, this, &BuildingEditorWindow::rotateRight);
+    connect(ui->actionRotateLeft, &QAction::triggered, this, &BuildingEditorWindow::rotateLeft);
 
-    connect(ui->actionInsertFloorAbove, SIGNAL(triggered()), SLOT(insertFloorAbove()));
-    connect(ui->actionInsertFloorBelow, SIGNAL(triggered()), SLOT(insertFloorBelow()));
-    connect(ui->actionRemoveFloor, SIGNAL(triggered()), SLOT(removeFloor()));
-    connect(ui->actionFloors, SIGNAL(triggered()), SLOT(floorsDialog()));
+    connect(ui->actionInsertFloorAbove, &QAction::triggered, this, &BuildingEditorWindow::insertFloorAbove);
+    connect(ui->actionInsertFloorBelow, &QAction::triggered, this, &BuildingEditorWindow::insertFloorBelow);
+    connect(ui->actionRemoveFloor, &QAction::triggered, this, &BuildingEditorWindow::removeFloor);
+    connect(ui->actionFloors, &QAction::triggered, this, &BuildingEditorWindow::floorsDialog);
 
-    connect(ui->actionBuildingProperties, SIGNAL(triggered()),
-            SLOT(buildingPropertiesDialog()));
+    connect(ui->actionBuildingProperties, &QAction::triggered,
+            this, &BuildingEditorWindow::buildingPropertiesDialog);
     connect(ui->actionKeyValues, &QAction::triggered, this, &BuildingEditorWindow::keyValuesDialog);
-    connect(ui->actionGrime, SIGNAL(triggered()),
-            SLOT(buildingGrime()));
-    connect(ui->actionRooms, SIGNAL(triggered()), SLOT(roomsDialog()));
-    connect(ui->actionTemplates, SIGNAL(triggered()), SLOT(templatesDialog()));
-    connect(ui->actionTiles, SIGNAL(triggered()), SLOT(tilesDialog()));
-    connect(ui->actionTemplateFromBuilding, SIGNAL(triggered()),
-            SLOT(templateFromBuilding()));
+    connect(ui->actionGrime, &QAction::triggered,
+            this, &BuildingEditorWindow::buildingGrime);
+    connect(ui->actionRooms, &QAction::triggered, this, &BuildingEditorWindow::roomsDialog);
+    connect(ui->actionTemplates, &QAction::triggered, this, &BuildingEditorWindow::templatesDialog);
+    connect(ui->actionTiles, &QAction::triggered, this, &BuildingEditorWindow::tilesDialog);
+    connect(ui->actionTemplateFromBuilding, &QAction::triggered,
+            this, &BuildingEditorWindow::templateFromBuilding);
 
-    connect(ui->actionHelp, SIGNAL(triggered()), SLOT(help()));
-    connect(ui->actionAboutQt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
+    connect(ui->actionHelp, &QAction::triggered, this, &BuildingEditorWindow::help);
+    connect(ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
 
     // Do this after connect() calls above -> esp. documentAdded()
     mWelcomeMode = new WelcomeMode(this);
@@ -452,10 +452,10 @@ BuildingEditorWindow::BuildingEditorWindow(QWidget *parent) :
     mIsoObjectEditMode = new IsoObjectEditMode(this);
     mTileEditMode = new TileEditMode(this);
 
-    connect(mIsoObjectEditMode, SIGNAL(viewAddedForDocument(BuildingDocument*,BuildingIsoView*)),
-            SLOT(viewAddedForDocument(BuildingDocument*,BuildingIsoView*)));
-    connect(mTileEditMode, SIGNAL(viewAddedForDocument(BuildingDocument*,BuildingIsoView*)),
-            SLOT(viewAddedForDocument(BuildingDocument*,BuildingIsoView*)));
+    connect(mIsoObjectEditMode, &IsoObjectEditMode::viewAddedForDocument,
+            this, &BuildingEditorWindow::viewAddedForDocument);
+    connect(mTileEditMode, &TileEditMode::viewAddedForDocument,
+            this, &BuildingEditorWindow::viewAddedForDocument);
 
     ::Utils::StyleHelper::setBaseColor(::Utils::StyleHelper::DEFAULT_BASE_COLOR);
     mTabWidget = new Core::Internal::FancyTabWidget;
@@ -471,14 +471,14 @@ BuildingEditorWindow::BuildingEditorWindow(QWidget *parent) :
     mWelcomeMode->setEnabled(true);
     ModeManager::instance().setCurrentMode(mWelcomeMode);
 
-    connect(ModeManager::instancePtr(), SIGNAL(currentModeAboutToChange(IMode*)),
-            SLOT(currentModeAboutToChange(IMode*)));
-    connect(ModeManager::instancePtr(), SIGNAL(currentModeChanged()),
-            SLOT(currentModeChanged()));
+    connect(ModeManager::instancePtr(), &ModeManager::currentModeAboutToChange,
+            this, &BuildingEditorWindow::currentModeAboutToChange);
+    connect(ModeManager::instancePtr(), &ModeManager::currentModeChanged,
+            this, &BuildingEditorWindow::currentModeChanged);
 
     // Do this *after* all the different modes handle the document changing.
-    connect(docman(), SIGNAL(currentDocumentChanged(BuildingDocument*)),
-            SLOT(reportMissingTilesets()));
+    connect(docman(), &BuildingDocumentMgr::currentDocumentChanged,
+            this, &BuildingEditorWindow::reportMissingTilesets);
 
     readSettings();
 
@@ -600,15 +600,15 @@ bool BuildingEditorWindow::Startup()
 
     /////
 
-    connect(BuildingTilesMgr::instance(), SIGNAL(tilesetAdded(Tiled::Tileset*)),
-            SLOT(tilesetAdded(Tiled::Tileset*)));
-    connect(BuildingTilesMgr::instance(), SIGNAL(tilesetAboutToBeRemoved(Tiled::Tileset*)),
-            SLOT(tilesetAboutToBeRemoved(Tiled::Tileset*)));
-    connect(BuildingTilesMgr::instance(), SIGNAL(tilesetRemoved(Tiled::Tileset*)),
-            SLOT(tilesetRemoved(Tiled::Tileset*)));
+    connect(BuildingTilesMgr::instance(), &BuildingTilesMgr::tilesetAdded,
+            this, &BuildingEditorWindow::tilesetAdded);
+    connect(BuildingTilesMgr::instance(), &BuildingTilesMgr::tilesetAboutToBeRemoved,
+            this, &BuildingEditorWindow::tilesetAboutToBeRemoved);
+    connect(BuildingTilesMgr::instance(), &BuildingTilesMgr::tilesetRemoved,
+            this, &BuildingEditorWindow::tilesetRemoved);
 
-    connect(TilesetManager::instance(), SIGNAL(tilesetChanged(Tiled::Tileset*)),
-            SLOT(tilesetChanged(Tiled::Tileset*)));
+    connect(TilesetManager::instance(), &TilesetManager::tilesetChanged,
+            this, &BuildingEditorWindow::tilesetChanged);
 
     return true;
 }
@@ -1128,31 +1128,31 @@ void BuildingEditorWindow::currentDocumentChanged(BuildingDocument *doc)
 
         mUndoGroup->setActiveStack(mCurrentDocument->undoStack());
 
-        connect(mCurrentDocument, SIGNAL(floorAdded(BuildingFloor*)),
-                SLOT(updateActions()));
-        connect(mCurrentDocument, SIGNAL(floorRemoved(BuildingFloor*)),
-                SLOT(updateActions()));
-        connect(mCurrentDocument, SIGNAL(currentFloorChanged()),
-                SLOT(updateActions()));
+        connect(mCurrentDocument, &BuildingDocument::floorAdded,
+                this, &BuildingEditorWindow::updateActions);
+        connect(mCurrentDocument, &BuildingDocument::floorRemoved,
+                this, &BuildingEditorWindow::updateActions);
+        connect(mCurrentDocument, &BuildingDocument::currentFloorChanged,
+                this, &BuildingEditorWindow::updateActions);
 
-        connect(mCurrentDocument, SIGNAL(currentLayerChanged()),
-                SLOT(updateActions()));
+        connect(mCurrentDocument, &BuildingDocument::currentLayerChanged,
+                this, &BuildingEditorWindow::updateActions);
 
-        connect(mCurrentDocument, SIGNAL(currentRoomChanged()),
-                SLOT(updateActions()));
+        connect(mCurrentDocument, &BuildingDocument::currentRoomChanged,
+                this, &BuildingEditorWindow::updateActions);
 
-        connect(mCurrentDocument, SIGNAL(selectedObjectsChanged()),
-                SLOT(updateActions()));
+        connect(mCurrentDocument, &BuildingDocument::selectedObjectsChanged,
+                this, &BuildingEditorWindow::updateActions);
 
-        connect(mCurrentDocument, SIGNAL(roomSelectionChanged(QRegion)),
-                SLOT(updateActions()));
+        connect(mCurrentDocument, &BuildingDocument::roomSelectionChanged,
+                this, &BuildingEditorWindow::updateActions);
 
-        connect(mCurrentDocument, SIGNAL(tileSelectionChanged(QRegion)),
-                SLOT(updateActions()));
-        connect(mCurrentDocument, SIGNAL(clipboardTilesChanged()),
-                SLOT(updateActions()));
+        connect(mCurrentDocument, &BuildingDocument::tileSelectionChanged,
+                this, &BuildingEditorWindow::updateActions);
+        connect(mCurrentDocument, &BuildingDocument::clipboardTilesChanged,
+                this, &BuildingEditorWindow::updateActions);
 
-        connect(mCurrentDocument, SIGNAL(cleanChanged()), SLOT(updateWindowTitle()));
+        connect(mCurrentDocument, &BuildingDocument::cleanChanged, this, &BuildingEditorWindow::updateWindowTitle);
     } else {
         ToolManager::instance()->clearDocument();
 

@@ -503,7 +503,7 @@ BmpRuleView::BmpRuleView(QWidget *parent) :
 
     setModel(mModel);
 
-    connect(mZoomable, SIGNAL(scaleChanged(qreal)), SLOT(scaleChanged(qreal)));
+    connect(mZoomable, &Zoomable::scaleChanged, this, &BmpRuleView::scaleChanged);
 }
 
 QSize BmpRuleView::sizeHint() const

@@ -34,8 +34,8 @@ BmpSelectionItem::BmpSelectionItem(MapDocument *mapDocument)
 {
     setFlag(QGraphicsItem::ItemUsesExtendedStyleOption);
 
-    connect(mMapDocument, SIGNAL(bmpSelectionChanged(QRegion,QRegion)),
-            SLOT(selectionChanged(QRegion,QRegion)));
+    connect(mMapDocument, &MapDocument::bmpSelectionChanged,
+            this, &BmpSelectionItem::selectionChanged);
 
     updateBoundingRect();
 }

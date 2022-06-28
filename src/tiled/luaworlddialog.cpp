@@ -49,8 +49,8 @@ LuaWorldDialog::LuaWorldDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    connect(ui->backupsBrowse, SIGNAL(clicked()), SLOT(backupsBrowse()));
-    connect(ui->scriptBrowse, SIGNAL(clicked()), SLOT(scriptBrowse()));
+    connect(ui->backupsBrowse, &QAbstractButton::clicked, this, &LuaWorldDialog::backupsBrowse);
+    connect(ui->scriptBrowse, &QAbstractButton::clicked, this, &LuaWorldDialog::scriptBrowse);
 
     QSettings settings;
 

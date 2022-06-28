@@ -140,48 +140,48 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
 
     fromPreferences();
 
-    connect(mUi->languageCombo, SIGNAL(currentIndexChanged(int)),
-            SLOT(languageSelected(int)));
-    connect(mUi->openGL, SIGNAL(toggled(bool)), SLOT(useOpenGLToggled(bool)));
-    connect(mUi->gridColor, SIGNAL(colorChanged(QColor)),
-            Preferences::instance(), SLOT(setGridColor(QColor)));
+    connect(mUi->languageCombo, &QComboBox::currentIndexChanged,
+            this, &PreferencesDialog::languageSelected);
+    connect(mUi->openGL, &QAbstractButton::toggled, this, &PreferencesDialog::useOpenGLToggled);
+    connect(mUi->gridColor, &ColorButton::colorChanged,
+            Preferences::instance(), &Preferences::setGridColor);
 #ifdef ZOMBOID
-    connect(mUi->gridColorReset, SIGNAL(clicked()),
-            SLOT(defaultGridColor()));
-    connect(mUi->bgColor, SIGNAL(colorChanged(QColor)),
-            Preferences::instance(), SLOT(setBackgroundColor(QColor)));
-    connect(mUi->bgColorReset, SIGNAL(clicked()),
-            SLOT(defaultBackgroundColor()));
-    connect(mUi->showAdjacent, SIGNAL(toggled(bool)),
-            Preferences::instance(), SLOT(setShowAdjacentMaps(bool)));
-    connect(mUi->listPZW, SIGNAL(currentRowChanged(int)), SLOT(updateActions()));
-    connect(mUi->addPZW, SIGNAL(clicked()), SLOT(browseWorlded()));
-    connect(mUi->removePZW, SIGNAL(clicked()), SLOT(removePZW()));
-    connect(mUi->raisePZW, SIGNAL(clicked()), SLOT(raisePZW()));
-    connect(mUi->lowerPZW, SIGNAL(clicked()), SLOT(lowerPZW()));
+    connect(mUi->gridColorReset, &QAbstractButton::clicked,
+            this, &PreferencesDialog::defaultGridColor);
+    connect(mUi->bgColor, &ColorButton::colorChanged,
+            Preferences::instance(), &Preferences::setBackgroundColor);
+    connect(mUi->bgColorReset, &QAbstractButton::clicked,
+            this, &PreferencesDialog::defaultBackgroundColor);
+    connect(mUi->showAdjacent, &QAbstractButton::toggled,
+            Preferences::instance(), &Preferences::setShowAdjacentMaps);
+    connect(mUi->listPZW, &QListWidget::currentRowChanged, this, &PreferencesDialog::updateActions);
+    connect(mUi->addPZW, &QAbstractButton::clicked, this, &PreferencesDialog::browseWorlded);
+    connect(mUi->removePZW, &QAbstractButton::clicked, this, &PreferencesDialog::removePZW);
+    connect(mUi->raisePZW, &QAbstractButton::clicked, this, &PreferencesDialog::raisePZW);
+    connect(mUi->lowerPZW, &QAbstractButton::clicked, this, &PreferencesDialog::lowerPZW);
 #endif // ZOMBOID
 
     connect(mUi->objectTypesTable->selectionModel(),
-            SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
-            SLOT(selectedObjectTypesChanged()));
-    connect(mUi->objectTypesTable, SIGNAL(doubleClicked(QModelIndex)),
-            SLOT(objectTypeIndexClicked(QModelIndex)));
-    connect(mUi->addObjectTypeButton, SIGNAL(clicked()),
-            SLOT(addObjectType()));
-    connect(mUi->removeObjectTypeButton, SIGNAL(clicked()),
-            SLOT(removeSelectedObjectTypes()));
-    connect(mUi->importObjectTypesButton, SIGNAL(clicked()),
-            SLOT(importObjectTypes()));
-    connect(mUi->exportObjectTypesButton, SIGNAL(clicked()),
-            SLOT(exportObjectTypes()));
+            &QItemSelectionModel::selectionChanged,
+            this, &PreferencesDialog::selectedObjectTypesChanged);
+    connect(mUi->objectTypesTable, &QAbstractItemView::doubleClicked,
+            this, &PreferencesDialog::objectTypeIndexClicked);
+    connect(mUi->addObjectTypeButton, &QAbstractButton::clicked,
+            this, &PreferencesDialog::addObjectType);
+    connect(mUi->removeObjectTypeButton, &QAbstractButton::clicked,
+            this, &PreferencesDialog::removeSelectedObjectTypes);
+    connect(mUi->importObjectTypesButton, &QAbstractButton::clicked,
+            this, &PreferencesDialog::importObjectTypes);
+    connect(mUi->exportObjectTypesButton, &QAbstractButton::clicked,
+            this, &PreferencesDialog::exportObjectTypes);
 
-    connect(mObjectTypesModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
-            SLOT(applyObjectTypes()));
-    connect(mObjectTypesModel, SIGNAL(rowsRemoved(QModelIndex,int,int)),
-            SLOT(applyObjectTypes()));
+    connect(mObjectTypesModel, &QAbstractItemModel::dataChanged,
+            this, &PreferencesDialog::applyObjectTypes);
+    connect(mObjectTypesModel, &QAbstractItemModel::rowsRemoved,
+            this, &PreferencesDialog::applyObjectTypes);
 
-    connect(mUi->autoMapWhileDrawing, SIGNAL(toggled(bool)),
-            SLOT(useAutomappingDrawingToggled(bool)));
+    connect(mUi->autoMapWhileDrawing, &QAbstractButton::toggled,
+            this, &PreferencesDialog::useAutomappingDrawingToggled);
 }
 
 PreferencesDialog::~PreferencesDialog()

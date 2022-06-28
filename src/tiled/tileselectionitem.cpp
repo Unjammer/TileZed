@@ -37,11 +37,11 @@ TileSelectionItem::TileSelectionItem(MapDocument *mapDocument)
 {
     setFlag(QGraphicsItem::ItemUsesExtendedStyleOption);
 
-    connect(mMapDocument, SIGNAL(tileSelectionChanged(QRegion,QRegion)),
-            this, SLOT(selectionChanged(QRegion,QRegion)));
+    connect(mMapDocument, &MapDocument::tileSelectionChanged,
+            this, &TileSelectionItem::selectionChanged);
 #ifdef ZOMBOID
-    connect(mMapDocument, SIGNAL(currentLayerIndexChanged(int)),
-            this, SLOT(currentLayerIndexChanged(int)));
+    connect(mMapDocument, &MapDocument::currentLayerIndexChanged,
+            this, &TileSelectionItem::currentLayerIndexChanged);
 #endif
 
     updateBoundingRect();

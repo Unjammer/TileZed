@@ -77,8 +77,8 @@ ImageLayerPropertiesDialog::ImageLayerPropertiesDialog(
     grid->addWidget(new QLabel(tr("Color:")), 1, 0);
     grid->addWidget(mColorButton, 1, 1);
 
-    connect(mBrowseButton, SIGNAL(clicked()), SLOT(browseForImage()));
-    connect(mImage, SIGNAL(textEdited(QString)), SLOT(imagePathChanged()));
+    connect(mBrowseButton, &QAbstractButton::clicked, this, &ImageLayerPropertiesDialog::browseForImage);
+    connect(mImage, &QLineEdit::textEdited, this, &ImageLayerPropertiesDialog::imagePathChanged);
 
     mColorButton->setColor(mImageLayer->transparentColor().isValid()
         ? mImageLayer->transparentColor()

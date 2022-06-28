@@ -43,7 +43,7 @@ private:
     void setLayersList();
 
 private slots:
-    void currentDocumentChanged(BuildingDocument *doc);
+    void currentDocumentChanged(BuildingEditor::BuildingDocument *doc);
     void currentLayerChanged(int row);
 
     void visibilityChanged(int value);
@@ -52,7 +52,7 @@ private slots:
 
     void currentFloorChanged();
     void currentLayerChanged();
-    void layerVisibilityChanged(BuildingFloor *floor, const QString &layerName);
+    void layerVisibilityChanged(BuildingEditor::BuildingFloor *floor, const QString &layerName);
 
     void updateActions();
 

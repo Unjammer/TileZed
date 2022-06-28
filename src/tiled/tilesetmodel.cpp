@@ -54,8 +54,8 @@ void TilesetModel::setMapDocument(MapDocument *mapDocument)
     mMapDocument = mapDocument;
 
     if (mMapDocument)
-        connect(mMapDocument, SIGNAL(tileLayerNameChanged(Tiled::Tile*)),
-                SLOT(tileLayerNameChanged(Tiled::Tile*)));
+        connect(mMapDocument, &MapDocument::tileLayerNameChanged,
+                this, &TilesetModel::tileLayerNameChanged);
 }
 
 void TilesetModel::redisplay()

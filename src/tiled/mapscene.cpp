@@ -81,14 +81,14 @@ MapScene::MapScene(QObject *parent):
 #endif
 
     TilesetManager *tilesetManager = TilesetManager::instance();
-    connect(tilesetManager, SIGNAL(tilesetChanged(Tiled::Tileset*)),
-            this, SLOT(tilesetChanged(Tiled::Tileset*)));
+    connect(tilesetManager, &TilesetManager::tilesetChanged,
+            this, &MapScene::tilesetChanged);
 
     Preferences *prefs = Preferences::instance();
-    connect(prefs, SIGNAL(objectTypesChanged()), SLOT(syncAllObjectItems()));
-    connect(prefs, SIGNAL(highlightCurrentLayerChanged(bool)),
-            SLOT(setHighlightCurrentLayer(bool)));
-    connect(prefs, SIGNAL(gridColorChanged(QColor)), SLOT(update()));
+    connect(prefs, &Preferences::objectTypesChanged, this, &MapScene::syncAllObjectItems);
+    connect(prefs, &Preferences::highlightCurrentLayerChanged,
+            this, &MapScene::setHighlightCurrentLayer);
+    connect(prefs, &Preferences::gridColorChanged, [this]{this->update();});
 
     mDarkRectangle->setPen(Qt::NoPen);
     mDarkRectangle->setBrush(Qt::black);
@@ -97,8 +97,8 @@ MapScene::MapScene(QObject *parent):
 
 #ifdef ZOMBOID
     setBackgroundBrush(prefs->backgroundColor());
-    connect(prefs, SIGNAL(backgroundColorChanged(QColor)),
-            SLOT(bgColorChanged(QColor)));
+    connect(prefs, &Preferences::backgroundColorChanged,
+            this, &MapScene::bgColorChanged);
     addItem(mGridItem);
 #endif
 
@@ -127,41 +127,41 @@ void MapScene::setMapDocument(MapDocument *mapDocument)
     refreshScene();
 
     if (mMapDocument) {
-        connect(mMapDocument, SIGNAL(mapChanged()),
-                this, SLOT(mapChanged()));
+        connect(mMapDocument, &MapDocument::mapChanged,
+                this, &MapScene::mapChanged);
 #ifdef ZOMBOID
-        connect(mMapDocument, SIGNAL(regionChanged(QRegion,Tiled::Layer*)),
-                this, SLOT(regionChanged(QRegion,Tiled::Layer*)));
+        connect(mMapDocument, &MapDocument::regionChanged,
+                this, &MapScene::regionChanged);
 #else
         connect(mMapDocument, SIGNAL(regionChanged(QRegion)),
                 this, SLOT(repaintRegion(QRegion)));
 #endif
-        connect(mMapDocument, SIGNAL(layerAdded(int)),
-                this, SLOT(layerAdded(int)));
+        connect(mMapDocument, &MapDocument::layerAdded,
+                this, &MapScene::layerAdded);
 #ifdef ZOMBOID
-        connect(mMapDocument, SIGNAL(layerAboutToBeRemoved(int)),
-                this, SLOT(layerAboutToBeRemoved(int)));
-        connect(mMapDocument, SIGNAL(layerRenamed(int)),
-                this, SLOT(layerRenamed(int)));
+        connect(mMapDocument, &MapDocument::layerAboutToBeRemoved,
+                this, &MapScene::layerAboutToBeRemoved);
+        connect(mMapDocument, &MapDocument::layerRenamed,
+                this, &MapScene::layerRenamed);
 #endif
-        connect(mMapDocument, SIGNAL(layerRemoved(int)),
-                this, SLOT(layerRemoved(int)));
-        connect(mMapDocument, SIGNAL(layerChanged(int)),
-                this, SLOT(layerChanged(int)));
-        connect(mMapDocument, SIGNAL(currentLayerIndexChanged(int)),
-                this, SLOT(currentLayerIndexChanged()));
-        connect(mMapDocument, SIGNAL(objectsAdded(QList<Tiled::MapObject*>)),
-                this, SLOT(objectsAdded(QList<Tiled::MapObject*>)));
-        connect(mMapDocument, SIGNAL(objectsRemoved(QList<Tiled::MapObject*>)),
-                this, SLOT(objectsRemoved(QList<Tiled::MapObject*>)));
-        connect(mMapDocument, SIGNAL(objectsChanged(QList<Tiled::MapObject*>)),
-                this, SLOT(objectsChanged(QList<Tiled::MapObject*>)));
-        connect(mMapDocument, SIGNAL(selectedObjectsChanged()),
-                this, SLOT(updateSelectedObjectItems()));
+        connect(mMapDocument, &MapDocument::layerRemoved,
+                this, &MapScene::layerRemoved);
+        connect(mMapDocument, &MapDocument::layerChanged,
+                this, &MapScene::layerChanged);
+        connect(mMapDocument, &MapDocument::currentLayerIndexChanged,
+                this, &MapScene::currentLayerIndexChanged);
+        connect(mMapDocument, &MapDocument::objectsAdded,
+                this, &MapScene::objectsAdded);
+        connect(mMapDocument, &MapDocument::objectsRemoved,
+                this, &MapScene::objectsRemoved);
+        connect(mMapDocument, &MapDocument::objectsChanged,
+                this, &MapScene::objectsChanged);
+        connect(mMapDocument, &MapDocument::selectedObjectsChanged,
+                this, &MapScene::updateSelectedObjectItems);
 #ifdef ZOMBOID
         // The tooltip on lot objects contains the relative path to the lot.
-        connect(mMapDocument, SIGNAL(fileNameChanged()),
-                SLOT(syncAllObjectItems()));
+        connect(mMapDocument, &MapDocument::fileNameChanged,
+                this, &MapScene::syncAllObjectItems);
 #endif
     }
 }

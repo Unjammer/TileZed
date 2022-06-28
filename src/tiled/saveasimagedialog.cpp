@@ -140,12 +140,12 @@ SaveAsImageDialog::SaveAsImageDialog(MapDocument *mapDocument,
 
     mUi->imageWidthRadio->setChecked(!useCurrentScale);
     mUi->imageWidthSpinBox->setEnabled(!useCurrentScale);
-    connect(mUi->currentZoomLevel, SIGNAL(toggled(bool)), mUi->imageWidthSpinBox, SLOT(setDisabled(bool)));
+    connect(mUi->currentZoomLevel, &QAbstractButton::toggled, mUi->imageWidthSpinBox, &QWidget::setDisabled);
 #endif
 
-    connect(mUi->browseButton, SIGNAL(clicked()), SLOT(browse()));
-    connect(mUi->fileNameEdit, SIGNAL(textChanged(QString)),
-            this, SLOT(updateAcceptEnabled()));
+    connect(mUi->browseButton, &QAbstractButton::clicked, this, &SaveAsImageDialog::browse);
+    connect(mUi->fileNameEdit, &QLineEdit::textChanged,
+            this, &SaveAsImageDialog::updateAcceptEnabled);
 }
 
 SaveAsImageDialog::~SaveAsImageDialog()

@@ -22,6 +22,7 @@
 #include "buildingdocument.h"
 #include "buildingdocumentmgr.h"
 #include "buildingeditorwindow.h"
+#include "buildingfloor.h"
 #include "ui_buildingeditorwindow.h"
 #include "buildingfurnituredock.h"
 #include "buildingisoview.h"
@@ -63,8 +64,8 @@ TileEditModeToolBar::TileEditModeToolBar(QWidget *parent) :
     mFloorLabel->setAutoRaise(true);
     mFloorLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
     mFloorLabel->setToolTip(tr("Click to edit floors"));
-    connect(mFloorLabel, SIGNAL(clicked()),
-            BuildingEditorWindow::instance(), SLOT(floorsDialog()));
+    connect(mFloorLabel, &QAbstractButton::clicked,
+            BuildingEditorWindow::instance(), &BuildingEditorWindow::floorsDialog);
 
     addAction(BuildingEditorWindow::instance()->actionIface()->actionDrawTiles);
     addAction(BuildingEditorWindow::instance()->actionIface()->actionSelectTiles);
@@ -74,8 +75,8 @@ TileEditModeToolBar::TileEditModeToolBar(QWidget *parent) :
     addAction(BuildingEditorWindow::instance()->actionIface()->actionUpLevel);
     addAction(BuildingEditorWindow::instance()->actionIface()->actionDownLevel);
 
-    connect(docman(), SIGNAL(currentDocumentChanged(BuildingDocument*)),
-            SLOT(currentDocumentChanged(BuildingDocument*)));
+    connect(docman(), &BuildingDocumentMgr::currentDocumentChanged,
+            this, &TileEditModeToolBar::currentDocumentChanged);
 }
 
 void TileEditModeToolBar::currentDocumentChanged(BuildingDocument *doc)
@@ -86,12 +87,12 @@ void TileEditModeToolBar::currentDocumentChanged(BuildingDocument *doc)
     mCurrentDocument = doc;
 
     if (mCurrentDocument) {
-        connect(mCurrentDocument, SIGNAL(floorAdded(BuildingFloor*)),
-                SLOT(updateActions()));
-        connect(mCurrentDocument, SIGNAL(floorRemoved(BuildingFloor*)),
-                SLOT(updateActions()));
-        connect(mCurrentDocument, SIGNAL(currentFloorChanged()),
-                SLOT(updateActions()));
+        connect(mCurrentDocument, &BuildingDocument::floorAdded,
+                this, &TileEditModeToolBar::updateActions);
+        connect(mCurrentDocument, &BuildingDocument::floorRemoved,
+                this, &TileEditModeToolBar::updateActions);
+        connect(mCurrentDocument, &BuildingDocument::currentFloorChanged,
+                this, &TileEditModeToolBar::updateActions);
     }
 
     updateActions();
@@ -122,12 +123,12 @@ TileEditModePerDocumentStuff::TileEditModePerDocumentStuff(
     mIsoView->setScene(mIsoScene);
     mIsoView->setDocument(document());
 
-    connect(document(), SIGNAL(fileNameChanged()), SLOT(updateDocumentTab()));
-    connect(document(), SIGNAL(cleanChanged()), SLOT(updateDocumentTab()));
-    connect(document()->undoStack(), SIGNAL(cleanChanged(bool)), SLOT(updateDocumentTab()));
+    connect(document(), &BuildingDocument::fileNameChanged, this, &TileEditModePerDocumentStuff::updateDocumentTab);
+    connect(document(), &BuildingDocument::cleanChanged, this, &TileEditModePerDocumentStuff::updateDocumentTab);
+    connect(document()->undoStack(), &QUndoStack::cleanChanged, this, &TileEditModePerDocumentStuff::updateDocumentTab);
 
-    connect(ToolManager::instance(), SIGNAL(currentEditorChanged()),
-            SLOT(updateActions()));
+    connect(ToolManager::instance(), &ToolManager::currentEditorChanged,
+            this, &TileEditModePerDocumentStuff::updateActions);
 }
 
 TileEditModePerDocumentStuff::~TileEditModePerDocumentStuff()
@@ -147,27 +148,27 @@ void TileEditModePerDocumentStuff::activate()
 {
     ToolManager::instance()->setEditor(scene());
 
-    connect(view(), SIGNAL(mouseCoordinateChanged(QPoint)),
-            mMode->mStatusBar, SLOT(mouseCoordinateChanged(QPoint)));
-    connect(zoomable(), SIGNAL(scaleChanged(qreal)),
-            SLOT(updateActions()));
+    connect(view(), &BuildingIsoView::mouseCoordinateChanged,
+            mMode->mStatusBar, &EditModeStatusBar::mouseCoordinateChanged);
+    connect(zoomable(), &Tiled::Internal::Zoomable::scaleChanged,
+            this, &TileEditModePerDocumentStuff::updateActions);
 
     zoomable()->connectToComboBox(mMode->mStatusBar->editorScaleComboBox);
 
-    connect(document(), SIGNAL(tileSelectionChanged(QRegion)),
-            SLOT(updateActions()));
-    connect(document(), SIGNAL(clipboardTilesChanged()),
-            SLOT(updateActions()));
+    connect(document(), &BuildingDocument::tileSelectionChanged,
+            this, &TileEditModePerDocumentStuff::updateActions);
+    connect(document(), &BuildingDocument::clipboardTilesChanged,
+            this, &TileEditModePerDocumentStuff::updateActions);
 
 //    connect(document(), SIGNAL(cleanChanged()), SLOT(updateWindowTitle()));
 
     Ui::BuildingEditorWindow *actions = BuildingEditorWindow::instance()->actionIface();
-    connect(actions->actionZoomIn, SIGNAL(triggered()),
-            SLOT(zoomIn()));
-    connect(actions->actionZoomOut, SIGNAL(triggered()),
-            SLOT(zoomOut()));
-    connect(actions->actionNormalSize, SIGNAL(triggered()),
-            SLOT(zoomNormal()));
+    connect(actions->actionZoomIn, &QAction::triggered,
+            this, &TileEditModePerDocumentStuff::zoomIn);
+    connect(actions->actionZoomOut, &QAction::triggered,
+            this, &TileEditModePerDocumentStuff::zoomOut);
+    connect(actions->actionNormalSize, &QAction::triggered,
+            this, &TileEditModePerDocumentStuff::zoomNormal);
 }
 
 void TileEditModePerDocumentStuff::deactivate()
@@ -278,10 +279,10 @@ TileEditMode::TileEditMode(QObject *parent) :
     mMainWindow->addDockWidget(Qt::RightDockWidgetArea, mTilesetDock);
     mMainWindow->tabifyDockWidget(mTilesetDock, mFurnitureDock);
 
-    connect(mTabWidget, SIGNAL(currentChanged(int)),
-            SLOT(currentDocumentTabChanged(int)));
-    connect(mTabWidget, SIGNAL(tabCloseRequested(int)),
-            SLOT(documentTabCloseRequested(int)));
+    connect(mTabWidget, &QTabWidget::currentChanged,
+            this, &TileEditMode::currentDocumentTabChanged);
+    connect(mTabWidget, &QTabWidget::tabCloseRequested,
+            this, &TileEditMode::documentTabCloseRequested);
 
 #ifndef BUILDINGED_SA
     if (mFirstTimeSeen) {
@@ -293,14 +294,14 @@ TileEditMode::TileEditMode(QObject *parent) :
 
     setWidget(mMainWindow);
 
-    connect(BuildingDocumentMgr::instance(), SIGNAL(documentAdded(BuildingEditor::BuildingDocument*)),
-            SLOT(documentAdded(BuildingEditor::BuildingDocument*)));
-    connect(BuildingDocumentMgr::instance(), SIGNAL(currentDocumentChanged(BuildingEditor::BuildingDocument*)),
-            SLOT(currentDocumentChanged(BuildingEditor::BuildingDocument*)));
-    connect(BuildingDocumentMgr::instance(), SIGNAL(documentAboutToClose(int,BuildingEditor::BuildingDocument*)),
-            SLOT(documentAboutToClose(int,BuildingEditor::BuildingDocument*)));
+    connect(BuildingDocumentMgr::instance(), &BuildingDocumentMgr::documentAdded,
+            this, &TileEditMode::documentAdded);
+    connect(BuildingDocumentMgr::instance(), &BuildingDocumentMgr::currentDocumentChanged,
+            this, &TileEditMode::currentDocumentChanged);
+    connect(BuildingDocumentMgr::instance(), &BuildingDocumentMgr::documentAboutToClose,
+            this, &TileEditMode::documentAboutToClose);
 
-    connect(this, SIGNAL(activeStateChanged(bool)), SLOT(onActiveStateChanged(bool)));
+    connect(this, &IMode::activeStateChanged, this, &TileEditMode::onActiveStateChanged);
 }
 
 #define WIDGET_STATE_VERSION 0
