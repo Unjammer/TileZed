@@ -43,7 +43,6 @@
 #include <QMessageBox>
 #include <QSettings>
 #include <QUrl>
-#include <mapComposite.h>
 
 using namespace Tiled;
 using namespace Tiled::Internal;
