@@ -37,7 +37,7 @@ BuildingLayersDock::BuildingLayersDock(QWidget *parent) :
     connect(ui->opacity, &QAbstractSlider::valueChanged, this, &BuildingLayersDock::opacityChanged);
 
     connect(ui->layers, &QListWidget::currentRowChanged,
-            this, qOverload<>(&BuildingLayersDock::currentLayerChanged));
+            this, qOverload<int>(&BuildingLayersDock::currentLayerChanged));
     connect(ui->layers, &QListWidget::itemChanged,
             this, &BuildingLayersDock::layerItemChanged);
 
