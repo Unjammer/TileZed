@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>462</width>
-    <height>393</height>
+    <height>491</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -406,6 +406,39 @@
         </widget>
        </item>
        <item>
+        <widget class="QGroupBox" name="groupBox_4">
+         <property name="title">
+          <string>Thumbnails Directory</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_10">
+          <item>
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>This is where building and map thumbnail images are stored.  Leave blank to store thumbnails in a subdirectory named .pzeditor in the same directory as each building or map file.</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QLineEdit" name="thumbnailEdit"/>
+            </item>
+            <item>
+             <widget class="QToolButton" name="thumbnailButton">
+              <property name="text">
+               <string>...</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <widget class="QGroupBox" name="configBox_2">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -607,8 +640,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>313</x>
-     <y>384</y>
+     <x>322</x>
+     <y>481</y>
     </hint>
     <hint type="destinationlabel">
      <x>315</x>

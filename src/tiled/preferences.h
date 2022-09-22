@@ -136,6 +136,10 @@ public:
 
     QColor tilesetBackgroundColor() const
     { return mTilesetBackgroundColor; }
+
+    QString thumbnailsDirectory() const
+    { return mThumbnailsDirectory; }
+
 #endif // ZOMBOID
 
     /**
@@ -163,6 +167,7 @@ public slots:
     void setHighlightRoomUnderPointer(bool highlight);
     void setEraserBrushSize(int newSize);
     void setTilesetBackgroundColor(const QColor& color);
+    void setThumbnailsDirectory(const QString &path);
 #endif
 
 signals:
@@ -192,6 +197,7 @@ signals:
     void highlightRoomUnderPointerChanged(bool highlight);
     void eraserBrushSizeChanged(int newSize);
     void tilesetBackgroundColorChanged(const QColor &color);
+    void thumbnailsDirectoryChanged(const QString &dir);
 #endif
 
 private:
@@ -232,6 +238,7 @@ private:
     bool mHighlightRoomUnderPointer;
     int mEraserBrushSize;
     QColor mTilesetBackgroundColor;
+    QString mThumbnailsDirectory;
 #endif
 
     static Preferences *mInstance;

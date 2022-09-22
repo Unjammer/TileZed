@@ -149,6 +149,8 @@ Preferences::Preferences()
     mConfigDirectory = mSettings->value(QLatin1String("ConfigDirectory"),
                                         configPath).toString();
 
+    mThumbnailsDirectory = mSettings->value(QLatin1String("Thumbnails/Directory"), QString()).toString();
+
     mWorldEdFiles = mSettings->value(QLatin1String("WorldEd/ProjectFile")).toStringList();
 #endif
 #ifndef ZOMBOID // do this in TilesetManager constructor to avoid infinite loop
@@ -621,6 +623,13 @@ void Preferences::setTilesetBackgroundColor(const QColor &color)
     mTilesetBackgroundColor = color;
     mSettings->setValue(QLatin1String("Interface/TilesetBackgroundColor"), mTilesetBackgroundColor.name());
     emit tilesetBackgroundColorChanged(mTilesetBackgroundColor);
+}
+
+void Preferences::setThumbnailsDirectory(const QString &path)
+{
+    mThumbnailsDirectory = path;
+    mSettings->setValue(QLatin1String("Thumbnails/Directory"), mThumbnailsDirectory);
+    emit thumbnailsDirectoryChanged(mThumbnailsDirectory);
 }
 
 #endif // ZOMBOID

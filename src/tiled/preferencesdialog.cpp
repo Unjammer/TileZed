@@ -159,6 +159,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
             this, &PreferencesDialog::defaultBackgroundColor);
     connect(mUi->showAdjacent, &QAbstractButton::toggled,
             Preferences::instance(), &Preferences::setShowAdjacentMaps);
+    connect(mUi->thumbnailButton, &QAbstractButton::clicked, this, &PreferencesDialog::browseThumbnailDirectory);
     connect(mUi->listPZW, &QListWidget::currentRowChanged, this, &PreferencesDialog::updateActions);
     connect(mUi->addPZW, &QAbstractButton::clicked, this, &PreferencesDialog::browseWorlded);
     connect(mUi->removePZW, &QAbstractButton::clicked, this, &PreferencesDialog::removePZW);
@@ -329,6 +330,17 @@ void PreferencesDialog::defaultBackgroundColor()
     mUi->bgColor->setColor(Preferences::instance()->backgroundColor());
 }
 
+void PreferencesDialog::browseThumbnailDirectory()
+{
+    QString f = QFileDialog::getExistingDirectory(this, tr("Choose Thumbnail Directory"),
+                                             QString(),
+                                             QFileDialog::Option::ShowDirsOnly);
+    if (f.isEmpty())
+        return;
+
+    mUi->thumbnailEdit->setText(QDir::toNativeSeparators(f));
+}
+
 void PreferencesDialog::browseWorlded()
 {
     QString f = QFileDialog::getOpenFileName(this, tr("Choose WorldEd Project"),
@@ -411,6 +423,7 @@ void PreferencesDialog::fromPreferences()
 #ifdef ZOMBOID
     mUi->bgColor->setColor(prefs->backgroundColor());
     mUi->configDirectory->setText(QDir::toNativeSeparators(prefs->configPath()));
+    mUi->thumbnailEdit->setText(QDir::toNativeSeparators(prefs->thumbnailsDirectory()));
     foreach (QString fileName, prefs->worldedFiles())
         mUi->listPZW->addItem(QDir::toNativeSeparators(fileName));
     if (mUi->listPZW->count())
@@ -428,6 +441,7 @@ void PreferencesDialog::toPreferences()
     prefs->setLayerDataFormat(layerDataFormat());
     prefs->setAutomappingDrawing(mUi->autoMapWhileDrawing->isChecked());
 #ifdef ZOMBOID
+    prefs->setThumbnailsDirectory(mUi->thumbnailEdit->text().trimmed());
     QStringList fileNames;
     for (int i = 0; i < mUi->listPZW->count(); i++)
         fileNames += mUi->listPZW->item(i)->text();
