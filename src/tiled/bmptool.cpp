@@ -2155,6 +2155,12 @@ void BmpFloodFill::floodFillScanlineStack(int x, int y, QRgb newColor, QRgb oldC
             else if (spanLeft && x > 0 && pixel(x - 1, y1) != oldColor) {
                 spanLeft = false;
             }
+#if 1 // For visually-vertical columns of tiles, test square to the northwest.
+            if (!spanLeft && x > 0 && y > 0 && pixel(x - 1, y1 - 1) == oldColor) {
+                if (!push(x - 1, y1 - 1)) return;
+                spanLeft = true;
+            }
+#endif
             if (!spanRight && x < mImage.width() - 1 && pixel(x + 1, y1) == oldColor) {
                 if (!push(x + 1, y1)) return;
                 spanRight = true;
@@ -2162,6 +2168,12 @@ void BmpFloodFill::floodFillScanlineStack(int x, int y, QRgb newColor, QRgb oldC
             else if (spanRight && x < mImage.width() - 1 && pixel(x + 1, y1) != oldColor) {
                 spanRight = false;
             }
+#if 1 // For visually-vertical columns of tiles, test square to the southeast.
+            if (!spanRight && x < mImage.width() - 1 && y < mImage.height() - 1 && pixel(x + 1, y1 + 1) == oldColor) {
+                if (!push(x + 1, y1 + 1)) return;
+                spanRight = true;
+            }
+#endif
             y1++;
         }
         if (!r.isEmpty())
