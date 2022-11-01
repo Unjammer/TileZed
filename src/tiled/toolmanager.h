@@ -62,6 +62,8 @@ public:
 
 #ifdef ZOMBOID
     void removeTool(AbstractTool *tool);
+
+    bool isBmpToolSelected() const;
 #endif
 
     /**

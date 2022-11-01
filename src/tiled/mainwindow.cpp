@@ -78,6 +78,7 @@
 #include "objectsdock.h"
 #ifdef ZOMBOID
 #include "bmpblender.h"
+#include "bmpclipboard.h"
 #include "bmptool.h"
 #include "changetileselection.h"
 #include "checkbuildingswindow.h"
@@ -187,6 +188,9 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     , mZoomable(nullptr)
     , mZoomComboBox(new QComboBox)
     , mStatusInfoLabel(new QLabel)
+#ifdef ZOMBOID
+    , mBmpClipboard(new BmpClipboard(this))
+#endif
     , mClipboardManager(new ClipboardManager(this))
     , mDocumentManager(DocumentManager::instance())
 #ifdef ZOMBOID
@@ -1357,6 +1361,14 @@ void MainWindow::copy()
     if (!mMapDocument)
         return;
 
+#ifdef ZOMBOID
+    if (ToolManager::instance()->isBmpToolSelected()) {
+        mBmpClipboard->copySelection(mMapDocument);
+        updateActions();
+        return;
+    }
+#endif
+
     mClipboardManager->copySelection(mMapDocument);
 }
 
@@ -1364,6 +1376,13 @@ void MainWindow::paste()
 {
     if (!mMapDocument)
         return;
+
+#ifdef ZOMBOID
+    if (ToolManager::instance()->isBmpToolSelected()) {
+        mBmpClipboard->pasteSelection(mMapDocument);
+        return;
+    }
+#endif
 
     Layer *currentLayer = mMapDocument->currentLayer();
     if (!currentLayer)
@@ -1852,6 +1871,11 @@ void MainWindow::brushSizePlus()
     int brushSize = BmpBrushTool::instance()->brushSize();
     if (brushSize < 300)
         BmpBrushTool::instance()->setBrushSize(brushSize + 1);
+}
+
+BmpClipboard *MainWindow::bmpClipboard() const
+{
+    return mBmpClipboard;
 }
 #endif // ZOMBOID
 
@@ -2718,6 +2742,10 @@ void MainWindow::updateActions()
     Map *map = nullptr;
     bool tileLayerSelected = false;
     bool objectsSelected = false;
+#ifdef ZOMBOID
+    bool bmpSelectionEmpty = true;
+    bool bmpToolSelected = false;
+#endif
     QRegion selection;
 
     if (mMapDocument) {
@@ -2727,6 +2755,10 @@ void MainWindow::updateActions()
         tileLayerSelected = dynamic_cast<TileLayer*>(currentLayer) != nullptr;
         objectsSelected = !mMapDocument->selectedObjects().isEmpty();
         selection = mMapDocument->tileSelection();
+#ifdef ZOMBOID
+        bmpToolSelected = ToolManager::instance()->isBmpToolSelected();
+        bmpSelectionEmpty = mMapDocument->bmpSelection().isEmpty();
+#endif
     }
 
     const bool canCopy = (tileLayerSelected && !selection.isEmpty())
@@ -2742,7 +2774,9 @@ void MainWindow::updateActions()
     mUi->actionPaste->setEnabled(mClipboardManager->hasMap());
 #ifdef ZOMBOID
     mUi->actionExportNewBinary->setEnabled(map != nullptr);
-    mUi->actionDelete->setEnabled(canCopy || (mMapDocument && !mMapDocument->bmpSelection().isEmpty()));
+    mUi->actionCopy->setEnabled(bmpToolSelected ? !bmpSelectionEmpty : canCopy);
+    mUi->actionPaste->setEnabled(bmpToolSelected ? mBmpClipboard->canPaste() : mClipboardManager->hasMap());
+    mUi->actionDelete->setEnabled(canCopy || !bmpSelectionEmpty);
 #else
     mUi->actionDelete->setEnabled(canCopy);
 #endif

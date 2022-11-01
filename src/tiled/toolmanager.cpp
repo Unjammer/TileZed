@@ -21,6 +21,9 @@
 #include "toolmanager.h"
 
 #include "abstracttool.h"
+#ifdef ZOMBOID
+#include "bmptool.h"
+#endif
 
 #include <QAction>
 #include <QActionGroup>
@@ -131,6 +134,11 @@ void ToolManager::registerTool(AbstractTool *tool)
 void ToolManager::removeTool(AbstractTool *tool)
 {
     Q_UNUSED(tool)
+}
+
+bool ToolManager::isBmpToolSelected() const
+{
+    return dynamic_cast<AbstractBmpTool*>(selectedTool()) != nullptr;
 }
 #endif
 

@@ -115,7 +115,7 @@ public:
     int brushSize() const
     { return mBrushSize; }
 
-    enum BrushShape {
+    enum struct BrushShape {
         Square,
         Circle
     };
@@ -145,14 +145,17 @@ public:
         return mFillAllInSelection;
     }
 
+    void setUseBmpClipboard(bool use);
+    bool useBmpClipboard() const;
+
 protected:
     void mapDocumentChanged(MapDocument *oldDocument,
-                            MapDocument *newDocument);
+                            MapDocument *newDocument) override;
 
-    void languageChanged();
+    void languageChanged() override;
 
 protected:
-    void tilePositionChanged(const QPoint &tilePos);
+    void tilePositionChanged(const QPoint &tilePos) override;
     void setBrushRegion(const QPoint &tilePos);
     void paint();
 
@@ -178,6 +181,7 @@ private:
     BrushShape mBrushShape;
     bool mRestrictToSelection;
     bool mFillAllInSelection;
+    bool mUseBmpClipboard;
 };
 
 // This tool is for erasing pixels in a map's BMP images.
@@ -542,15 +546,13 @@ public:
         newImage.fill(Qt::black);
 
         // Copy over the preserved part
-        const int startX = qMax(0, -offset.x());
-        const int startY = qMax(0, -offset.y());
-        const int endX = qMin(width(), size.width() - offset.x());
-        const int endY = qMin(height(), size.height() - offset.y());
-
-        for (int y = startY; y < endY; ++y) {
-            for (int x = startX; x < endX; ++x) {
-                newImage.setPixel(x + offset.x(), y + offset.y(), pixel(x, y));
-            }
+        QRect oldBounds(0, 0, width(), height());
+        QRect newBounds(0, 0, size.width(), size.height());
+        QRect area = oldBounds.translated(offset) & newBounds;
+        for (int y = area.top(); y <= area.bottom(); ++y) {
+           for (int x = area.left(); x <= area.right(); ++x) {
+               newImage.setPixel(x, y, pixel(x - offset.x(), y - offset.y()));
+           }
         }
 
         *this = newImage;
@@ -559,7 +561,7 @@ public:
     // This is like TileLayer::merge().
     void merge(const QPoint &pos, const ResizableImage *other, const QRegion &otherRegion)
     {
-        QRegion region = otherRegion.translated(pos - otherRegion.boundingRect().topLeft()) & QRect(0, 0, width(), height());
+        QRegion region = otherRegion.translated(pos) & QRect(0, 0, width(), height());
         for (QRect area : region) {
             for (int y = area.top(); y <= area.bottom(); ++y) {
                 for (int x = area.left(); x <= area.right(); ++x) {
@@ -645,6 +647,27 @@ private:
     bool mMergeable;
     QList<EraseTiles*> mEraseTilesCmds;
     QList<QRegion> mEraseRgns;
+};
+
+// Paint into main and vegetation BMPs.
+class PaintBMPx2 : public QUndoCommand
+{
+public:
+    PaintBMPx2(MapDocument *mapDocument, int x, int y, const QImage &image0, const QImage &image1,
+               const QRegion &region0, const QRegion &region1, bool mergeable);
+    ~PaintBMPx2();
+
+    void undo() override;
+    void redo() override;
+
+    int id() const override;
+    bool mergeWith(const QUndoCommand *other) override;
+
+private:
+    MapDocument *mMapDocument;
+    bool mMergeable;
+    PaintBMP *mPaintCmd0;
+    PaintBMP *mPaintCmd1;
 };
 
 class ChangeBmpSelection : public QUndoCommand

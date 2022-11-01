@@ -260,6 +260,14 @@ property
 }
 property
 {
+	Type = Boolean
+	Name = Can tie sheet rope (no hammer or nails needed)
+	ShortName = TieSheetRope
+	Default = false
+	ReverseLogic = false
+}
+property
+{
     Type = Boolean
     Name = IsHigh (only occupies upper half)
     ShortName = IsHigh
@@ -870,6 +878,14 @@ property
 property
 {
     Type = Boolean
+    Name = trans
+    ShortName =
+    Default = false
+    ReverseLogic = false
+}
+property
+{
+    Type = Boolean
     Name = Bush
     ShortName =
     Default = false
@@ -879,6 +895,14 @@ property
 {
     Type = Boolean
     Name = ForceAmbient
+    ShortName =
+    Default = false
+    ReverseLogic = false
+}
+property
+{
+    Type = Boolean
+    Name = forceRender
     ShortName =
     Default = false
     ReverseLogic = false
@@ -1056,10 +1080,12 @@ property
         WestWallTrans = WallWTrans
         WestWindow = WindowW
         WestDoorFrame = DoorWallW
+		WestDoorFrameTrans = DoorWallWTrans
         NorthWall = WallN
         NorthWallTrans = WallNTrans
         NorthWindow = WindowN
         NorthDoorFrame = DoorWallN
+		NorthDoorFrameTrans = DoorWallNTrans
         NorthWestCorner = WallNW
         NorthWestCornerTrans = WallNWTrans
         SouthEastCorner = WallSE
@@ -1236,6 +1262,14 @@ property
 {
     Type = Boolean
     Name = attachedFloor
+    ShortName =
+    Default = false
+    ReverseLogic = false
+}
+property
+{
+    Type = Boolean
+    Name = attachedCeiling
     ShortName =
     Default = false
     ReverseLogic = false

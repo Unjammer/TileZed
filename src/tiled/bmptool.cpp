@@ -18,6 +18,7 @@
 #include "bmptool.h"
 
 #include "bmpblender.h"
+#include "bmpclipboard.h"
 #include "bmpselectionitem.h"
 #include "bmptooldialog.h"
 #include "brushitem.h"
@@ -266,6 +267,7 @@ int PaintBMP::id() const
     return Cmd_PaintBMP;
 }
 
+// 'other' is the new command being pushed onto the stack that we are merging into this existing command.
 bool PaintBMP::mergeWith(const QUndoCommand *other)
 {
     const PaintBMP *o = static_cast<const PaintBMP*>(other);
@@ -292,10 +294,10 @@ bool PaintBMP::mergeWith(const QUndoCommand *other)
 
     // Copy the painted pixels from the other command over
     const QPoint pos = QPoint(o->mX, o->mY) - combinedBounds.topLeft();
-    mSource.merge(pos, &o->mSource, o->mRegion);
+    mSource.merge(pos, &o->mSource, o->mRegion.translated(-o->mX, -o->mY));
 
     // Copy the newly-erased pixels from the other command over
-    mErased.merge(pos, &o->mErased, newRegion);
+    mErased.merge(pos, &o->mErased, newRegion.translated(-o->mX, -o->mY));
 
     for (int i = 0; i < mEraseTilesCmds.size(); i++) {
 #ifdef QT_NO_DEBUG
@@ -307,6 +309,58 @@ bool PaintBMP::mergeWith(const QUndoCommand *other)
         mEraseRgns[i] |= o->mEraseRgns[i];
     }
 
+    return true;
+}
+
+/////
+
+PaintBMPx2::PaintBMPx2(MapDocument *mapDocument, int x, int y, const QImage &image0, const QImage& image1,
+                       const QRegion &region0, const QRegion &region1, bool mergeable)
+    : QUndoCommand(QCoreApplication::translate("UndoCommands", "Paint Both BMPs"))
+    , mMapDocument(mapDocument)
+    , mMergeable(mergeable)
+{
+    mPaintCmd0 = new PaintBMP(mapDocument, 0, x, y, image0, region0, true);
+    mPaintCmd0->setMergeable(mergeable);
+
+    mPaintCmd1 = new PaintBMP(mapDocument, 1, x, y, image1, region1, true);
+    mPaintCmd1->setMergeable(mergeable);
+}
+
+PaintBMPx2::~PaintBMPx2()
+{
+    delete mPaintCmd0;
+    delete mPaintCmd1;
+}
+
+void PaintBMPx2::undo()
+{
+    mPaintCmd0->undo();
+    mPaintCmd1->undo();
+}
+
+void PaintBMPx2::redo()
+{
+    mPaintCmd0->redo();
+    mPaintCmd1->redo();
+}
+
+int PaintBMPx2::id() const
+{
+    return UndoCommands::Cmd_PainBMPx2;
+}
+
+bool PaintBMPx2::mergeWith(const QUndoCommand *other)
+{
+    const PaintBMPx2* o = static_cast<const PaintBMPx2*>(other);
+    if (mMapDocument != o->mMapDocument) {
+        return false;
+    }
+    if (!o->mMergeable) {
+        return false;
+    }
+    mPaintCmd0->mergeWith(o->mPaintCmd0);
+    mPaintCmd1->mergeWith(o->mPaintCmd1);
     return true;
 }
 
@@ -329,9 +383,10 @@ BmpBrushTool::BmpBrushTool(QObject *parent) :
     mPainting(false),
     mBmpIndex(0),
     mBrushSize(1),
-    mBrushShape(Square),
+    mBrushShape(BrushShape::Square),
     mRestrictToSelection(false),
-    mFillAllInSelection(false)
+    mFillAllInSelection(false),
+    mUseBmpClipboard(false)
 {
 }
 
@@ -348,6 +403,7 @@ void BmpBrushTool::deactivate(MapScene *scene)
 {
     mPainting = false;
     mErasing = false;
+    mUseBmpClipboard = false;
     AbstractBmpTool::deactivate(scene);
 }
 
@@ -362,6 +418,11 @@ void BmpBrushTool::mousePressed(QGraphicsSceneMouseEvent *event)
         mStampPos = tilePosition();
         mErasing = (event->modifiers() & Qt::ControlModifier) != 0;
         paint();
+    }
+
+    if (event->button() == Qt::RightButton) {
+        mUseBmpClipboard = false;
+        tilePositionChanged(tilePosition());
     }
 }
 
@@ -393,6 +454,17 @@ void BmpBrushTool::setBrushShape(BmpBrushTool::BrushShape shape)
 {
     mBrushShape = shape;
     tilePositionChanged(tilePosition());
+}
+
+void BmpBrushTool::setUseBmpClipboard(bool use)
+{
+    mUseBmpClipboard = use;
+    tilePositionChanged(tilePosition());
+}
+
+bool BmpBrushTool::useBmpClipboard() const
+{
+    return mUseBmpClipboard;
 }
 
 void BmpBrushTool::mapDocumentChanged(MapDocument *oldDocument,
@@ -459,8 +531,9 @@ void BmpBrushTool::tilePositionChanged(const QPoint &tilePos)
     setBrushRegion(tilePos);
 
     if (mPainting) {
-        foreach (const QPoint &p, calculateLine(mStampPos.x(), mStampPos.y(),
-                                                tilePos.x(), tilePos.y())) {
+        const QVector<QPoint> linePts = calculateLine(mStampPos.x(), mStampPos.y(),
+                                                tilePos.x(), tilePos.y());
+        for (const QPoint &p : linePts) {
             setBrushRegion(p);
             paint();
         }
@@ -558,7 +631,14 @@ public:
 
 void BmpBrushTool::setBrushRegion(const QPoint &tilePos)
 {
-    if (mBrushShape == Circle) {
+    if (useBmpClipboard()) {
+        BmpClipboard *bmpClipboard = MainWindow::instance()->bmpClipboard();
+        QRegion region = bmpClipboard->region();
+        region.translate(tilePos - region.boundingRect().topLeft());
+        brushItem()->setTileRegion(region);
+        return;
+    }
+    if (mBrushShape == BrushShape::Circle) {
         BresenhamCircle bc(tilePos.x(), tilePos.y(), mBrushSize);
         brushItem()->setTileRegion(bc.region);
         return;
@@ -589,10 +669,17 @@ static QRegion bmpPixelRegion(Map *map, int bmpIndex, const QRegion &tileRgn, QR
 
 void BmpBrushTool::paint()
 {
+    if (useBmpClipboard()) {
+        // TODO: handle restrictToSelection()
+        BmpClipboard *bmpClipboard = MainWindow::instance()->bmpClipboard();
+        QRect brushRect = brushItem()->tileRegion().boundingRect();
+        bmpClipboard->paint(mapDocument(), brushRect.topLeft(), mDidFirstPaint);
+        mDidFirstPaint = true;
+        return;
+    }
+
     if (!mErasing && mColor == qRgb(0, 0, 0))
         return;
-
-    QRect mapBounds(QPoint(), mapDocument()->map()->size());
 
     QRegion tileRgn = brushItem()->tileRegion();
     if (restrictToSelection()) {
@@ -710,7 +797,7 @@ void BmpEraserTool::tilePositionChanged(const QPoint &tilePos)
 void BmpEraserTool::setBrushRegion(const QPoint &tilePos)
 {
     int brushSize = BmpBrushTool::instance()->brushSize();
-    if (BmpBrushTool::instance()->brushShape() == BmpBrushTool::Circle) {
+    if (BmpBrushTool::instance()->brushShape() == BmpBrushTool::BrushShape::Circle) {
 #if 1
         BresenhamCircle bc(tilePos.x(), tilePos.y(), brushSize);
         QRegion rgn = bc.region;
@@ -2306,7 +2393,7 @@ void BmpToLayersTool::tilePositionChanged(const QPoint &tilePos)
 void BmpToLayersTool::setBrushRegion(const QPoint &tilePos)
 {
     int brushSize = BmpBrushTool::instance()->brushSize();
-    if (BmpBrushTool::instance()->brushShape() == BmpBrushTool::Circle) {
+    if (BmpBrushTool::instance()->brushShape() == BmpBrushTool::BrushShape::Circle) {
         BresenhamCircle bc(tilePos.x(), tilePos.y(), brushSize);
         brushItem()->setTileRegion(bc.region);
         return;

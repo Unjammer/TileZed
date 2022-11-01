@@ -532,8 +532,8 @@ void BmpToolDialog::setDocument(MapDocument *doc)
     ui->trashBlends->setEnabled(ui->reloadBlends->isEnabled());
 
     switch (BmpBrushTool::instance()->brushShape()) {
-    case BmpBrushTool::Square: ui->brushSquare->setChecked(true); break;
-    case BmpBrushTool::Circle: ui->brushCircle->setChecked(true); break;
+    case BmpBrushTool::BrushShape::Square: ui->brushSquare->setChecked(true); break;
+    case BmpBrushTool::BrushShape::Circle: ui->brushCircle->setChecked(true); break;
     }
     ui->restrictToSelection->setChecked(BmpBrushTool::instance()->restrictToSelection());
     ui->fillAllInSelectedArea->setChecked(BmpBrushTool::instance()->fillAllInSelection());
@@ -613,12 +613,12 @@ void BmpToolDialog::brushSizeChanged(int size)
 
 void BmpToolDialog::brushSquare()
 {
-    BmpBrushTool::instance()->setBrushShape(BmpBrushTool::Square);
+    BmpBrushTool::instance()->setBrushShape(BmpBrushTool::BrushShape::Square);
 }
 
 void BmpToolDialog::brushCircle()
 {
-    BmpBrushTool::instance()->setBrushShape(BmpBrushTool::Circle);
+    BmpBrushTool::instance()->setBrushShape(BmpBrushTool::BrushShape::Circle);
 }
 
 void BmpToolDialog::restrictToSelection(bool isRestricted)

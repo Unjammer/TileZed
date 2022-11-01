@@ -71,6 +71,7 @@ SOURCES += aboutdialog.cpp \
     automapperwrapper.cpp \
     automappingmanager.cpp \
     automappingutils.cpp  \
+    bmpclipboard.cpp \
     brushitem.cpp \
     bucketfilltool.cpp \
     changemapobject.cpp \
@@ -287,6 +288,7 @@ HEADERS += aboutdialog.h \
     automapperwrapper.h \
     automappingmanager.h \
     automappingutils.h \
+    bmpclipboard.h \
     brushitem.h \
     bucketfilltool.h \
     changemapobject.h \

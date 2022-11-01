@@ -32,6 +32,7 @@ enum UndoCommands {
 #ifdef ZOMBOID
     ,
     Cmd_PaintBMP,
+    Cmd_PainBMPx2,
     Cmd_BmpToLayers
 #endif
 };

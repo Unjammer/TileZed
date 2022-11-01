@@ -77,6 +77,7 @@ class CommandButton;
 class ObjectsDock;
 class Zoomable;
 #ifdef ZOMBOID
+class BmpClipboard;
 class EdgeTool;
 class Eraser;
 class ZLevelsDock;
@@ -133,6 +134,8 @@ public:
 
     TileLayersPanel *tileLayersPanel() const
     { return mTileLayersPanel; }
+
+    BmpClipboard *bmpClipboard() const;
 #endif
 
 public slots:
@@ -331,6 +334,7 @@ private:
 
     void initLuaTileTools();
     QList<Lua::LuaTileTool*> mLuaTileTools;
+    BmpClipboard *mBmpClipboard;
 #endif
 
     ClipboardManager *mClipboardManager;
