@@ -28,7 +28,8 @@
 
 #pragma once
 
-#include "tiled_global.h"
+//#include "tiled_global.h"
+#include "../../libtiled/tiled_global.h"
 
 #include <QMap>
 #include <QObject>

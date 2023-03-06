@@ -1,0 +1,13 @@
+﻿  tolua_event.c
+  tolua_is.c
+  tolua_map.c
+  tolua_push.c
+  tolua_to.c
+F:\PZ\tiled-zomboid\src\tolua\include\tolua.h(33,10): warning C4067: jetons inattendus après la directive du préprocesseur - saut de ligne attendu (compilation du fichier source tolua_is.c)
+F:\PZ\tiled-zomboid\src\tolua\include\tolua.h(33,10): warning C4067: jetons inattendus après la directive du préprocesseur - saut de ligne attendu (compilation du fichier source tolua_map.c)
+F:\PZ\tiled-zomboid\src\tolua\include\tolua.h(33,10): warning C4067: jetons inattendus après la directive du préprocesseur - saut de ligne attendu (compilation du fichier source tolua_push.c)
+F:\PZ\tiled-zomboid\src\tolua\include\tolua.h(33,10): warning C4067: jetons inattendus après la directive du préprocesseur - saut de ligne attendu (compilation du fichier source tolua_to.c)
+F:\PZ\tiled-zomboid\src\tolua\include\tolua.h(33,10): warning C4067: jetons inattendus après la directive du préprocesseur - saut de ligne attendu (compilation du fichier source tolua_event.c)
+F:\PZ\tiled-zomboid\src\tolua\src\lib\tolua_to.c(117,75): warning C4100: 'def' : paramètre formel non référencé
+F:\PZ\tiled-zomboid\src\tolua\src\lib\tolua_is.c(277,28): warning C4100: 'dim' : paramètre formel non référencé
+  tolua.vcxproj -> F:\lib\tolua.lib

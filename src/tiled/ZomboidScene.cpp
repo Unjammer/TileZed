@@ -898,7 +898,8 @@ void DnDItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget
 
     QRect tileBounds(mPositionInMap.x() - mHotSpot.x(), mPositionInMap.y() - mHotSpot.y(),
                      mMapImage->mapInfo()->width(), mMapImage->mapInfo()->height());
-    mRenderer->drawFancyRectangle(painter, tileBounds, Qt::darkGray, mLevel);
+    //mRenderer->drawFancyRectangle(painter, tileBounds, Qt::darkGray, mLevel);
+    mRenderer->drawFancyRectangle(painter, tileBounds, Qt::darkMagenta, mLevel);
 
 #ifdef _DEBUG
     painter->drawRect(mBoundingRect);

@@ -359,7 +359,8 @@ bool AutoMapper::setupRulesUsedCheck()
 
             const TileLayer *setLayer = mMapWork->layerAt(i)->asTileLayer();
             QSet<Tileset*> usedTilesets = setLayer->usedTilesets();
-            QList<Tileset*> tilesetWork(usedTilesets.begin(), usedTilesets.end());
+            //QList<Tileset*> tilesetWork(usedTilesets.begin(), usedTilesets.end());
+            QList<Tileset*> tilesetWork(usedTilesets.toList());
 
             foreach (const TileLayer *tilelayer, ii[name].listYes)
                 foreach (Tileset *tileset, tilelayer->usedTilesets())

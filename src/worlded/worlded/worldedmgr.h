@@ -23,7 +23,7 @@
 #include <QStringList>
 #include <QTimer>
 
-#include "filesystemwatcher.h"
+#include "../../tiled/filesystemwatcher.h";
 
 class World;
 class WorldCell;

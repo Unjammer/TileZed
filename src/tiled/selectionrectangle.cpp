@@ -27,13 +27,13 @@
 using namespace Tiled;
 using namespace Tiled::Internal;
 
-SelectionRectangle::SelectionRectangle(QGraphicsItem *parent)
+SelectionRectangle::SelectionRectangle(QGraphicsItem* parent)
     : QGraphicsItem(parent)
 {
     setZValue(10000);
 }
 
-void SelectionRectangle::setRectangle(const QRectF &rectangle)
+void SelectionRectangle::setRectangle(const QRectF& rectangle)
 {
     prepareGeometryChange();
     mRectangle = rectangle;
@@ -44,8 +44,8 @@ QRectF SelectionRectangle::boundingRect() const
     return mRectangle.adjusted(-1, -1, 2, 2);
 }
 
-void SelectionRectangle::paint(QPainter *painter,
-                               const QStyleOptionGraphicsItem *, QWidget *)
+void SelectionRectangle::paint(QPainter* painter,
+    const QStyleOptionGraphicsItem*, QWidget*)
 {
     if (mRectangle.isNull())
         return;

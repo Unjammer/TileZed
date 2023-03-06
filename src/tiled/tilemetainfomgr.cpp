@@ -751,7 +751,7 @@ bool TileMetaInfoMgr::isEnumNorth(const QString &enumName) const
 
 bool TileMetaInfoMgr::parse2Ints(const QString &s, int *pa, int *pb)
 {
-    QStringList coords = s.split(QLatin1Char(','), Qt::SkipEmptyParts);
+    QStringList coords = s.split(QLatin1Char(','), QString::SkipEmptyParts);
     if (coords.size() != 2)
         return false;
     bool ok;

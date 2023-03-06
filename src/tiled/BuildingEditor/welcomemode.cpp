@@ -39,6 +39,7 @@
 #include <QHeaderView>
 #include <QLabel>
 #include <QMessageBox>
+#include <preferences.h>
 
 using namespace BuildingEditor;
 
@@ -60,7 +61,18 @@ LinkItem::LinkItem(const QString &text1, const QString &text2, QGraphicsItem *pa
 
     QGraphicsTextItem *item1 = new QGraphicsTextItem(this);
     item1->setPlainText(text1);
-    item1->setDefaultTextColor(Qt::blue);
+    //item1->setDefaultTextColor(Qt::blue);
+    if (Tiled::Internal::Preferences::instance()->enableDarkTheme())
+    {
+        QFont f;
+        //f.setPixelSize(23);
+        f.setBold(true);
+        item1->setFont(f);
+        item1->setDefaultTextColor(QColor("#0078d4"));
+    }
+    else {
+        item1->setDefaultTextColor(Qt::blue);
+    }
 
     mBoundingRect = sceneRectOfItem(item1);
 
@@ -173,6 +185,7 @@ WelcomeMode::WelcomeMode(QObject *parent) :
     pitem->setPos(x, y + 4);
     QGraphicsTextItem *item = scene->addText(tr("BuildingEd"), QFont(QLatin1String("Helvetica"), 16, 1));
     item->setPos(x + 24 + 6, y);
+    item->setDefaultTextColor(QColor("#D0D0D0"));
     QRectF r = sceneRectOfItem(item) | sceneRectOfItem(pitem);
     r.translate(0, 12);
     QGraphicsLineItem *line = scene->addLine(r.left(), r.bottom(), 400, r.bottom());
@@ -199,7 +212,7 @@ WelcomeMode::WelcomeMode(QObject *parent) :
 //    y += 36;
     item = scene->addText(tr("Recent Buildings"), QFont(QLatin1String("Helvetica"), 16, 1));
     item->setPos(x, y);
-
+    item->setDefaultTextColor(QColor("#D0D0D0"));
     y += item->boundingRect().height() + 12;
     mRecentItemsY = y;
     setRecentFiles();

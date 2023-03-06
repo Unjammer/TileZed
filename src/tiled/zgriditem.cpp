@@ -68,7 +68,9 @@ void ZGridItem::paint(QPainter *painter,
         return;
 #endif
 	QColor gridColor = Preferences::instance()->gridColor();
-    renderer->drawGrid(painter, option->exposedRect, gridColor, mMapDocument->currentLevel());
+    int gridOpacity = Preferences::instance()->gridOpacity();
+    int gridWidth = Preferences::instance()->gridWidth();
+    renderer->drawGrid(painter, option->exposedRect, gridColor, mMapDocument->currentLevel(), gridOpacity, gridWidth);
 }
 
 void ZGridItem::updateBoundingRect()

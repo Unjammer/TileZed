@@ -47,7 +47,8 @@ RoomDefNameDialog::RoomDefNameDialog(const QList<ObjectGroup *> &ogList,
         }
     }
 
-    QStringList sorted(names.begin(), names.end());
+    //QStringList sorted(names.begin(), names.end());
+    QStringList sorted(names.toList());
     sorted.sort();
     ui->names->addItems(sorted);
 }

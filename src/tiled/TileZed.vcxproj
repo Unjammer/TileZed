@@ -1,0 +1,1122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{55EC0AF4-3AD8-3812-8759-0BA86565FF5F}</ProjectGuid>
+    <RootNamespace>TileZed</RootNamespace>
+    <Keyword>QtVS_v304</Keyword>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformMinVersion>10.0.19041.0</WindowsTargetPlatformMinVersion>
+    <QtMsBuild Condition="'$(QtMsBuild)'=='' or !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <PlatformToolset>v143</PlatformToolset>
+    <OutputDirectory>..\..\</OutputDirectory>
+    <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
+    <CharacterSet>NotSet</CharacterSet>
+    <ConfigurationType>Application</ConfigurationType>
+    <IntermediateDirectory>release\</IntermediateDirectory>
+    <PrimaryOutput>TileZed</PrimaryOutput>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <PlatformToolset>v143</PlatformToolset>
+    <OutputDirectory>..\..\</OutputDirectory>
+    <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
+    <CharacterSet>NotSet</CharacterSet>
+    <ConfigurationType>Application</ConfigurationType>
+    <IntermediateDirectory>debug\</IntermediateDirectory>
+    <PrimaryOutput>TileZed</PrimaryOutput>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
+    <Message Importance="High" Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />
+  </Target>
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">
+    <Import Project="$(QtMsBuild)\qt_defaults.props" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>..\..\</OutDir>
+    <IntDir>debug\</IntDir>
+    <TargetName>TileZed</TargetName>
+    <IgnoreImportLibrary>true</IgnoreImportLibrary>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>..\..\</OutDir>
+    <IntDir>release\</IntDir>
+    <TargetName>TileZed</TargetName>
+    <IgnoreImportLibrary>true</IgnoreImportLibrary>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <QtInstall>5.12.2_msvc2017_64</QtInstall>
+    <QtModules>core;opengl;network;gui;widgets</QtModules>
+  </PropertyGroup>
+  <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <QtInstall>5.12.2_msvc2017_64</QtInstall>
+    <QtModules>core;opengl;network;gui;widgets</QtModules>
+  </PropertyGroup>
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">
+    <Import Project="$(QtMsBuild)\qt.props" />
+  </ImportGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>GeneratedFiles\$(ConfigurationName);GeneratedFiles;.;..\libtiled;..\qtsingleapplication;..\qtlockedfile;..\worlded;..\tolua\include;..\lua\src;release;C:\VulkanSDK\1.0.51.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
+      <AssemblerListingLocation>release\</AssemblerListingLocation>
+      <BrowseInformation>false</BrowseInformation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4577;4467;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ObjectFileName>release\</ObjectFileName>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;ZOMBOID;QT_NO_CAST_FROM_ASCII;QT_NO_CAST_TO_ASCII;ZOMBOID;QT_NO_DEBUG;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <WarningLevel>Level3</WarningLevel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>tiled.lib;zlib1.lib;\lib\worlded.lib;\lib\tolua.lib;\lib\lua.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>\lib;F:\PZ\tiled-zomboid\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreImportLibrary>true</IgnoreImportLibrary>
+      <LinkIncremental>false</LinkIncremental>
+      <OptimizeReferences>true</OptimizeReferences>
+      <OutputFile>$(OutDir)\TileZed.exe</OutputFile>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Link>
+    <Midl>
+      <DefaultCharType>Unsigned</DefaultCharType>
+      <EnableErrorChecks>None</EnableErrorChecks>
+      <WarningLevel>0</WarningLevel>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;ZOMBOID;QT_NO_CAST_FROM_ASCII;QT_NO_CAST_TO_ASCII;ZOMBOID;QT_NO_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <QtMoc>
+      <CompilerFlavor>msvc</CompilerFlavor>
+      <Include>./$(Configuration)/moc_predefs.h</Include>
+      <ExecutionDescription>Moc'ing %(Identity)...</ExecutionDescription>
+      <DynamicSource>output</DynamicSource>
+      <QtMocDir>$(Configuration)</QtMocDir>
+      <QtMocFileName>moc_%(Filename).cpp</QtMocFileName>
+    </QtMoc>
+    <QtRcc>
+      <Compression>default</Compression>
+      <ExecutionDescription>Rcc'ing %(Identity)...</ExecutionDescription>
+      <QtRccDir>$(Configuration)</QtRccDir>
+      <QtRccFileName>qrc_%(Filename).cpp</QtRccFileName>
+    </QtRcc>
+    <QtUic>
+      <ExecutionDescription>Uic'ing %(Identity)...</ExecutionDescription>
+      <QtUicDir>$(ProjectDir)</QtUicDir>
+      <QtUicFileName>ui_%(Filename).h</QtUicFileName>
+    </QtUic>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>GeneratedFiles\$(ConfigurationName);GeneratedFiles;.;..\libtiled;..\qtsingleapplication;..\qtlockedfile;..\worlded;..\tolua\include;..\lua\src;debug;C:\VulkanSDK\1.0.51.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
+      <AssemblerListingLocation>debug\</AssemblerListingLocation>
+      <BrowseInformation>false</BrowseInformation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4577;4467;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ObjectFileName>debug\</ObjectFileName>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;ZOMBOID;QT_NO_CAST_FROM_ASCII;QT_NO_CAST_TO_ASCII;ZOMBOID;LUA_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <WarningLevel>Level3</WarningLevel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>tiled.lib;zlib1.lib;\lib\worlded.lib;\lib\tolua.lib;\lib\lua.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>\lib;F:\PZ\tiled-zomboid\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreImportLibrary>true</IgnoreImportLibrary>
+      <OutputFile>$(OutDir)\TileZed.exe</OutputFile>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Link>
+    <Midl>
+      <DefaultCharType>Unsigned</DefaultCharType>
+      <EnableErrorChecks>None</EnableErrorChecks>
+      <WarningLevel>0</WarningLevel>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;ZOMBOID;QT_NO_CAST_FROM_ASCII;QT_NO_CAST_TO_ASCII;ZOMBOID;LUA_DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <QtMoc>
+      <CompilerFlavor>msvc</CompilerFlavor>
+      <Include>./$(Configuration)/moc_predefs.h</Include>
+      <ExecutionDescription>Moc'ing %(Identity)...</ExecutionDescription>
+      <DynamicSource>output</DynamicSource>
+      <QtMocDir>$(Configuration)</QtMocDir>
+      <QtMocFileName>moc_%(Filename).cpp</QtMocFileName>
+    </QtMoc>
+    <QtRcc>
+      <Compression>default</Compression>
+      <ExecutionDescription>Rcc'ing %(Identity)...</ExecutionDescription>
+      <QtRccDir>$(Configuration)</QtRccDir>
+      <QtRccFileName>qrc_%(Filename).cpp</QtRccFileName>
+    </QtRcc>
+    <QtUic>
+      <ExecutionDescription>Uic'ing %(Identity)...</ExecutionDescription>
+      <QtUicDir>$(ProjectDir)</QtUicDir>
+      <QtUicFileName>ui_%(Filename).h</QtUicFileName>
+    </QtUic>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="ZomboidScene.cpp" />
+    <ClCompile Include="aboutdialog.cpp" />
+    <ClCompile Include="abstractobjecttool.cpp" />
+    <ClCompile Include="abstracttiletool.cpp" />
+    <ClCompile Include="abstracttool.cpp" />
+    <ClCompile Include="addremovelayer.cpp" />
+    <ClCompile Include="addremovemapobject.cpp" />
+    <ClCompile Include="addremovetileset.cpp" />
+    <ClCompile Include="addtilesetsdialog.cpp" />
+    <ClCompile Include="automapper.cpp" />
+    <ClCompile Include="automapperwrapper.cpp" />
+    <ClCompile Include="automappingmanager.cpp" />
+    <ClCompile Include="automappingutils.cpp" />
+    <ClCompile Include="bmpblender.cpp" />
+    <ClCompile Include="bmpblendview.cpp" />
+    <ClCompile Include="bmpclipboard.cpp" />
+    <ClCompile Include="bmpruleview.cpp" />
+    <ClCompile Include="bmpselectionitem.cpp" />
+    <ClCompile Include="bmptool.cpp" />
+    <ClCompile Include="bmptooldialog.cpp" />
+    <ClCompile Include="brushitem.cpp" />
+    <ClCompile Include="bucketfilltool.cpp" />
+    <ClCompile Include="BuildingEditor\building.cpp" />
+    <ClCompile Include="BuildingEditor\buildingdocument.cpp" />
+    <ClCompile Include="BuildingEditor\buildingdocumentmgr.cpp" />
+    <ClCompile Include="BuildingEditor\buildingeditorwindow.cpp" />
+    <ClCompile Include="BuildingEditor\buildingfloor.cpp" />
+    <ClCompile Include="BuildingEditor\buildingfloorsdialog.cpp" />
+    <ClCompile Include="BuildingEditor\buildingfurnituredock.cpp" />
+    <ClCompile Include="BuildingEditor\buildingisoview.cpp" />
+    <ClCompile Include="BuildingEditor\buildingkeyvaluesdialog.cpp" />
+    <ClCompile Include="BuildingEditor\buildinglayersdock.cpp" />
+    <ClCompile Include="BuildingEditor\buildingmap.cpp" />
+    <ClCompile Include="BuildingEditor\buildingobjects.cpp" />
+    <ClCompile Include="BuildingEditor\buildingorthoview.cpp" />
+    <ClCompile Include="BuildingEditor\buildingpreferences.cpp" />
+    <ClCompile Include="BuildingEditor\buildingpreferencesdialog.cpp" />
+    <ClCompile Include="BuildingEditor\buildingpropertiesdialog.cpp" />
+    <ClCompile Include="BuildingEditor\buildingreader.cpp" />
+    <ClCompile Include="BuildingEditor\buildingroomdef.cpp" />
+    <ClCompile Include="BuildingEditor\buildingtemplates.cpp" />
+    <ClCompile Include="BuildingEditor\buildingtemplatesdialog.cpp" />
+    <ClCompile Include="BuildingEditor\buildingtileentryview.cpp" />
+    <ClCompile Include="BuildingEditor\buildingtiles.cpp" />
+    <ClCompile Include="BuildingEditor\buildingtilesdialog.cpp" />
+    <ClCompile Include="BuildingEditor\buildingtilesetdock.cpp" />
+    <ClCompile Include="BuildingEditor\buildingtiletools.cpp" />
+    <ClCompile Include="BuildingEditor\buildingtmx.cpp" />
+    <ClCompile Include="BuildingEditor\buildingtools.cpp" />
+    <ClCompile Include="BuildingEditor\buildingundoredo.cpp" />
+    <ClCompile Include="BuildingEditor\buildingwriter.cpp" />
+    <ClCompile Include="BuildingEditor\categorydock.cpp" />
+    <ClCompile Include="changeimagelayerproperties.cpp" />
+    <ClCompile Include="changemapobject.cpp" />
+    <ClCompile Include="changeobjectgroupproperties.cpp" />
+    <ClCompile Include="changepolygon.cpp" />
+    <ClCompile Include="changeproperties.cpp" />
+    <ClCompile Include="changetileselection.cpp" />
+    <ClCompile Include="checkbuildingswindow.cpp" />
+    <ClCompile Include="checkmapswindow.cpp" />
+    <ClCompile Include="BuildingEditor\choosebuildingtiledialog.cpp" />
+    <ClCompile Include="BuildingEditor\choosetemplatesdialog.cpp" />
+    <ClCompile Include="clipboardmanager.cpp" />
+    <ClCompile Include="colorbutton.cpp" />
+    <ClCompile Include="command.cpp" />
+    <ClCompile Include="commandbutton.cpp" />
+    <ClCompile Include="commanddatamodel.cpp" />
+    <ClCompile Include="commanddialog.cpp" />
+    <ClCompile Include="commandlineparser.cpp" />
+    <ClCompile Include="containeroverlaydialog.cpp" />
+    <ClCompile Include="containeroverlayfile.cpp" />
+    <ClCompile Include="containeroverlayview.cpp" />
+    <ClCompile Include="convertorientationdialog.cpp" />
+    <ClCompile Include="converttolotdialog.cpp" />
+    <ClCompile Include="createobjecttool.cpp" />
+    <ClCompile Include="createpackdialog.cpp" />
+    <ClCompile Include="curbtool.cpp" />
+    <ClCompile Include="curbtooldialog.cpp" />
+    <ClCompile Include="documentmanager.cpp" />
+    <ClCompile Include="edgetool.cpp" />
+    <ClCompile Include="edgetooldialog.cpp" />
+    <ClCompile Include="BuildingEditor\editmodestatusbar.cpp" />
+    <ClCompile Include="editpolygontool.cpp" />
+    <ClCompile Include="BuildingEditor\embeddedmainwindow.cpp" />
+    <ClCompile Include="enflatulatordialog.cpp" />
+    <ClCompile Include="eraser.cpp" />
+    <ClCompile Include="erasetiles.cpp" />
+    <ClCompile Include="BuildingEditor\fancytabwidget.cpp" />
+    <ClCompile Include="fencetool.cpp" />
+    <ClCompile Include="fencetooldialog.cpp" />
+    <ClCompile Include="filesystemwatcher.cpp" />
+    <ClCompile Include="filltiles.cpp" />
+    <ClCompile Include="BuildingEditor\furnituregroups.cpp" />
+    <ClCompile Include="BuildingEditor\furnitureview.cpp" />
+    <ClCompile Include="BuildingEditor\horizontallinedelegate.cpp" />
+    <ClCompile Include="imagelayeritem.cpp" />
+    <ClCompile Include="imagelayerpropertiesdialog.cpp" />
+    <ClCompile Include="BuildingEditor\imode.cpp" />
+    <ClCompile Include="languagemanager.cpp" />
+    <ClCompile Include="layerdock.cpp" />
+    <ClCompile Include="layermodel.cpp" />
+    <ClCompile Include="BuildingEditor\listofstringsdialog.cpp" />
+    <ClCompile Include="luaconsole.cpp" />
+    <ClCompile Include="luamapsdialog.cpp" />
+    <ClCompile Include="luatable.cpp" />
+    <ClCompile Include="luatiled.cpp" />
+    <ClCompile Include="luatiletool.cpp" />
+    <ClCompile Include="luatooldialog.cpp" />
+    <ClCompile Include="luatooloptions.cpp" />
+    <ClCompile Include="luaworlddialog.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="mainwindow.cpp" />
+    <ClCompile Include="mapbuildings.cpp" />
+    <ClCompile Include="mapcomposite.cpp" />
+    <ClCompile Include="mapdocument.cpp" />
+    <ClCompile Include="mapdocumentactionhandler.cpp" />
+    <ClCompile Include="mapimagemanager.cpp" />
+    <ClCompile Include="mapmanager.cpp" />
+    <ClCompile Include="mapobjectitem.cpp" />
+    <ClCompile Include="mapobjectmodel.cpp" />
+    <ClCompile Include="mapscene.cpp" />
+    <ClCompile Include="mapsdock.cpp" />
+    <ClCompile Include="mapview.cpp" />
+    <ClCompile Include="minimap.cpp" />
+    <ClCompile Include="BuildingEditor\mixedtilesetview.cpp" />
+    <ClCompile Include="movelayer.cpp" />
+    <ClCompile Include="movemapobject.cpp" />
+    <ClCompile Include="movemapobjecttogroup.cpp" />
+    <ClCompile Include="movetileset.cpp" />
+    <ClCompile Include="BuildingEditor\newbuildingdialog.cpp" />
+    <ClCompile Include="newmapbinaryfile.cpp" />
+    <ClCompile Include="newmapdialog.cpp" />
+    <ClCompile Include="newtilesetdialog.cpp" />
+    <ClCompile Include="BuildingEditor\objecteditmode.cpp" />
+    <ClCompile Include="objectgroupitem.cpp" />
+    <ClCompile Include="objectgrouppropertiesdialog.cpp" />
+    <ClCompile Include="objectpropertiesdialog.cpp" />
+    <ClCompile Include="objectsdock.cpp" />
+    <ClCompile Include="objectselectiontool.cpp" />
+    <ClCompile Include="objecttypes.cpp" />
+    <ClCompile Include="objecttypesmodel.cpp" />
+    <ClCompile Include="offsetlayer.cpp" />
+    <ClCompile Include="offsetmapdialog.cpp" />
+    <ClCompile Include="packcompare.cpp" />
+    <ClCompile Include="packextractdialog.cpp" />
+    <ClCompile Include="packviewer.cpp" />
+    <ClCompile Include="painttilelayer.cpp" />
+    <ClCompile Include="picktiletool.cpp" />
+    <ClCompile Include="pluginmanager.cpp" />
+    <ClCompile Include="preferences.cpp" />
+    <ClCompile Include="preferencesdialog.cpp" />
+    <ClCompile Include="propertiesdialog.cpp" />
+    <ClCompile Include="propertiesmodel.cpp" />
+    <ClCompile Include="propertiesview.cpp" />
+    <ClCompile Include="..\qtsingleapplication\qtlocalpeer.cpp" />
+    <ClCompile Include="..\qtlockedfile\qtlockedfile.cpp" />
+    <ClCompile Include="..\qtlockedfile\qtlockedfile_win.cpp" />
+    <ClCompile Include="..\qtsingleapplication\qtsingleapplication.cpp" />
+    <ClCompile Include="quickstampmanager.cpp" />
+    <ClCompile Include="rearrangetiles.cpp" />
+    <ClCompile Include="renamelayer.cpp" />
+    <ClCompile Include="BuildingEditor\resizebuildingdialog.cpp" />
+    <ClCompile Include="resizedialog.cpp" />
+    <ClCompile Include="resizehelper.cpp" />
+    <ClCompile Include="resizelayer.cpp" />
+    <ClCompile Include="resizemap.cpp" />
+    <ClCompile Include="resizemapobject.cpp" />
+    <ClCompile Include="BuildingEditor\roofhiding.cpp" />
+    <ClCompile Include="roomdefecator.cpp" />
+    <ClCompile Include="roomdefnamedialog.cpp" />
+    <ClCompile Include="roomdeftool.cpp" />
+    <ClCompile Include="BuildingEditor\roomsdialog.cpp" />
+    <ClCompile Include="saveasimagedialog.cpp" />
+    <ClCompile Include="selectionrectangle.cpp" />
+    <ClCompile Include="BuildingEditor\simplefile.cpp" />
+    <ClCompile Include="stampbrush.cpp" />
+    <ClCompile Include="BuildingEditor\utils\styledbar.cpp" />
+    <ClCompile Include="BuildingEditor\utils\stylehelper.cpp" />
+    <ClCompile Include="BuildingEditor\templatefrombuildingdialog.cpp" />
+    <ClCompile Include="texturepacker.cpp" />
+    <ClCompile Include="texturepackfile.cpp" />
+    <ClCompile Include="textureunpacker.cpp" />
+    <ClCompile Include="threads.cpp" />
+    <ClCompile Include="BuildingEditor\tilecategoryview.cpp" />
+    <ClCompile Include="tiledapplication.cpp" />
+    <ClCompile Include="tiledefcompare.cpp" />
+    <ClCompile Include="tiledefdialog.cpp" />
+    <ClCompile Include="tiledeffile.cpp" />
+    <ClCompile Include="BuildingEditor\tileeditmode.cpp" />
+    <ClCompile Include="tilelayeritem.cpp" />
+    <ClCompile Include="tilelayerspanel.cpp" />
+    <ClCompile Include="tilemetainfodialog.cpp" />
+    <ClCompile Include="tilemetainfomgr.cpp" />
+    <ClCompile Include="tileoverlaydialog.cpp" />
+    <ClCompile Include="tileoverlayfile.cpp" />
+    <ClCompile Include="tilepainter.cpp" />
+    <ClCompile Include="tileselectionitem.cpp" />
+    <ClCompile Include="tileselectiontool.cpp" />
+    <ClCompile Include="tilesetdock.cpp" />
+    <ClCompile Include="tilesetmanager.cpp" />
+    <ClCompile Include="tilesetmodel.cpp" />
+    <ClCompile Include="tilesetstxtfile.cpp" />
+    <ClCompile Include="tilesetview.cpp" />
+    <ClCompile Include="tmxmapreader.cpp" />
+    <ClCompile Include="tmxmapwriter.cpp" />
+    <ClCompile Include="undodock.cpp" />
+    <ClCompile Include="undoredobuttons.cpp" />
+    <ClCompile Include="utils.cpp" />
+    <ClCompile Include="BuildingEditor\welcomemode.cpp" />
+    <ClCompile Include="worldeddock.cpp" />
+    <ClCompile Include="worldlottool.cpp" />
+    <ClCompile Include="zgriditem.cpp" />
+    <ClCompile Include="zlevelsdock.cpp" />
+    <ClCompile Include="zlevelsmodel.cpp" />
+    <ClCompile Include="zlotmanager.cpp" />
+    <ClCompile Include="zoomable.cpp" />
+    <ClCompile Include="zprogress.cpp" />
+    <ClCompile Include="ztilelayergroupitem.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="ZomboidScene.h">
+    </QtMoc>
+    <QtMoc Include="aboutdialog.h">
+    </QtMoc>
+    <QtMoc Include="abstractobjecttool.h">
+    </QtMoc>
+    <ClInclude Include="abstractoverlay.h" />
+    <QtMoc Include="abstracttiletool.h">
+    </QtMoc>
+    <QtMoc Include="abstracttool.h">
+    </QtMoc>
+    <ClInclude Include="addremovelayer.h" />
+    <ClInclude Include="addremovemapobject.h" />
+    <ClInclude Include="addremovetileset.h" />
+    <QtMoc Include="addtilesetsdialog.h">
+    </QtMoc>
+    <QtMoc Include="automapper.h">
+    </QtMoc>
+    <ClInclude Include="automapperwrapper.h" />
+    <QtMoc Include="automappingmanager.h">
+    </QtMoc>
+    <ClInclude Include="automappingutils.h" />
+    <QtMoc Include="bmpblender.h">
+    </QtMoc>
+    <QtMoc Include="bmpblendview.h">
+    </QtMoc>
+    <QtMoc Include="bmpclipboard.h">
+    </QtMoc>
+    <QtMoc Include="bmpruleview.h">
+    </QtMoc>
+    <QtMoc Include="bmpselectionitem.h">
+    </QtMoc>
+    <QtMoc Include="bmptool.h">
+    </QtMoc>
+    <QtMoc Include="bmptooldialog.h">
+    </QtMoc>
+    <ClInclude Include="brushitem.h" />
+    <QtMoc Include="bucketfilltool.h">
+    </QtMoc>
+    <ClInclude Include="BuildingEditor\building.h" />
+    <QtMoc Include="BuildingEditor\buildingdocument.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\buildingdocumentmgr.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\buildingeditorwindow.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\buildingfloor.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\buildingfloorsdialog.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\buildingfurnituredock.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\buildingisoview.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\buildingkeyvaluesdialog.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\buildinglayersdock.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\buildingmap.h">
+    </QtMoc>
+    <ClInclude Include="BuildingEditor\buildingobjects.h" />
+    <QtMoc Include="BuildingEditor\buildingorthoview.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\buildingpreferences.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\buildingpreferencesdialog.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\buildingpropertiesdialog.h">
+    </QtMoc>
+    <ClInclude Include="BuildingEditor\buildingreader.h" />
+    <ClInclude Include="BuildingEditor\buildingroomdef.h" />
+    <QtMoc Include="BuildingEditor\buildingtemplates.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\buildingtemplatesdialog.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\buildingtileentryview.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\buildingtiles.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\buildingtilesdialog.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\buildingtilesetdock.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\buildingtiletools.h">
+    </QtMoc>
+    <ClInclude Include="BuildingEditor\buildingtmx.h" />
+    <QtMoc Include="BuildingEditor\buildingtools.h">
+    </QtMoc>
+    <ClInclude Include="BuildingEditor\buildingundoredo.h" />
+    <ClInclude Include="BuildingEditor\buildingwriter.h" />
+    <QtMoc Include="BuildingEditor\categorydock.h">
+    </QtMoc>
+    <ClInclude Include="changeimagelayerproperties.h" />
+    <ClInclude Include="changemapobject.h" />
+    <ClInclude Include="changeobjectgroupproperties.h" />
+    <ClInclude Include="changepolygon.h" />
+    <ClInclude Include="changeproperties.h" />
+    <ClInclude Include="changetileselection.h" />
+    <QtMoc Include="checkbuildingswindow.h">
+    </QtMoc>
+    <QtMoc Include="checkmapswindow.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\choosebuildingtiledialog.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\choosetemplatesdialog.h">
+    </QtMoc>
+    <QtMoc Include="clipboardmanager.h">
+    </QtMoc>
+    <QtMoc Include="colorbutton.h">
+    </QtMoc>
+    <QtMoc Include="command.h">
+    </QtMoc>
+    <QtMoc Include="commandbutton.h">
+    </QtMoc>
+    <QtMoc Include="commanddatamodel.h">
+    </QtMoc>
+    <QtMoc Include="commanddialog.h">
+    </QtMoc>
+    <ClInclude Include="commandlineparser.h" />
+    <QtMoc Include="containeroverlaydialog.h">
+    </QtMoc>
+    <ClInclude Include="containeroverlayfile.h" />
+    <QtMoc Include="containeroverlayview.h">
+    </QtMoc>
+    <QtMoc Include="convertorientationdialog.h">
+    </QtMoc>
+    <QtMoc Include="converttolotdialog.h">
+    </QtMoc>
+    <QtMoc Include="createobjecttool.h">
+    </QtMoc>
+    <QtMoc Include="createpackdialog.h">
+    </QtMoc>
+    <ClInclude Include="curbtool.h" />
+    <QtMoc Include="curbtooldialog.h">
+    </QtMoc>
+    <QtMoc Include="documentmanager.h">
+    </QtMoc>
+    <ClInclude Include="edgetool.h" />
+    <QtMoc Include="edgetooldialog.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\editmodestatusbar.h">
+    </QtMoc>
+    <QtMoc Include="editpolygontool.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\embeddedmainwindow.h">
+    </QtMoc>
+    <QtMoc Include="enflatulatordialog.h">
+    </QtMoc>
+    <QtMoc Include="eraser.h">
+    </QtMoc>
+    <ClInclude Include="erasetiles.h" />
+    <QtMoc Include="BuildingEditor\fancytabwidget.h">
+    </QtMoc>
+    <ClInclude Include="fencetool.h" />
+    <QtMoc Include="fencetooldialog.h">
+    </QtMoc>
+    <QtMoc Include="filesystemwatcher.h">
+    </QtMoc>
+    <ClInclude Include="filltiles.h" />
+    <QtMoc Include="BuildingEditor\furnituregroups.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\furnitureview.h">
+    </QtMoc>
+    <ClInclude Include="BuildingEditor\horizontallinedelegate.h" />
+    <ClInclude Include="BuildingEditor\utils\hostosinfo.h" />
+    <ClInclude Include="imagelayeritem.h" />
+    <QtMoc Include="imagelayerpropertiesdialog.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\imode.h">
+    </QtMoc>
+    <ClInclude Include="languagemanager.h" />
+    <QtMoc Include="layerdock.h">
+    </QtMoc>
+    <QtMoc Include="layermodel.h">
+    </QtMoc>
+    <ClInclude Include="BuildingEditor\listofstringsdialog.h" />
+    <QtMoc Include="luaconsole.h">
+    </QtMoc>
+    <QtMoc Include="luamapsdialog.h">
+    </QtMoc>
+    <ClInclude Include="luatable.h" />
+    <ClInclude Include="luatiled.h" />
+    <QtMoc Include="luatiletool.h">
+    </QtMoc>
+    <QtMoc Include="luatooldialog.h">
+    </QtMoc>
+    <QtMoc Include="luatooloptions.h">
+    </QtMoc>
+    <QtMoc Include="luaworlddialog.h">
+    </QtMoc>
+    <ClInclude Include="macsupport.h" />
+    <QtMoc Include="mainwindow.h">
+    </QtMoc>
+    <ClInclude Include="mapbuildings.h" />
+    <QtMoc Include="mapcomposite.h">
+    </QtMoc>
+    <QtMoc Include="mapdocument.h">
+    </QtMoc>
+    <QtMoc Include="mapdocumentactionhandler.h">
+    </QtMoc>
+    <QtMoc Include="mapimagemanager.h">
+    </QtMoc>
+    <QtMoc Include="mapmanager.h">
+    </QtMoc>
+    <ClInclude Include="mapobjectitem.h" />
+    <QtMoc Include="mapobjectmodel.h">
+    </QtMoc>
+    <ClInclude Include="mapreaderinterface.h" />
+    <QtMoc Include="mapscene.h">
+    </QtMoc>
+    <QtMoc Include="mapsdock.h">
+    </QtMoc>
+    <QtMoc Include="mapview.h">
+    </QtMoc>
+    <ClInclude Include="mapwriterinterface.h" />
+    <QtMoc Include="minimap.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\mixedtilesetview.h">
+    </QtMoc>
+    <ClInclude Include="movelayer.h" />
+    <ClInclude Include="movemapobject.h" />
+    <ClInclude Include="movemapobjecttogroup.h" />
+    <ClInclude Include="movetileset.h" />
+    <QtMoc Include="BuildingEditor\newbuildingdialog.h">
+    </QtMoc>
+    <QtMoc Include="newmapbinaryfile.h">
+    </QtMoc>
+    <QtMoc Include="newmapdialog.h">
+    </QtMoc>
+    <QtMoc Include="newtilesetdialog.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\objecteditmode.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\objecteditmode_p.h">
+    </QtMoc>
+    <ClInclude Include="objectgroupitem.h" />
+    <QtMoc Include="objectgrouppropertiesdialog.h">
+    </QtMoc>
+    <QtMoc Include="objectpropertiesdialog.h">
+    </QtMoc>
+    <QtMoc Include="objectsdock.h">
+    </QtMoc>
+    <QtMoc Include="objectselectiontool.h">
+    </QtMoc>
+    <ClInclude Include="objecttypes.h" />
+    <QtMoc Include="objecttypesmodel.h">
+    </QtMoc>
+    <ClInclude Include="offsetlayer.h" />
+    <QtMoc Include="offsetmapdialog.h">
+    </QtMoc>
+    <QtMoc Include="packcompare.h">
+    </QtMoc>
+    <QtMoc Include="packextractdialog.h">
+    </QtMoc>
+    <QtMoc Include="packviewer.h">
+    </QtMoc>
+    <ClInclude Include="painttilelayer.h" />
+    <QtMoc Include="picktiletool.h">
+    </QtMoc>
+    <ClInclude Include="pluginmanager.h" />
+    <QtMoc Include="preferences.h">
+    </QtMoc>
+    <QtMoc Include="preferencesdialog.h">
+    </QtMoc>
+    <QtMoc Include="propertiesdialog.h">
+    </QtMoc>
+    <QtMoc Include="propertiesmodel.h">
+    </QtMoc>
+    <ClInclude Include="propertiesview.h" />
+    <QtMoc Include="..\qtsingleapplication\qtlocalpeer.h">
+    </QtMoc>
+    <ClInclude Include="..\qtlockedfile\qtlockedfile.h" />
+    <QtMoc Include="..\qtsingleapplication\qtsingleapplication.h">
+    </QtMoc>
+    <QtMoc Include="quickstampmanager.h">
+    </QtMoc>
+    <ClInclude Include="rangeset.h" />
+    <QtMoc Include="rearrangetiles.h">
+    </QtMoc>
+    <ClInclude Include="renamelayer.h" />
+    <QtMoc Include="BuildingEditor\resizebuildingdialog.h">
+    </QtMoc>
+    <QtMoc Include="resizedialog.h">
+    </QtMoc>
+    <QtMoc Include="resizehelper.h">
+    </QtMoc>
+    <ClInclude Include="resizelayer.h" />
+    <ClInclude Include="resizemap.h" />
+    <ClInclude Include="resizemapobject.h" />
+    <ClInclude Include="BuildingEditor\roofhiding.h" />
+    <ClInclude Include="roomdefecator.h" />
+    <QtMoc Include="roomdefnamedialog.h">
+    </QtMoc>
+    <QtMoc Include="roomdeftool.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\roomsdialog.h">
+    </QtMoc>
+    <QtMoc Include="saveasimagedialog.h">
+    </QtMoc>
+    <ClInclude Include="selectionrectangle.h" />
+    <ClInclude Include="BuildingEditor\simplefile.h" />
+    <ClInclude Include="BuildingEditor\singleton.h" />
+    <QtMoc Include="stampbrush.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\utils\styledbar.h">
+    </QtMoc>
+    <ClInclude Include="BuildingEditor\utils\stylehelper.h" />
+    <QtMoc Include="BuildingEditor\templatefrombuildingdialog.h">
+    </QtMoc>
+    <ClInclude Include="texturepacker.h" />
+    <ClInclude Include="texturepackfile.h" />
+    <ClInclude Include="textureunpacker.h" />
+    <QtMoc Include="threads.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\tilecategoryview.h">
+    </QtMoc>
+    <QtMoc Include="tiledapplication.h">
+    </QtMoc>
+    <QtMoc Include="tiledefcompare.h">
+    </QtMoc>
+    <QtMoc Include="tiledefdialog.h">
+    </QtMoc>
+    <QtMoc Include="tiledeffile.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\tileeditmode.h">
+    </QtMoc>
+    <QtMoc Include="BuildingEditor\tileeditmode_p.h">
+    </QtMoc>
+    <ClInclude Include="tilelayeritem.h" />
+    <QtMoc Include="tilelayerspanel.h">
+    </QtMoc>
+    <QtMoc Include="tilemetainfodialog.h">
+    </QtMoc>
+    <QtMoc Include="tilemetainfomgr.h">
+    </QtMoc>
+    <QtMoc Include="tileoverlaydialog.h">
+    </QtMoc>
+    <ClInclude Include="tileoverlayfile.h" />
+    <ClInclude Include="tilepainter.h" />
+    <QtMoc Include="tileselectionitem.h">
+    </QtMoc>
+    <QtMoc Include="tileselectiontool.h">
+    </QtMoc>
+    <QtMoc Include="tilesetdock.h">
+    </QtMoc>
+    <QtMoc Include="tilesetmanager.h">
+    </QtMoc>
+    <QtMoc Include="tilesetmodel.h">
+    </QtMoc>
+    <QtMoc Include="tilesetstxtfile.h">
+    </QtMoc>
+    <QtMoc Include="tilesetview.h">
+    </QtMoc>
+    <ClInclude Include="tmxmapreader.h" />
+    <ClInclude Include="tmxmapwriter.h" />
+    <QtMoc Include="toolmanager.h">
+    </QtMoc>
+    <ClInclude Include="undocommands.h" />
+    <QtMoc Include="undodock.h">
+    </QtMoc>
+    <QtMoc Include="undoredobuttons.h">
+    </QtMoc>
+    <ClInclude Include="utils.h" />
+    <QtMoc Include="BuildingEditor\welcomemode.h">
+    </QtMoc>
+    <QtMoc Include="worldeddock.h">
+    </QtMoc>
+    <QtMoc Include="worldlottool.h">
+    </QtMoc>
+    <ClInclude Include="zgriditem.h" />
+    <QtMoc Include="zlevelsdock.h">
+    </QtMoc>
+    <QtMoc Include="zlevelsmodel.h">
+    </QtMoc>
+    <QtMoc Include="zlotmanager.h">
+    </QtMoc>
+    <QtMoc Include="zoomable.h">
+    </QtMoc>
+    <QtMoc Include="zprogress.h">
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <!--<ClCompile Include="luatiled.tolua.cpp" />-->
+    <CustomBuild Include="debug\moc_predefs.h.cbt">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\mkspecs\features\data\dummy.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">cl -Bx"$(QTDIR)\bin\qmake.exe" -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -Zi -MDd -W3 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -wd4577 -wd4467 -E $(QTDIR)\mkspecs\features\data\dummy.cpp 2&gt;NUL &gt;debug\moc_predefs.h</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Generate moc_predefs.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">debug\moc_predefs.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="release\moc_predefs.h.cbt">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\mkspecs\features\data\dummy.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">cl -Bx"$(QTDIR)\bin\qmake.exe" -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -O2 -MD -Zi -W3 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -wd4577 -wd4467 -E $(QTDIR)\mkspecs\features\data\dummy.cpp 2&gt;NUL &gt;release\moc_predefs.h</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Generate moc_predefs.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">release\moc_predefs.h;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <QtMoc Include="toolmanager.cpp">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
+      <QtMocDir>$(Configuration)</QtMocDir>
+      <QtMocFileName>%(Filename).moc</QtMocFileName>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="aboutdialog.ui">
+    </QtUic>
+    <QtUic Include="addtilesetsdialog.ui">
+    </QtUic>
+    <QtUic Include="bmptooldialog.ui">
+    </QtUic>
+    <QtUic Include="BuildingEditor\buildingeditorwindow.ui">
+    </QtUic>
+    <QtUic Include="BuildingEditor\buildingfloorsdialog.ui">
+    </QtUic>
+    <QtUic Include="BuildingEditor\buildingkeyvaluesdialog.ui">
+    </QtUic>
+    <QtUic Include="BuildingEditor\buildinglayersdock.ui">
+    </QtUic>
+    <QtUic Include="BuildingEditor\buildingpreferencesdialog.ui">
+    </QtUic>
+    <QtUic Include="BuildingEditor\buildingpropertiesdialog.ui">
+    </QtUic>
+    <QtUic Include="BuildingEditor\buildingtemplatesdialog.ui">
+    </QtUic>
+    <QtUic Include="BuildingEditor\buildingtilesdialog.ui">
+    </QtUic>
+    <QtUic Include="BuildingEditor\buildingtilesetdock.ui">
+    </QtUic>
+    <QtUic Include="checkbuildingswindow.ui">
+    </QtUic>
+    <QtUic Include="checkmapswindow.ui">
+    </QtUic>
+    <QtUic Include="BuildingEditor\choosebuildingtiledialog.ui">
+    </QtUic>
+    <QtUic Include="BuildingEditor\choosetemplatesdialog.ui">
+    </QtUic>
+    <QtUic Include="commanddialog.ui">
+    </QtUic>
+    <QtUic Include="containeroverlaydialog.ui">
+    </QtUic>
+    <QtUic Include="convertorientationdialog.ui">
+    </QtUic>
+    <QtUic Include="converttolotdialog.ui">
+    </QtUic>
+    <QtUic Include="createpackdialog.ui">
+    </QtUic>
+    <QtUic Include="curbtooldialog.ui">
+    </QtUic>
+    <QtUic Include="edgetooldialog.ui">
+    </QtUic>
+    <QtUic Include="enflatulatordialog.ui">
+    </QtUic>
+    <QtUic Include="fencetooldialog.ui">
+    </QtUic>
+    <QtUic Include="BuildingEditor\listofstringsdialog.ui">
+    </QtUic>
+    <QtUic Include="luaconsole.ui">
+    </QtUic>
+    <QtUic Include="luamapsdialog.ui">
+    </QtUic>
+    <QtUic Include="luatooldialog.ui">
+    </QtUic>
+    <QtUic Include="luaworlddialog.ui">
+    </QtUic>
+    <QtUic Include="mainwindow.ui">
+    </QtUic>
+    <QtUic Include="BuildingEditor\newbuildingdialog.ui">
+    </QtUic>
+    <QtUic Include="newimagelayerdialog.ui">
+    </QtUic>
+    <QtUic Include="newmapdialog.ui">
+    </QtUic>
+    <QtUic Include="newtilesetdialog.ui">
+    </QtUic>
+    <QtUic Include="objectpropertiesdialog.ui">
+    </QtUic>
+    <QtUic Include="offsetmapdialog.ui">
+    </QtUic>
+    <QtUic Include="packcompare.ui">
+    </QtUic>
+    <QtUic Include="packextractdialog.ui">
+    </QtUic>
+    <QtUic Include="packviewer.ui">
+    </QtUic>
+    <QtUic Include="preferencesdialog.ui">
+    </QtUic>
+    <QtUic Include="propertiesdialog.ui">
+    </QtUic>
+    <QtUic Include="rearrangetiles.ui">
+    </QtUic>
+    <QtUic Include="BuildingEditor\resizebuildingdialog.ui">
+    </QtUic>
+    <QtUic Include="resizedialog.ui">
+    </QtUic>
+    <QtUic Include="roomdefnamedialog.ui">
+    </QtUic>
+    <QtUic Include="BuildingEditor\roomsdialog.ui">
+    </QtUic>
+    <QtUic Include="saveasimagedialog.ui">
+    </QtUic>
+    <QtUic Include="BuildingEditor\templatefrombuildingdialog.ui">
+    </QtUic>
+    <QtUic Include="tiledefcompare.ui">
+    </QtUic>
+    <QtUic Include="tiledefdialog.ui">
+    </QtUic>
+    <QtUic Include="tilemetainfodialog.ui">
+    </QtUic>
+    <QtUic Include="BuildingEditor\welcomemode.ui">
+    </QtUic>
+    <QtUic Include="worldeddock.ui">
+    </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="images\about-tiled-logo.png" />
+    <None Include="images\22x22\add.png" />
+    <None Include="images\16x16\application-exit.png" />
+    <None Include="images\16x16\black.png" />
+    <None Include="images\22x22\bmp-bucket.png" />
+    <None Include="images\22x22\bmp-eraser.png" />
+    <None Include="images\22x22\bmp-no-blend.png" />
+    <None Include="images\22x22\bmp-rect.png" />
+    <None Include="images\22x22\bmp-select.png" />
+    <None Include="images\22x22\bmp-to-layers.png" />
+    <None Include="images\22x22\bmp-tool.png" />
+    <None Include="images\22x22\bmp-wand.png" />
+    <None Include="images\22x22\brush-circle.png" />
+    <None Include="images\22x22\brush-square.png" />
+    <QtRcc Include="BuildingEditor\buildingeditor.qrc">
+      <InitFuncName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">buildingeditor</InitFuncName>
+      <InitFuncName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">buildingeditor</InitFuncName>
+    </QtRcc>
+    <None Include="images\22x22\curb-tool.png" />
+    <None Include="images\24x24\dice.png" />
+    <None Include="images\16x16\document-export.png" />
+    <None Include="images\16x16\document-import.png" />
+    <None Include="images\16x16\document-new.png" />
+    <None Include="images\24x24\document-new.png" />
+    <None Include="images\16x16\document-open-recent.png" />
+    <None Include="images\24x24\document-open-recent.png" />
+    <None Include="images\16x16\document-open.png" />
+    <None Include="images\24x24\document-open.png" />
+    <None Include="images\16x16\document-page-setup.png" />
+    <None Include="images\24x24\document-page-setup.png" />
+    <None Include="images\16x16\document-properties.png" />
+    <None Include="images\24x24\document-properties.png" />
+    <None Include="images\16x16\document-save-as.png" />
+    <None Include="images\24x24\document-save-as.png" />
+    <None Include="images\16x16\document-save.png" />
+    <None Include="images\24x24\document-save.png" />
+    <None Include="images\16x16\drive-harddisk.png" />
+    <None Include="images\24x24\drive-harddisk.png" />
+    <None Include="images\22x22\edge-tool.png" />
+    <None Include="images\16x16\edit-clear.png" />
+    <None Include="images\24x24\edit-clear.png" />
+    <None Include="images\16x16\edit-copy.png" />
+    <None Include="images\24x24\edit-copy.png" />
+    <None Include="images\16x16\edit-cut.png" />
+    <None Include="images\24x24\edit-cut.png" />
+    <None Include="images\16x16\edit-delete.png" />
+    <None Include="images\16x16\edit-paste.png" />
+    <None Include="images\24x24\edit-paste.png" />
+    <None Include="images\16x16\edit-redo.png" />
+    <None Include="images\24x24\edit-redo.png" />
+    <None Include="images\16x16\edit-rename.png" />
+    <None Include="images\16x16\edit-undo.png" />
+    <None Include="images\24x24\edit-undo.png" />
+    <None Include="images\22x22\fence-tool.png" />
+    <None Include="images\16x16\go-back.png" />
+    <None Include="images\16x16\go-down.png" />
+    <None Include="images\24x24\go-down.png" />
+    <None Include="images\16x16\go-forward.png" />
+    <None Include="images\16x16\go-up.png" />
+    <None Include="images\24x24\go-up.png" />
+    <None Include="images\16x16\green.png" />
+    <None Include="images\16x16\help-about.png" />
+    <None Include="images\24x24\help-about.png" />
+    <None Include="BuildingEditor\icons\icon_corner_innerNE.png" />
+    <None Include="BuildingEditor\icons\icon_corner_innerNW.png" />
+    <None Include="BuildingEditor\icons\icon_corner_innerSE.png" />
+    <None Include="BuildingEditor\icons\icon_corner_innerSW.png" />
+    <None Include="BuildingEditor\icons\icon_corner_outerNE.png" />
+    <None Include="BuildingEditor\icons\icon_corner_outerNW.png" />
+    <None Include="BuildingEditor\icons\icon_corner_outerSE.png" />
+    <None Include="BuildingEditor\icons\icon_corner_outerSW.png" />
+    <None Include="BuildingEditor\icons\icon_corners.png" />
+    <None Include="BuildingEditor\icons\icon_crop.png" />
+    <None Include="BuildingEditor\icons\icon_door.png" />
+    <None Include="BuildingEditor\icons\icon_edges.png" />
+    <None Include="BuildingEditor\icons\icon_expert_mode.png" />
+    <None Include="BuildingEditor\icons\icon_eyedrop.png" />
+    <None Include="BuildingEditor\icons\icon_flip_horizontal.png" />
+    <None Include="BuildingEditor\icons\icon_flip_vertical.png" />
+    <None Include="BuildingEditor\icons\icon_floordn.png" />
+    <None Include="BuildingEditor\icons\icon_floorup.png" />
+    <None Include="BuildingEditor\icons\icon_furniture.png" />
+    <None Include="BuildingEditor\icons\icon_pencil.png" />
+    <None Include="BuildingEditor\icons\icon_resize.png" />
+    <None Include="BuildingEditor\icons\icon_roof.png" />
+    <None Include="BuildingEditor\icons\icon_roof_dormerE.png" />
+    <None Include="BuildingEditor\icons\icon_roof_dormerN.png" />
+    <None Include="BuildingEditor\icons\icon_roof_dormerS.png" />
+    <None Include="BuildingEditor\icons\icon_roof_dormerW.png" />
+    <None Include="BuildingEditor\icons\icon_roof_flat.png" />
+    <None Include="BuildingEditor\icons\icon_roof_peakNS.png" />
+    <None Include="BuildingEditor\icons\icon_roof_peakWE.png" />
+    <None Include="BuildingEditor\icons\icon_roof_slopeE.png" />
+    <None Include="BuildingEditor\icons\icon_roof_slopeN.png" />
+    <None Include="BuildingEditor\icons\icon_roof_slopeS.png" />
+    <None Include="BuildingEditor\icons\icon_roof_slopeW.png" />
+    <None Include="BuildingEditor\icons\icon_rooms.png" />
+    <None Include="BuildingEditor\icons\icon_rotate_left.png" />
+    <None Include="BuildingEditor\icons\icon_rotate_right.png" />
+    <None Include="BuildingEditor\icons\icon_select.png" />
+    <None Include="BuildingEditor\icons\icon_stair.png" />
+    <None Include="BuildingEditor\icons\icon_wall.png" />
+    <None Include="BuildingEditor\icons\icon_window.png" />
+    <None Include="images\24x24\insert-image.png" />
+    <None Include="images\24x24\insert-object.png" />
+    <None Include="images\24x24\insert-polygon.png" />
+    <None Include="images\24x24\insert-polyline.png" />
+    <None Include="images\16x16\layer-image.png" />
+    <None Include="images\16x16\layer-object.png" />
+    <None Include="images\16x16\layer-tile-stop.png" />
+    <None Include="images\16x16\layer-tile.png" />
+    <None Include="images\16x16\lock.png" />
+    <None Include="BuildingEditor\icons\missing-tile.png" />
+    <None Include="images\missing-tile.png" />
+    <None Include="BuildingEditor\icons\mode_iso.png" />
+    <None Include="BuildingEditor\icons\mode_ortho.png" />
+    <None Include="BuildingEditor\icons\mode_tile.png" />
+    <None Include="images\noblend.png" />
+    <None Include="BuildingEditor\icons\none-tile.png" />
+    <None Include="images\16x16\pink.png" />
+    <None Include="images\22x22\remove.png" />
+    <None Include="images\22x22\roomdef-tool.png" />
+    <None Include="BuildingEditor\icons\shadow_curtains.png" />
+    <None Include="BuildingEditor\icons\shadow_door_frames.png" />
+    <None Include="BuildingEditor\icons\shadow_doors.png" />
+    <None Include="BuildingEditor\icons\shadow_floors.png" />
+    <None Include="BuildingEditor\icons\shadow_grime_floor.png" />
+    <None Include="BuildingEditor\icons\shadow_grime_wall.png" />
+    <None Include="BuildingEditor\icons\shadow_roof_caps.png" />
+    <None Include="BuildingEditor\icons\shadow_roof_slopes.png" />
+    <None Include="BuildingEditor\icons\shadow_roof_tops.png" />
+    <None Include="BuildingEditor\icons\shadow_shutters.png" />
+    <None Include="BuildingEditor\icons\shadow_stairs.png" />
+    <None Include="BuildingEditor\icons\shadow_walls.png" />
+    <None Include="BuildingEditor\icons\shadow_windows.png" />
+    <None Include="images\16x16\show_hide_others.png" />
+    <None Include="images\16x16\sort-by-name.png" />
+    <None Include="images\16x16\stock-duplicate-16.png" />
+    <None Include="images\22x22\stock-tool-bucket-fill.png" />
+    <None Include="images\22x22\stock-tool-clone.png" />
+    <None Include="images\22x22\stock-tool-eraser.png" />
+    <None Include="images\22x22\stock-tool-rect-select.png" />
+    <None Include="images\24x24\system-run.png" />
+    <None Include="images\tiled-icon-16.png" />
+    <None Include="images\tiled-icon-32.png" />
+    <QtRcc Include="tiled.qrc">
+      <InitFuncName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">tiled</InitFuncName>
+      <InitFuncName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">tiled</InitFuncName>
+    </QtRcc>
+    <None Include="images\24x24\tool-edit-polygons.png" />
+    <None Include="images\22x22\tool-select-objects.png" />
+    <None Include="images\24x24\warning.png" />
+    <None Include="images\16x16\white.png" />
+    <None Include="images\16x16\window-close.png" />
+    <None Include="images\worlded-icon-16.png" />
+    <None Include="images\16x16\zoom-in.png" />
+    <None Include="images\24x24\zoom-in.png" />
+    <None Include="images\16x16\zoom-original.png" />
+    <None Include="images\24x24\zoom-original.png" />
+    <None Include="images\16x16\zoom-out.png" />
+    <None Include="images\24x24\zoom-out.png" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <CustomBuild Include="luatiled.pkg">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">luatiled.pkg;.\luatiled.h;\tolua.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">F:\PZ\tiled-zomboid\tolua.exe -n tiled -o luatiled.tolua.cpp luatiled.pkg</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">tolua generator</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">luatiled.tolua.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">luatiled.pkg;.\luatiled.h;F:\PZ\tiled-zomboid\tolua.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">F:\PZ\tiled-zomboid\tolua.exe -n tiled -o luatiled.tolua.cpp luatiled.pkg</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">tolua generator</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">luatiled.tolua.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ResourceCompile Include="tiled.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
+    <Import Project="$(QtMsBuild)\qt.targets" />
+  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

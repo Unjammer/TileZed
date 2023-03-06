@@ -30,8 +30,8 @@
 extern "C" {
 #endif
 
-#include "lua.h"
-#include "lauxlib.h"
+#include "../../lua/src/lua.h";
+#include "../../lua/src/lauxlib.h"
 
 struct tolua_Error
 {

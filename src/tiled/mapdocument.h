@@ -28,10 +28,11 @@
 #include <QRegion>
 #include <QString>
 
-#include "layer.h"
+//#include "layer.h"
+#include "../../libtiled/layer.h"
 #ifdef ZOMBOID
-#include "map.h" // for MapRands
-#include "mapobject.h" // needed for meta-type for some reason
+#include "../../libtiled/map.h" // for MapRands
+#include "../../libtiled/mapobject.h" // needed for meta-type for some reason
 #endif
 
 class QPoint;

@@ -107,7 +107,7 @@ BuildingTilesMgr::BuildingTilesMgr() :
     mMissingTile = TilesetManager::instance()->missingTile();
 
     Tileset *tileset = new Tileset(QLatin1String("none"), 64, 128);
-    tileset->setTransparentColor(Qt::white);
+    //tileset->setTransparentColor(Qt::white);
     QString fileName = QLatin1String(":/BuildingEditor/icons/none-tile.png");
     if (tileset->loadFromImage(QImage(fileName), fileName))
         mNoneTiledTile = tileset->tileAt(0);
@@ -289,7 +289,7 @@ static BuildingTileEntry *readTileEntry(BuildingTileCategory *category,
 
     foreach (SimpleFileKeyValue kv, block.values) {
         if (kv.name == QLatin1String("offset")) {
-            QStringList split = kv.value.split(QLatin1Char(' '), Qt::SkipEmptyParts);
+            QStringList split = kv.value.split(QLatin1Char(' '), QString::SkipEmptyParts);
             if (split.size() != 3) {
                 error = BuildingTilesMgr::instance()->tr("Expected 'offset = name x y', got '%1'").arg(kv.value);
                 delete entry;

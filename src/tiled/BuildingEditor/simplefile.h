@@ -54,7 +54,7 @@ public:
     QStringList values() const
     {
         static QRegularExpression re(QLatin1String("[\\s]+"));
-        return value.split(re, Qt::SkipEmptyParts);
+        return value.split(re, QString::SkipEmptyParts);
     }
 
     QString name;

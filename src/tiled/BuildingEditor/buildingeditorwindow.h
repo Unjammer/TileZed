@@ -17,7 +17,7 @@
 
 #ifndef BUILDINGEDITORWINDOW_H
 #define BUILDINGEDITORWINDOW_H
-
+//#define BUILDINGED_SA
 #include <QItemSelection>
 #include <QMainWindow>
 #include <QMap>

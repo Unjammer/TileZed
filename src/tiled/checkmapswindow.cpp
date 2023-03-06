@@ -228,8 +228,10 @@ void CheckMapsWindow::check(MapDocument *doc)
                 if (!lg->orderedCellsAt2(QPoint(x, y), cells))
                     continue;
                 foreach (const Cell *cell, cells) {
-                    if (cell->isEmpty())
+                    if (cell->isEmpty()) {
                         continue;
+                    }
+                        
                     if (cell->tile->image().isNull()) {
                         issue(Issue::Bogus, tr("invisible tile"), x, y, level);
                     } else if (cell->tile->tileset()->name() == QLatin1String("vegetation_groundcover_01")) {
@@ -360,6 +362,16 @@ void CheckMapsWindow::check(MapDocument *doc)
                         }
                     } else if (RearrangeTiles::instance()->isRearranged(cell->tile)) {
                         issue(Issue::Bogus, tr("Rearranged tile (%1)").arg(BuildingEditor::BuildingTilesMgr::instance()->nameForTile(cell->tile)), x, y, level);
+                    }
+                    else if (cell->tile->tileset()->name() == QLatin1String("blends_natural_01")) {
+                        foreach(const Cell* cell2, cells) {
+                            if (cell2 != cell && !cell2->isEmpty() && (cell2->tile->tileset()->name() == QLatin1String("blends_natural_02")) &&
+                                (cell2->tile->id() == 0 || cell2->tile->id() == 5 || cell2->tile->id() == 6 || cell2->tile->id() == 7)) {
+                                issue(Issue::Bogus, tr("Water tile not on ground"), x, y, level);
+                                
+                                break;
+                            }
+                        }
                     }
                 }
             }

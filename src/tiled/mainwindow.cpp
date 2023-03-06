@@ -175,6 +175,7 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     , mWorldEdDock(new WorldEdDock(this))
 #endif
     , mTilesetDock(new TilesetDock(this))
+
 #ifdef ZOMBOID
     , mTileLayersPanel(new TileLayersPanel())
     , mMainSplitter(new QSplitter(this))
@@ -185,7 +186,7 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
 #else
     , mCurrentLayerLabel(new QLabel)
 #endif
-    , mZoomable(nullptr)
+    , mZoomable(new Zoomable(this))
     , mZoomComboBox(new QComboBox)
     , mStatusInfoLabel(new QLabel)
 #ifdef ZOMBOID
@@ -315,7 +316,7 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     mUi->actionShowMiniMap->setChecked(preferences->showMiniMap());
     mUi->actionShowTileLayersPanel->setChecked(preferences->showTileLayersPanel());
 
-    mUi->actionExportNewBinary->setVisible(false);
+    mUi->actionExportNewBinary->setVisible(true);
 #endif
 
     // Make sure Ctrl+= also works for zooming in
@@ -601,6 +602,7 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     statusBarLayout->addWidget(mCurrentLayerButton);
     statusBarLayout->addStretch();
     mZoomComboBox->setObjectName(QLatin1String("zoomComboBox"));
+    mZoomComboBox->setEditable(false);
     statusBarLayout->addWidget(mZoomComboBox);
 #else
     statusBar()->addWidget(mCurrentLayerLabel);
@@ -610,6 +612,7 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     mUi->menuView->addAction(mLayerDock->toggleViewAction());
     mUi->menuView->addAction(undoDock->toggleViewAction());
     mUi->menuView->addAction(mObjectsDock->toggleViewAction());
+    //mUi->menuView->addAction(mBmpTools->toggleViewAction());
 #ifdef ZOMBOID
     mUi->menuView->addAction(mLevelsDock->toggleViewAction());
     mUi->menuView->addAction(mWorldEdDock->toggleViewAction());
@@ -2089,7 +2092,8 @@ static QList<QRect> cleanupRegion(QRegion region)
 {
     // Clean up the region by merging vertically-adjacent rectangles of the
     // same width.
-    QVector<QRect> rects(region.begin(), region.end());
+    //QVector<QRect> rects(region.begin(), region.end());
+    QVector<QRect> rects(region.rects());
     for (int i = 0; i < rects.size(); i++) {
         QRect r = rects[i];
         if (!r.isValid()) continue;
@@ -3128,7 +3132,7 @@ void MainWindow::readSettings()
 void MainWindow::updateWindowTitle()
 {
     if (mMapDocument) {
-        setWindowTitle(tr("[*]%1 - Tiled").arg(mMapDocument->displayName()));
+        setWindowTitle(tr("[*]%1 - TileZed (Unofficial fork by Alree build:230306)").arg(mMapDocument->displayName()));
         setWindowFilePath(mMapDocument->fileName());
         setWindowModified(mMapDocument->isModified());
     } else {
@@ -3301,11 +3305,11 @@ void MainWindow::setupQuickStamps()
         connect(saveStamp, &QShortcut::activated, saveMapper, qOverload<>(&QSignalMapper::map));
         saveMapper->setMapping(saveStamp, i);
     }
+    connect(selectMapper, QOverload<int>::of(&QSignalMapper::mapped), quickStampManager, &QuickStampManager::selectQuickStamp);
+    //connect(selectMapper, &QSignalMapper::mappedInt, quickStampManager, &QuickStampManager::selectQuickStamp);
 
-    connect(selectMapper, &QSignalMapper::mappedInt,
-            quickStampManager, &QuickStampManager::selectQuickStamp);
-    connect(saveMapper, &QSignalMapper::mappedInt,
-            quickStampManager, &QuickStampManager::saveQuickStamp);
+    connect(saveMapper, QOverload<int>::of(&QSignalMapper::mapped), quickStampManager, &QuickStampManager::saveQuickStamp);
+    //connect(saveMapper, &QSignalMapper::mappedInt, quickStampManager, &QuickStampManager::saveQuickStamp);
 
     connect(quickStampManager, &QuickStampManager::setStampBrush,
             this, &MainWindow::setStampBrush);

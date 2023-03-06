@@ -50,6 +50,8 @@
 #include <QUndoGroup>
 #include <QUndoStack>
 
+#include "preferences.h"
+
 using namespace BuildingEditor;
 using namespace Tiled;
 using namespace Tiled::Internal;
@@ -1771,8 +1773,17 @@ void BuildingTilesDialog::tilesetChanged(Tileset *tileset)
     }
 
     int row = TileMetaInfoMgr::instance()->indexOf(tileset);
-    if (QListWidgetItem *item = ui->tilesetList->item(row))
-        item->setForeground(tileset->isMissing() ? Qt::red : Qt::black);
+    if (QListWidgetItem* item = ui->tilesetList->item(row))
+    {
+        if (Tiled::Internal::Preferences::instance()->enableDarkTheme())
+        {
+            item->setForeground(tileset->isMissing() ? Qt::red : QColor("#DDDDDD"));
+        }
+        else {
+            item->setForeground(tileset->isMissing() ? Qt::red : Qt::black);
+        }
+    }
+        
 }
 
 void BuildingTilesDialog::undoTextChanged(const QString &text)

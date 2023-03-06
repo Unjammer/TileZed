@@ -104,6 +104,7 @@ class LuaTileLayer @ TileLayer : public LuaLayer
 class LuaMapObject @ MapObject
 {
     LuaMapObject(const char *name, const char *type, int x, int y, int width, int height);
+    //LuaMapObject(const char *name, int x, int y, int width, int height);
 
     const char *name();
     const char *type();
@@ -224,8 +225,10 @@ class LuaMap @ Map
     LuaLayer *layerAt(int index);
     LuaLayer *layer(const char *name);
     LuaTileLayer *tileLayer(const char *name);
+    LuaObjectGroup *objectLayer(const char *name);
     
     LuaTileLayer *newTileLayer(const char *name);
+    LuaObjectGroup *newObjectLayer(const char *name);
 
     void addTileset(Tileset *tileset);
     int tilesetCount();

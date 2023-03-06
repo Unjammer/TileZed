@@ -115,7 +115,8 @@ QSet<Tileset*> ObjectGroup::usedTilesets() const
 {
 #ifdef ZOMBOID
     QList<Tileset*> keys = mUsedTilesets.keys();
-    return { keys.begin(), keys.end() };
+    //return { keys.begin(), keys.end() };
+    return { keys.toSet() };
 #else
     QSet<Tileset*> tilesets;
 

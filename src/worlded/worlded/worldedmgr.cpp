@@ -140,7 +140,8 @@ void WorldEdMgr::fileChanged(const QString &fileName)
 void WorldEdMgr::fileChangedTimeout()
 {
     qDebug() << "WorldEdMgr::fileChangedTimeout";
-    QStringList files(mChangedFiles.begin(), mChangedFiles.end());
+    //QStringList files(mChangedFiles.begin(), mChangedFiles.end());
+    QStringList files(mChangedFiles.toList());
     mChangedFiles.clear();
 
     foreach (QString fileName, files) {

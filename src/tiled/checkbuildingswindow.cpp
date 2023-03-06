@@ -256,7 +256,8 @@ void CheckBuildingsWindow::check(const QString &filePath)
         bmap.addRoomDefObjects(map);
         QSet<Tileset*> usedTilesets = map->usedTilesets();
         usedTilesets.remove(TilesetManager::instance()->missingTileset());
-        TileMetaInfoMgr::instance()->loadTilesets({usedTilesets.begin(), usedTilesets.end()});
+        //TileMetaInfoMgr::instance()->loadTilesets({usedTilesets.begin(), usedTilesets.end()});
+        TileMetaInfoMgr::instance()->loadTilesets({usedTilesets.toList()});
 //            TilesetManager::instance()->removeReferences(map->tilesets());
         check(&bmap, building, map, filePath);
         TilesetManager::instance()->removeReferences(map->tilesets());

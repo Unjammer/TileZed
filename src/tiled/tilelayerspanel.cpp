@@ -89,7 +89,13 @@ void LayersPanelDelegate::paint(QPainter *painter,
     if (index.row() > 0 && !(option.state & QStyle::State_Selected)) {
         painter->setPen(Qt::darkGray);
         painter->drawLine(option.rect.topLeft(), option.rect.topRight());
-        painter->setPen(Qt::black);
+        if (Preferences::instance()->enableDarkTheme())
+        {
+            painter->setPen(QColor("#DDDDDD"));
+        }
+        else {
+            painter->setPen(Qt::black);
+        }
     }
 
     // Note: BuildingTilesMgr::instance()->noneTiledTile() is used for valid
@@ -109,6 +115,9 @@ void LayersPanelDelegate::paint(QPainter *painter,
 
     // Draw the tile image
     if (tile != 0) {
+        QString tileName = QFileInfo(tile->tileset()->imageSource()).baseName() + QLatin1Char('_') + QString::number(m->tileAt(index)->id());
+        QString tileId = QLatin1Char('_') + QString::number(m->tileAt(index)->id());
+
         const QVariant display = index.model()->data(index, Qt::DisplayRole);
         const QPixmap tileImage = QPixmap::fromImage(tile->image()); //display.value<QPixmap>();
         const int tileWidth = qCeil(tile->tileset()->tileWidth() * mView->zoomable()->scale());
@@ -118,10 +127,12 @@ void LayersPanelDelegate::paint(QPainter *painter,
 
         const int dw = option.rect.width() - tileWidth;
         QMargins margins = tile->drawMargins(mView->zoomable()->scale());
-        painter->drawPixmap(option.rect.adjusted(dw/2, extra + labelHeight + extra,
+        painter->drawPixmap(option.rect.adjusted(dw/2, extra + (labelHeight) + extra,
                                                  -(dw - dw/2), -extra)
                             .adjusted(margins.left(), margins.top(), -margins.right(), -margins.bottom()),
                             tileImage);
+        painter->drawText(option.rect.left(), option.rect.top() + labelHeight,
+            option.rect.width(), labelHeight, Qt::AlignHCenter, tileName);
     }
 #if 0
     // Overlay with highlight color when selected
@@ -157,6 +168,9 @@ void LayersPanelDelegate::paint(QPainter *painter,
     }
 
     // Draw the layer name.  Underline it if the mouse is over it.
+    
+
+
     QString label = index.data(Qt::DecorationRole).toString();
     QString name = fm.elidedText(label, Qt::ElideRight, option.rect.width());
     const QFont oldFont = painter->font();
@@ -169,6 +183,7 @@ void LayersPanelDelegate::paint(QPainter *painter,
         painter->setPen(Qt::gray);
     painter->drawText(option.rect.left(), option.rect.top() + 2,
                       option.rect.width(), labelHeight, Qt::AlignHCenter, name);
+    
     if (!tile)
         painter->setPen(oldPen);
     if (mMouseOverIndex == index)
@@ -702,9 +717,15 @@ void TileLayersPanel::setList()
             tile = BuildingEditor::BuildingTilesMgr::instance()->noneTiledTile();
         int layerIndex = mDocument->map()->layers().indexOf(tl);
         mView->prependLayer(layerName, tile, layerIndex);
-
-        QBrush brush(tl->isVisible() ? Qt::white : Qt::lightGray);
-        mView->model()->setData(mView->model()->index(layerIndex), brush, Qt::BackgroundRole);
+        if (Preferences::instance()->enableDarkTheme())
+        {
+            QBrush brush(tl->isVisible() ? QColor("#1F1F1F") : Qt::lightGray);
+            mView->model()->setData(mView->model()->index(layerIndex), brush, Qt::BackgroundRole);
+        }
+        else {
+            QBrush brush(tl->isVisible() ? Qt::white : Qt::lightGray);
+            mView->model()->setData(mView->model()->index(layerIndex), brush, Qt::BackgroundRole);
+        }
         ++index;
     }
 
@@ -786,8 +807,17 @@ void TileLayersPanel::layerChanged(int index)
         if (mi.isValid()) {
             QString name = MapComposite::layerNameWithoutPrefix(layer);
             mView->model()->setData(mi, name, Qt::DecorationRole);
-            QBrush brush(layer->isVisible() ? Qt::white : Qt::lightGray);
-            mView->model()->setData(mi, brush, Qt::BackgroundRole);
+            
+            if (Preferences::instance()->enableDarkTheme())
+            {
+                QBrush brush(layer->isVisible() ? QColor("#1F1F1F") : Qt::lightGray);
+                mView->model()->setData(mi, brush, Qt::BackgroundRole);
+            }
+            else {
+                QBrush brush(layer->isVisible() ? Qt::white : Qt::lightGray);
+                mView->model()->setData(mi, brush, Qt::BackgroundRole);
+            }
+            
         }
     }
 }

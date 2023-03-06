@@ -14,7 +14,7 @@
    <bool>true</bool>
   </property>
   <property name="windowTitle">
-   <string>Tiled</string>
+   <string>TileZed (Unofficial fork by Alree)</string>
   </property>
   <property name="unifiedTitleAndToolBarOnMac">
    <bool>true</bool>

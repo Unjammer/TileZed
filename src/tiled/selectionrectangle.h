@@ -24,28 +24,28 @@
 #include <QGraphicsItem>
 
 namespace Tiled {
-namespace Internal {
+    namespace Internal {
 
-/**
- * The rectangle used for indicating the dragged area when selecting items.
- */
-class SelectionRectangle : public QGraphicsItem
-{
-public:
-    SelectionRectangle(QGraphicsItem *parent = 0);
+        /**
+         * The rectangle used for indicating the dragged area when selecting items.
+         */
+        class SelectionRectangle : public QGraphicsItem
+        {
+        public:
+            SelectionRectangle(QGraphicsItem* parent = 0);
 
-    void setRectangle(const QRectF &rectangle);
+            void setRectangle(const QRectF& rectangle);
 
-    QRectF boundingRect() const;
-    void paint(QPainter *painter,
-               const QStyleOptionGraphicsItem *option,
-               QWidget *widget = 0);
+            QRectF boundingRect() const;
+            void paint(QPainter* painter,
+                const QStyleOptionGraphicsItem* option,
+                QWidget* widget = 0);
 
-private:
-    QRectF mRectangle;
-};
+        private:
+            QRectF mRectangle;
+        };
 
-} // namespace Internal
+    } // namespace Internal
 } // namespace Tiled
 
 #endif // SELECTIONRECTANGLE_H

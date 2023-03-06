@@ -42,6 +42,7 @@
 #include <QGraphicsScene>
 #include <QStyleOptionGraphicsItem>
 
+
 using namespace Tiled;
 
 /**
@@ -164,7 +165,9 @@ TmxViewer::TmxViewer(QWidget *parent) :
     setDragMode(QGraphicsView::ScrollHandDrag);
     setOptimizationFlags(QGraphicsView::DontAdjustForAntialiasing
                          | QGraphicsView::DontSavePainterState);
-    setBackgroundBrush(Qt::black);
+        setBackgroundBrush(Qt::black);
+
+    
     setFrameStyle(QFrame::NoFrame);
 
     viewport()->setAttribute(Qt::WA_StaticContents);

@@ -550,18 +550,18 @@ void MapReaderPrivate::decodeBinaryLayerData(TileLayer *tileLayer,
 }
 
 #if defined(ZOMBOID) /*&& defined(_DEBUG)*/
-void QString_split(const QChar &sep, Qt::SplitBehavior behavior, Qt::CaseSensitivity cs, const QString &in, QVector<int>& out)
+void QString_split(const QChar &sep, QString::SplitBehavior behavior, Qt::CaseSensitivity cs, const QString &in, QVector<int>& out)
 {
     int start = 0;
     int end;
     while ((end = in.indexOf(sep, start, cs)) != -1) {
-        if (start != end || behavior == Qt::KeepEmptyParts) {
+        if (start != end || behavior == QString::KeepEmptyParts) {
             out.append(start);
             out.append(end - start);
         }
         start = end + 1;
     }
-    if (start != in.size() || behavior == Qt::KeepEmptyParts) {
+    if (start != in.size() || behavior == QString::KeepEmptyParts) {
         out.append(start);
         out.append(in.size() - start);
     }
@@ -863,7 +863,7 @@ QPolygonF MapReaderPrivate::readPolygon()
     const QXmlStreamAttributes atts = xml.attributes();
     const QString points = atts.value(QLatin1String("points")).toString();
     const QStringList pointsList = points.split(QLatin1Char(' '),
-                                                Qt::SkipEmptyParts);
+                                                QString::SkipEmptyParts);
 
     QPolygonF polygon;
     bool ok = true;
@@ -999,7 +999,7 @@ void MapReaderPrivate::readBmpAliases()
             const QXmlStreamAttributes atts = xml.attributes();
             QString name = atts.value(QLatin1String("name")).toString();
             QStringList tiles = atts.value(QLatin1String("tiles")).toString()
-                    .split(QLatin1Char(' '), Qt::SkipEmptyParts);
+                    .split(QLatin1Char(' '), QString::SkipEmptyParts);
             aliases += new BmpAlias(name, tiles);
             xml.skipCurrentElement();
         } else {
@@ -1067,9 +1067,9 @@ void MapReaderPrivate::readBmpBlends()
             }
             BmpBlend::Direction dir = dirMap[dirString];
             QStringList ExclusionList = atts.value(QLatin1String("ExclusionList"))
-                    .toString().split(QLatin1Char(' '), Qt::SkipEmptyParts);
+                    .toString().split(QLatin1Char(' '), QString::SkipEmptyParts);
             QStringList exclude2 = atts.value(QLatin1String("exclude2"))
-                    .toString().split(QLatin1Char(' '), Qt::SkipEmptyParts);
+                    .toString().split(QLatin1Char(' '), QString::SkipEmptyParts);
             blends += new BmpBlend(targetLayer, mainTile, blendTile, dir,
                                    ExclusionList, exclude2);
             xml.skipCurrentElement();
@@ -1101,7 +1101,7 @@ bogusColor:
                 xml.raiseError(tr("invalid bmp-image color '%1'").arg(rgbString));
                 return;
             }
-            QStringList split = rgbString.split(QLatin1Char(' '), Qt::SkipEmptyParts);
+            QStringList split = rgbString.split(QLatin1Char(' '), QString::SkipEmptyParts);
             if (split.size() != 3)
                 goto bogusColor;
             int r = split[0].toInt();

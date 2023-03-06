@@ -81,6 +81,7 @@ Preferences::Preferences()
     mLanguage = mSettings->value(QLatin1String("Language"),
                                  QString()).toString();
     mUseOpenGL = mSettings->value(QLatin1String("OpenGL"), false).toBool();
+    menableDarkTheme = mSettings->value(QLatin1String("EnableDarkTheme"), false).toBool();
 #ifdef ZOMBOID
     mAutoSwitchLayer = mSettings->value(QLatin1String("AutoSwitchLayer"), true).toBool();
     mTilesetScale = mSettings->value(QLatin1String("TilesetScale"), 1.0).toReal();
@@ -99,6 +100,8 @@ Preferences::Preferences()
 #ifdef ZOMBOID
     mEraserBrushSize = mSettings->value(QLatin1String("Tools/Eraser/BrushSize"), 1).toInt();
 #endif
+    mGridOpacity = mSettings->value(QLatin1String("GridOpacity"), 128).toInt();
+    mGridWidth = mSettings->value(QLatin1String("GridWidth"), 128).toInt();
 
     // Retrieve defined object types
     mSettings->beginGroup(QLatin1String("ObjectTypes"));
@@ -287,6 +290,17 @@ void Preferences::setUseOpenGL(bool useOpenGL)
     mSettings->setValue(QLatin1String("Interface/OpenGL"), mUseOpenGL);
 
     emit useOpenGLChanged(mUseOpenGL);
+}
+
+void Preferences::setenableDarkTheme(bool useDarkTheme)
+{
+    if (menableDarkTheme == useDarkTheme)
+        return;
+
+    menableDarkTheme = useDarkTheme;
+    mSettings->setValue(QLatin1String("Interface/EnableDarkTheme"), menableDarkTheme);
+
+    emit enableDarkTheme(menableDarkTheme);
 }
 
 void Preferences::setObjectTypes(const ObjectTypes &objectTypes)
@@ -613,6 +627,24 @@ void Preferences::setEraserBrushSize(int newSize)
     mEraserBrushSize = newSize;
     mSettings->setValue(QLatin1String("Tools/Eraser/BrushSize"), mEraserBrushSize);
     emit eraserBrushSizeChanged(mEraserBrushSize);
+}
+
+void Preferences::setGridOpacity(int newOpacity)
+{
+    if (mGridOpacity == newOpacity)
+        return;
+    mGridOpacity = newOpacity;
+    mSettings->setValue(QLatin1String("GridOpacity"), mGridOpacity);
+    emit gridOpacityChanged(mGridOpacity);
+}
+
+void Preferences::setGridWidth(int newWidth)
+{
+    if (mGridWidth == newWidth)
+        return;
+    mGridWidth = newWidth;
+    mSettings->setValue(QLatin1String("GridWidth"), mGridWidth);
+    emit gridWidthChanged(mGridWidth);
 }
 
 void Preferences::setTilesetBackgroundColor(const QColor &color)

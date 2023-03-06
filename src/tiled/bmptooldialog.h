@@ -100,6 +100,8 @@ private:
     explicit BmpToolDialog(QWidget *parent = 0);
     ~BmpToolDialog();
 
+    void onActiveStateChanged(bool active);
+
     Ui::BmpToolDialog *ui;
     MapDocument *mDocument;
     bool mVisibleLater;

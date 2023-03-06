@@ -273,6 +273,11 @@ private slots:
 
     void tilesetBackgroundColorChanged(const QColor& color);
 
+    void changeTilesetBackgroundColorWhite();
+    void changeTilesetBackgroundColorBlack();
+    void changeTilesetBackgroundColorPink();
+    void changeTilesetBackgroundColorGreen();
+
 private:
     void setTilesetNamesList();
     void setTilesetList();
@@ -301,6 +306,10 @@ private:
     QAction *mActionDeleteTileset;
     QAction *mActionRenameTileset;
     QAction *mActionSwitchLayer;
+    QAction *mActionBackgroundColorWhite;
+    QAction *mActionBackgroundColorBlack;
+    QAction *mActionBackgroundColorPink;
+    QAction *mActionBackgroundColorGreen;
 
     ColorButton *mBackgroundColorButton;
 

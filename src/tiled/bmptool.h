@@ -23,6 +23,7 @@
 #include "map.h" // for MapRands
 
 #include <QUndoCommand>
+#include <QDockWidget>
 
 namespace Tiled {
 class Layer;

@@ -652,7 +652,8 @@ void BmpRuleView::setRules(const Map *map)
         }
     }
     if (tilesets.isEmpty() == false) {
-        TileMetaInfoMgr::instance()->loadTilesets({tilesets.begin(), tilesets.end()});
+        //TileMetaInfoMgr::instance()->loadTilesets({tilesets.begin(), tilesets.end()});
+        TileMetaInfoMgr::instance()->loadTilesets({tilesets.toList()});
     }
     model()->setRules(map);
 }

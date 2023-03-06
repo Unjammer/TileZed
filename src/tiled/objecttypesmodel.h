@@ -26,44 +26,44 @@
 #include <QAbstractTableModel>
 
 namespace Tiled {
-namespace Internal {
+    namespace Internal {
 
-class ObjectTypesModel : public QAbstractTableModel
-{
-    Q_OBJECT
+        class ObjectTypesModel : public QAbstractTableModel
+        {
+            Q_OBJECT
 
-public:
-    enum { ColorRole = Qt::UserRole };
+        public:
+            enum { ColorRole = Qt::UserRole };
 
-    ObjectTypesModel(QObject *parent = 0)
-        : QAbstractTableModel(parent)
-    {}
+            ObjectTypesModel(QObject* parent = 0)
+                : QAbstractTableModel(parent)
+            {}
 
-    void setObjectTypes(const ObjectTypes &objectTypes);
+            void setObjectTypes(const ObjectTypes& objectTypes);
 
-    const ObjectTypes &objectTypes() const { return mObjectTypes; }
+            const ObjectTypes& objectTypes() const { return mObjectTypes; }
 
-    int rowCount(const QModelIndex &parent) const;
-    int columnCount(const QModelIndex &parent) const;
+            int rowCount(const QModelIndex& parent) const;
+            int columnCount(const QModelIndex& parent) const;
 
-    QVariant headerData(int section, Qt::Orientation orientation,
-                        int role) const;
+            QVariant headerData(int section, Qt::Orientation orientation,
+                int role) const;
 
-    QVariant data(const QModelIndex &index, int role) const;
-    bool setData(const QModelIndex &index, const QVariant &value, int role);
-    Qt::ItemFlags flags(const QModelIndex &index) const;
+            QVariant data(const QModelIndex& index, int role) const;
+            bool setData(const QModelIndex& index, const QVariant& value, int role);
+            Qt::ItemFlags flags(const QModelIndex& index) const;
 
-    void setObjectTypeColor(int objectIndex, const QColor &color);
-    void removeObjectTypes(const QModelIndexList &indexes);
+            void setObjectTypeColor(int objectIndex, const QColor& color);
+            void removeObjectTypes(const QModelIndexList& indexes);
 
-public slots:
-    void appendNewObjectType();
+        public slots:
+            void appendNewObjectType();
 
-private:
-    ObjectTypes mObjectTypes;
-};
+        private:
+            ObjectTypes mObjectTypes;
+        };
 
-} // namespace Internal
+    } // namespace Internal
 } // namespace Tiled
 
 #endif // OBJECTTYPESMODEL_H

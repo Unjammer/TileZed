@@ -1,4 +1,4 @@
-include($$top_srcdir/tiled.pri)
+include($$top_srcdir/PZWorldEd.pri)
 
 TEMPLATE = lib
 TARGET = zlib1
@@ -8,10 +8,8 @@ CONFIG -= qt
 
 win32:DEFINES += ZLIB_DLL
 
-isEmpty(INSTALL_ONLY_BUILD) {
-    target.path = $${LIBDIR}
-    INSTALLS += target
-}
+target.path = $${LIBDIR}
+INSTALLS += target
 
 macx {
     DESTDIR = ../../bin/TileZed.app/Contents/Frameworks

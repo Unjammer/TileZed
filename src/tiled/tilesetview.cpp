@@ -48,6 +48,7 @@
 #include <QScrollBar>
 #endif
 
+
 using namespace Tiled;
 using namespace Tiled::Internal;
 
@@ -90,6 +91,8 @@ void TileDelegate::paint(QPainter *painter,
     const QFontMetrics fm = painter->fontMetrics();
     const int labelHeight = mTilesetView->showLayerNames() ? fm.lineSpacing() : 0;
     const TilesetModel *m = static_cast<const TilesetModel*>(index.model());
+    QString tileName = QFileInfo(m->tileset()->imageSource()).baseName() + QLatin1Char('_') + QString::number(m->tileAt(index)->id());
+    QString tileId = QLatin1Char('_') + QString::number(m->tileAt(index)->id());
     if (Tile *tile = m->tileAt(index)) {
         const QMargins margins = tile->drawMargins(mTilesetView->zoomable()->scale());
         painter->drawPixmap(option.rect.adjusted(margins.left(), margins.top(), -extra - margins.right(), -extra - labelHeight - margins.bottom()), tileImage);
@@ -97,12 +100,16 @@ void TileDelegate::paint(QPainter *painter,
 
     if (mTilesetView->showLayerNames()) {
         const QVariant decoration = index.model()->data(index, Qt::DecorationRole);
+        
         QString layerName = decoration.toString();
         if (layerName.isEmpty())
             layerName = QLatin1String("???");
 
+
         QString name = fm.elidedText(layerName, Qt::ElideRight, option.rect.width());
+        
         painter->drawText(option.rect.left(), option.rect.bottom() - labelHeight, option.rect.width(), labelHeight, Qt::AlignHCenter, name);
+        painter->drawText(option.rect.left(), option.rect.top(), option.rect.width(), labelHeight, Qt::AlignLeft, tileId);
     }
 
     if (mTilesetView->drawGrid()) {
@@ -120,6 +127,7 @@ void TileDelegate::paint(QPainter *painter,
         painter->fillRect(option.rect.adjusted(0, 0, -extra, -extra),
                           option.palette.highlight());
         painter->setOpacity(opacity);
+        
     }
 }
 
@@ -343,15 +351,30 @@ void TilesetView::contextMenuEvent(QContextMenuEvent *event)
     QMenu menu;
 
     QIcon propIcon(QLatin1String(":images/16x16/document-properties.png"));
+    QIcon exportIcon(QLatin1String(":images/16x16/document-export.png"));
 
 #ifdef ZOMBOID
+    //const TilesetModel* a = static_cast<const TilesetModel*>(index.model());
+    
+
+    
     QAction *actionProperties = 0;
+    QAction *exportTileAsPng = 0;
     if (tile) {
+        QString tileName = QFileInfo(m->tileset()->imageSource()).baseName() + QLatin1Char('_') + QString::number(m->tileAt(index)->id());
+        QAction* toggleTileName = menu.addAction(tileName);
+        toggleTileName->setText(tileName);
+        
+
+        menu.addSeparator();
         actionProperties = menu.addAction(propIcon,
                                           tr("Tile &Properties..."));
         actionProperties->setEnabled(!isExternal);
         Utils::setThemeIcon(actionProperties, "document-properties");
         menu.addSeparator();
+        exportTileAsPng = menu.addAction(exportIcon, tr("Export selection as png"));
+        Utils::setThemeIcon(exportTileAsPng, "document-export");
+        exportTileAsPng->setText(tr("Export selection as png"));
     }
 #else
     if (tile) {
@@ -394,7 +417,8 @@ void TilesetView::contextMenuEvent(QContextMenuEvent *event)
             if (!layerName.isEmpty())
                 set.insert(layerName);
         }
-        layerNames = QStringList(set.begin(), set.end());
+        //layerNames = QStringList(set.begin(), set.end());
+        layerNames = QStringList(set.toList());
         layerNames.sort();
 
         QMenu *layersMenu = menu.addMenu(QLatin1String("Default Layer"));
@@ -447,6 +471,42 @@ void TilesetView::contextMenuEvent(QContextMenuEvent *event)
             mMapDocument->undoStack()->push(undo);
         }
         undoStack->endMacro();
+    }
+    else if (action && action == exportTileAsPng)
+    {
+        int index = layerActions.indexOf(action);
+        QModelIndexList indexes = selectionModel()->selectedIndexes();
+        foreach(QModelIndex index, indexes) {
+            tile = m->tileAt(index);
+            QString tileName = QFileInfo(m->tileset()->imageSource()).baseName() + QLatin1Char('_') + QString::number(m->tileAt(index)->id());
+            tileName = QFileInfo(m->tileset()->imageSource()).baseName() + QLatin1Char('_') + QString::number(tile->id());
+            QVariant display = index.model()->data(index, Qt::DisplayRole);
+            QPixmap tileImage = display.value<QPixmap>();
+            QDir dir(QDir::currentPath() + QLatin1Literal("/tiles_export/"));
+            if (!dir.exists()) {
+                dir.mkpath(QLatin1Literal("."));
+            }
+            QFile file(QDir::currentPath() + QLatin1Literal("/tiles_export/") + tileName + QLatin1Literal(".png"));
+            file.open(QIODevice::WriteOnly);
+            tileImage.save(&file, "PNG");
+
+            //int width = 128;
+            //int height = 256;
+            //QPixmap tileImage = display.value<QPixmap>();
+            //QPixmap canvas(width, height);
+            //canvas.fill(Qt::transparent);
+            //QPainter painter(&canvas);
+            //QRect target = QRect((width - tileImage.width()) / 2, (height - tileImage.height()) / 2, tileImage.width(), tileImage.height());
+            //painter.drawPixmap(target, tileImage);
+
+            //QDir dir(QDir::currentPath() + QLatin1Literal("/tiles_export/"));
+            //if (!dir.exists()) {
+            //    dir.mkpath(QLatin1Literal("."));
+            //}
+            //QFile file(QDir::currentPath() + QLatin1Literal("/tiles_export/") + tileName + QLatin1Literal(".png"));
+            //file.open(QIODevice::WriteOnly);
+            //canvas.save(&file, "PNG");
+        }
     }
 #else
     menu.exec(event->globalPos());

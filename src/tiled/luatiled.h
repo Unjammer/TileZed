@@ -95,7 +95,8 @@ public:
 
     QVector<QRect> rects() const
     {
-        return QVector<QRect>(begin(), end());
+        //return QVector<QRect>(begin(), end());
+        return QVector<QRect>(this->rects());
     }
 
     void unite(int x, int y, int w, int h) { *this += QRect(x, y, w, h); }
@@ -202,6 +203,8 @@ public:
     ObjectGroup *mCloneObjectGroup;
     ObjectGroup *mOrig;
     QList<LuaMapObject*> mObjects;
+    QList<LuaMapObject*> mRemovedObjects;
+    QMap<QString, LuaMapObject*> mObjectsByName;
     QColor mColor;
 };
 
@@ -340,8 +343,10 @@ public:
     LuaLayer *layerAt(int index) const;
     LuaLayer *layer(const char *name);
     LuaTileLayer *tileLayer(const char *name);
+    LuaObjectGroup *objectLayer(const char *name);
 
     LuaTileLayer *newTileLayer(const char *name);
+    LuaObjectGroup *newObjectLayer(const char *name);
 
     void addLayer(LuaLayer *layer);
     void insertLayer(int index, LuaLayer *layer);

@@ -19,6 +19,7 @@
 
 #include "luaconsole.h"
 #include "luatable.h"
+#include "preferences.h"
 
 #include "BuildingEditor/buildingtiles.h"
 
@@ -99,7 +100,13 @@ bool TileOverlayParser::dofile(const QString &f, QString &output)
     }
     if (status != LUA_OK) {
         output = QString::fromLatin1(lua_tostring(L, -1));
-        LuaConsole::instance()->write(output, (status == LUA_OK) ? Qt::black : Qt::red);
+        if (Tiled::Internal::Preferences::instance()->enableDarkTheme())
+        {
+            LuaConsole::instance()->write(output, (status == LUA_OK) ? QColor("#DDDDDD") : Qt::red);
+        }
+        else {
+            LuaConsole::instance()->write(output, (status == LUA_OK) ? Qt::black : Qt::red);
+        }
     }
 //    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
     return status == LUA_OK;

@@ -224,7 +224,8 @@ bool Map::isTilesetUsed(Tileset *tileset) const
 QSet<Tileset *> Map::usedTilesets() const
 {
     QList<Tileset*> keys = mUsedTilesets.keys();
-    return { keys.begin(), keys.end() };
+    //return { keys.begin(), keys.end() };
+    return { keys.toSet() };
 }
 
 void Map::addTilesetUser(Tileset *tileset)
@@ -516,7 +517,8 @@ QList<QRgb> MapBmp::colors() const
                 colorSet += rgb;
         }
     }
-    return { colorSet.begin(), colorSet.end() };
+    //return { colorSet.begin(), colorSet.end() };
+    return { colorSet.toList() };
 }
 
 /////

@@ -25,6 +25,10 @@ PackExtractDialog::PackExtractDialog(PackFile &packFile, QWidget *parent) :
     ui->radioSingle->setChecked(false);
     ui->checkBox2x->setChecked(true);
     ui->checkBox2x->setEnabled(ui->radioSingle->isChecked());
+    ui->checkBoxWWO->setEnabled(true);
+    ui->checkBoxWWO->setChecked(true);
+    ui->checkBoxMultiTileSheets->setChecked(false);
+    ui->checkBoxMultiTileSheets->setEnabled(true);
 
     QSettings settings;
     settings.beginGroup(QStringLiteral("PackExtractDialog"));
@@ -64,67 +68,207 @@ void PackExtractDialog::accept()
     settings.setValue(QStringLiteral("OutputDirectory"), outputDir.path());
     settings.endGroup();
 
-    if (ui->radioMultiple->isChecked()) {
-        foreach (PackPage page, mPackFile.pages()) {
-            foreach (PackSubTexInfo tex, page.mInfo) {
-                if (prefix.isEmpty() || tex.name.startsWith(prefix, Qt::CaseInsensitive)) {
-                    QImage image(tex.fx, tex.fy, QImage::Format_ARGB32);
-                    image.fill(Qt::transparent);
-                    QPainter painter(&image);
-                    painter.drawImage(tex.ox, tex.oy, page.image, tex.x, tex.y, tex.w, tex.h);
-                    painter.end();
-                    image.save(outputDir.filePath(tex.name + QLatin1String(".png")));
-                }
-            }
-        }
-    } else if (!prefix.isEmpty()) {
-        struct TileInfo {
-            QString tileName;
-            int tileIndex;
-            QImage tileImage;
-            QRect tileRect;
-        };
-        QRect bounds(0, 0, 0, 0);
-        QList<TileInfo> tiles;
-        int TileScale = ui->checkBox2x->isChecked() ? 2 : 1;
-        const int tileW = 64 * TileScale;
-        const int tileH = 128 * TileScale;
-        foreach (PackPage page, mPackFile.pages()) {
-            foreach (PackSubTexInfo tex, page.mInfo) {
-                if (tex.name.startsWith(prefix, Qt::CaseInsensitive)) {
-                    QString tileName;
-                    int tileIndex;
-                    if (BuildingEditor::BuildingTilesMgr::parseTileName(tex.name, tileName, tileIndex)) {
-                        if (tex.fx != tileW || tex.fy != tileH) {
-                            qDebug() << QStringLiteral("WARNING: %1 size %2x%3 is not %4x%5").arg(tex.name).arg(tex.fx).arg(tex.fy).arg(tileW).arg(tileH);
-                        }
+    if (!ui->checkBoxMultiTileSheets->isChecked())
+    {
+        if (ui->radioMultiple->isChecked()) {
+            foreach(PackPage page, mPackFile.pages()) {
+                foreach(PackSubTexInfo tex, page.mInfo) {
+                    if (prefix.isEmpty() || tex.name.startsWith(prefix, Qt::CaseInsensitive)) {
                         QImage image(tex.fx, tex.fy, QImage::Format_ARGB32);
                         image.fill(Qt::transparent);
                         QPainter painter(&image);
                         painter.drawImage(tex.ox, tex.oy, page.image, tex.x, tex.y, tex.w, tex.h);
                         painter.end();
-
-                        TileInfo info;
-                        info.tileName = tileName;
-                        info.tileIndex = tileIndex;
-                        info.tileImage = image;
-                        info.tileRect = QRect((tileIndex % 8) * tileW, (tileIndex / 8) * tileH, tileW, tileH);
-                        tiles += info;
-
-                        bounds |= info.tileRect;
+                        image.save(outputDir.filePath(tex.name + QLatin1String(".png")));
                     }
                 }
             }
         }
-        if (!bounds.isEmpty()) {
-            QImage image(bounds.size(), QImage::Format_ARGB32);
-            image.fill(Qt::transparent);
-            foreach (TileInfo info, tiles) {
-                QPainter painter(&image);
-                painter.drawImage(info.tileRect.topLeft(), info.tileImage);
-                painter.end();
+        else if (!prefix.isEmpty()) {
+            struct TileInfo {
+                QString tileName;
+                int tileIndex;
+                QImage tileImage;
+                QRect tileRect;
+            };
+            QRect bounds(0, 0, 0, 0);
+            QList<TileInfo> tiles;
+            int TileScale = ui->checkBox2x->isChecked() ? 2 : 1;
+            const int tileW = 64 * TileScale;
+            const int tileH = 128 * TileScale;
+            foreach(PackPage page, mPackFile.pages()) {
+                foreach(PackSubTexInfo tex, page.mInfo) {
+                    if (ui->checkBoxWWO->isChecked())
+                    {
+
+                        QRegExp rx(prefix + QStringLiteral("_\\d+"));
+
+                        if (rx.exactMatch(tex.name)) {
+                            QString tileName;
+                            int tileIndex;
+                            if (BuildingEditor::BuildingTilesMgr::parseTileName(tex.name, tileName, tileIndex)) {
+                                if (tex.fx != tileW || tex.fy != tileH) {
+                                    qDebug() << QStringLiteral("WARNING: %1 size %2x%3 is not %4x%5").arg(tex.name).arg(tex.fx).arg(tex.fy).arg(tileW).arg(tileH);
+                                }
+                                QImage image(tex.fx, tex.fy, QImage::Format_ARGB32);
+                                image.fill(Qt::transparent);
+                                QPainter painter(&image);
+                                painter.drawImage(tex.ox, tex.oy, page.image, tex.x, tex.y, tex.w, tex.h);
+                                painter.end();
+
+                                TileInfo info;
+                                info.tileName = tileName;
+                                info.tileIndex = tileIndex;
+                                info.tileImage = image;
+                                info.tileRect = QRect((tileIndex % 8) * tileW, (tileIndex / 8) * tileH, tileW, tileH);
+                                tiles += info;
+
+                                bounds |= info.tileRect;
+                            }
+                        }
+
+                    }
+                    else {
+
+                        if (tex.name.startsWith(prefix, Qt::CaseInsensitive)) {
+                            QString tileName;
+                            int tileIndex;
+                            if (BuildingEditor::BuildingTilesMgr::parseTileName(tex.name, tileName, tileIndex)) {
+                                if (tex.fx != tileW || tex.fy != tileH) {
+                                    qDebug() << QStringLiteral("WARNING: %1 size %2x%3 is not %4x%5").arg(tex.name).arg(tex.fx).arg(tex.fy).arg(tileW).arg(tileH);
+                                }
+                                QImage image(tex.fx, tex.fy, QImage::Format_ARGB32);
+                                image.fill(Qt::transparent);
+                                QPainter painter(&image);
+                                painter.drawImage(tex.ox, tex.oy, page.image, tex.x, tex.y, tex.w, tex.h);
+                                painter.end();
+
+                                TileInfo info;
+                                info.tileName = tileName;
+                                info.tileIndex = tileIndex;
+                                info.tileImage = image;
+                                info.tileRect = QRect((tileIndex % 8) * tileW, (tileIndex / 8) * tileH, tileW, tileH);
+                                tiles += info;
+
+                                bounds |= info.tileRect;
+                            }
+                        }
+                    }
+                }
             }
-            image.save(outputDir.filePath(prefix + QLatin1String(".png")));
+            if (!bounds.isEmpty()) {
+                QImage image(bounds.size(), QImage::Format_ARGB32);
+                image.fill(Qt::transparent);
+                foreach(TileInfo info, tiles) {
+                    QPainter painter(&image);
+                    painter.drawImage(info.tileRect.topLeft(), info.tileImage);
+                    painter.end();
+                }
+                image.save(outputDir.filePath(prefix + QLatin1String(".png")));
+            }
+        }
+    }
+    else {
+        QStringList list = prefix.split(QLatin1String(";"));
+        for (const QString& item : list) {
+            prefix = item;
+            if (ui->radioMultiple->isChecked()) {
+                foreach(PackPage page, mPackFile.pages()) {
+                    foreach(PackSubTexInfo tex, page.mInfo) {
+                        if (prefix.isEmpty() || tex.name.startsWith(prefix, Qt::CaseInsensitive)) {
+                            QImage image(tex.fx, tex.fy, QImage::Format_ARGB32);
+                            image.fill(Qt::transparent);
+                            QPainter painter(&image);
+                            painter.drawImage(tex.ox, tex.oy, page.image, tex.x, tex.y, tex.w, tex.h);
+                            painter.end();
+                            image.save(outputDir.filePath(tex.name + QLatin1String(".png")));
+                        }
+                    }
+                }
+            }
+            else if (!prefix.isEmpty()) {
+                struct TileInfo {
+                    QString tileName;
+                    int tileIndex;
+                    QImage tileImage;
+                    QRect tileRect;
+                };
+                QRect bounds(0, 0, 0, 0);
+                QList<TileInfo> tiles;
+                int TileScale = ui->checkBox2x->isChecked() ? 2 : 1;
+                const int tileW = 64 * TileScale;
+                const int tileH = 128 * TileScale;
+                foreach(PackPage page, mPackFile.pages()) {
+                    foreach(PackSubTexInfo tex, page.mInfo) {
+                        if (ui->checkBoxWWO->isChecked())
+                        {
+
+                            QRegExp rx(prefix + QStringLiteral("_\\d+"));
+
+                            if (rx.exactMatch(tex.name)) {
+                                QString tileName;
+                                int tileIndex;
+                                if (BuildingEditor::BuildingTilesMgr::parseTileName(tex.name, tileName, tileIndex)) {
+                                    if (tex.fx != tileW || tex.fy != tileH) {
+                                        qDebug() << QStringLiteral("WARNING: %1 size %2x%3 is not %4x%5").arg(tex.name).arg(tex.fx).arg(tex.fy).arg(tileW).arg(tileH);
+                                    }
+                                    QImage image(tex.fx, tex.fy, QImage::Format_ARGB32);
+                                    image.fill(Qt::transparent);
+                                    QPainter painter(&image);
+                                    painter.drawImage(tex.ox, tex.oy, page.image, tex.x, tex.y, tex.w, tex.h);
+                                    painter.end();
+
+                                    TileInfo info;
+                                    info.tileName = tileName;
+                                    info.tileIndex = tileIndex;
+                                    info.tileImage = image;
+                                    info.tileRect = QRect((tileIndex % 8) * tileW, (tileIndex / 8) * tileH, tileW, tileH);
+                                    tiles += info;
+
+                                    bounds |= info.tileRect;
+                                }
+                            }
+
+                        }
+                        else {
+
+                            if (tex.name.startsWith(prefix, Qt::CaseInsensitive)) {
+                                QString tileName;
+                                int tileIndex;
+                                if (BuildingEditor::BuildingTilesMgr::parseTileName(tex.name, tileName, tileIndex)) {
+                                    if (tex.fx != tileW || tex.fy != tileH) {
+                                        qDebug() << QStringLiteral("WARNING: %1 size %2x%3 is not %4x%5").arg(tex.name).arg(tex.fx).arg(tex.fy).arg(tileW).arg(tileH);
+                                    }
+                                    QImage image(tex.fx, tex.fy, QImage::Format_ARGB32);
+                                    image.fill(Qt::transparent);
+                                    QPainter painter(&image);
+                                    painter.drawImage(tex.ox, tex.oy, page.image, tex.x, tex.y, tex.w, tex.h);
+                                    painter.end();
+
+                                    TileInfo info;
+                                    info.tileName = tileName;
+                                    info.tileIndex = tileIndex;
+                                    info.tileImage = image;
+                                    info.tileRect = QRect((tileIndex % 8) * tileW, (tileIndex / 8) * tileH, tileW, tileH);
+                                    tiles += info;
+
+                                    bounds |= info.tileRect;
+                                }
+                            }
+                        }
+                    }
+                }
+                if (!bounds.isEmpty()) {
+                    QImage image(bounds.size(), QImage::Format_ARGB32);
+                    image.fill(Qt::transparent);
+                    foreach(TileInfo info, tiles) {
+                        QPainter painter(&image);
+                        painter.drawImage(info.tileRect.topLeft(), info.tileImage);
+                        painter.end();
+                    }
+                    image.save(outputDir.filePath(prefix + QLatin1String(".png")));
+                }
+            }
         }
     }
 

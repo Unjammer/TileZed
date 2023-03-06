@@ -17,7 +17,7 @@
 
 #ifndef BUILDINGTILESETDOCK_H
 #define BUILDINGTILESETDOCK_H
-
+#define BUILDINGED_SA
 #ifdef BUILDINGED_SA
 #include "colorbutton.h"
 #endif

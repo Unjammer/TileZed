@@ -980,7 +980,9 @@ void TileDefDialog::tileEntered(const QModelIndex &index)
         TileDefTile *defTile1 = mSelectedTiles.first();
         TileDefTile *defTile2 = static_cast<TileDefTile*>(ui->tiles->model()->userDataAt(index)); // danger!
         int offset = defTile2->id() - defTile1->id();
+        QString tileName = defTile->tileset()->mName + QLatin1Literal("_") + QString::fromLatin1("%1").arg(defTile->id());
         ui->tileOffset->setText(tr("Offset: %1").arg(offset));
+        ui->lbl_TileName->setText(tileName);
         return;
     }
     ui->tileOffset->setText(tr("Offset: ?"));
@@ -1360,6 +1362,11 @@ void TileDefDialog::setToolTipEtc(int tileID)
         return;
     TileDefTile *defTile = mCurrentDefTileset->mTiles[tileID];
     QStringList tooltip;
+
+    QString tileName = defTile->tileset()->mName + QLatin1Literal("_") + QString::fromLatin1("%1").arg(defTile->id());
+    QString tileId = QString::fromLatin1("%1").arg(defTile->tileset()->mID * 1000 + defTile->id());
+
+    tooltip += tileName;
     foreach (UIProperties::UIProperty *p, defTile->mPropertyUI.nonDefaultProperties())
         tooltip += tr("%1 = %2").arg(p->mName).arg(p->valueAsString());
 
@@ -1378,7 +1385,8 @@ void TileDefDialog::setToolTipEtc(int tileID)
     // Use a different background color for tiles that have unknown property names.
     QColor color; // invalid means use default color
     QStringList knownPropertyNames = defTile->mPropertyUI.knownPropertyNames();
-    QSet<QString> known(knownPropertyNames.begin(), knownPropertyNames.end()); // FIXME: same for every tile
+   // QSet<QString> known(knownPropertyNames.begin(), knownPropertyNames.end()); // FIXME: same for every tile
+    QSet<QString> known(knownPropertyNames.toSet()); // FIXME: same for every tile
     QStringList unknown;
     foreach (QString name, defTile->mProperties.keys()) {
         if (!known.contains(name))
@@ -1582,7 +1590,8 @@ void TileDefDialog::initStringComboBoxValues()
             if (values.contains(p->mName)) {
                 if (QComboBox *w = mComboBoxes[p->mName]) {
                     w->clear();
-                    QStringList names(values[p->mName].constBegin(), values[p->mName].constEnd());
+                    //QStringList names(values[p->mName].constBegin(), values[p->mName].constEnd());
+                    QStringList names(values[p->mName].toList());
                     names.sort();
                     w->addItems(names);
                     w->clearEditText();

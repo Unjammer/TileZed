@@ -140,7 +140,8 @@ public:
 
     QStringList warnings() const
     {
-        QStringList ret(mWarnings.begin(), mWarnings.end());
+        //QStringList ret(mWarnings.begin(), mWarnings.end());
+        QStringList ret(mWarnings.toList());
         ret.sort();
         return ret;
     }

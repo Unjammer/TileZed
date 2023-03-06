@@ -161,7 +161,8 @@ public:
     QColor color() const
     { return mColor.isValid() ? mColor : defaultColor(); }
 
-    static QColor defaultColor() { return Qt::darkGray; }
+    //static QColor defaultColor() { return Qt::darkGray; }
+    static QColor defaultColor() { return Qt::darkMagenta; }
 
     /**
       * This is the default type for objects created in this group.

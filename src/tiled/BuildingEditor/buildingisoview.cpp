@@ -147,7 +147,7 @@ QRectF TileModeGridItem::boundingRect() const
 void TileModeGridItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *)
 {
     mRenderer->drawGrid(p, option->exposedRect, BuildingPreferences::instance()->gridColor(),
-                        mDocument->currentLevel(), mTileBounds);
+                        mDocument->currentLevel(), 128, 1, mTileBounds);
 }
 
 void TileModeGridItem::setEditingTiles(bool editing)
@@ -731,7 +731,8 @@ void BuildingIsoScene::setCursorPosition(const QPoint &pos)
         QVector<QRect> rects;
         foreach (QRegion rgn, rd.mRegions) {
             if (rgn.contains(pos)) {
-                rects += QVector<QRect>(rgn.begin(), rgn.end());
+                //rects += QVector<QRect>(rgn.begin(), rgn.end());
+                rects += QVector<QRect>(rgn.rects());
                 break;
             }
         }

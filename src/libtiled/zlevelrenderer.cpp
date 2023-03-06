@@ -38,6 +38,8 @@
 
 #include <QPainterPath>
 
+
+
 using namespace Tiled;
 
 #define DISPLAY_TILE_WIDTH (map()->tileWidth() * (is2x() ? 2 : 1))
@@ -148,7 +150,7 @@ AddRemoveMapObject::removeObject
 }
 
 void ZLevelRenderer::drawGrid(QPainter *painter, const QRectF &rect,
-                              QColor gridColor, int level,
+                              QColor gridColor, int level, int opacity, int width, 
                               const QRect &tileBounds) const
 {
     QRect b = tileBounds;
@@ -170,9 +172,12 @@ void ZLevelRenderer::drawGrid(QPainter *painter, const QRectF &rect,
                           pixelToTileCoords(r.bottomLeft(), level).y());
 
     gridColor.setAlpha(128);
+    gridColor.setAlpha(opacity);
 
     QPen pen;
     pen.setCosmetic(true);
+    pen.setWidth(width);
+
     QBrush brush(gridColor, Qt::Dense4Pattern);
     brush.setTransform(QTransform::fromScale(1/painter->transform().m11(),
                                              1/painter->transform().m22()));

@@ -17,10 +17,9 @@
 
 #include "road.h"
 
-#include "mainwindow.h"
-#include "preferences.h"
-
-#include "BuildingEditor/simplefile.h"
+#include "../../tiled/mainwindow.h";
+#include "../../tiled/preferences.h"
+#include "../../tiled/BuildingEditor/simplefile.h"
 
 using namespace Tiled::Internal;
 

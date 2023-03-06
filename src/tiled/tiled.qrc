@@ -91,5 +91,9 @@
         <file>images/22x22/fence-tool.png</file>
         <file>images/16x16/lock.png</file>
         <file>images/missing-tile.png</file>
+        <file>images/16x16/black.png</file>
+        <file>images/16x16/green.png</file>
+        <file>images/16x16/pink.png</file>
+        <file>images/16x16/white.png</file>
     </qresource>
 </RCC>

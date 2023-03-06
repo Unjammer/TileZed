@@ -477,7 +477,7 @@ bool PackSettingsFile::write(const QString &fileName)
 
 bool PackSettingsFile::stringToSize(const QString &s, QSize &result)
 {
-    QStringList split = s.split(QLatin1Char(','), Qt::SkipEmptyParts);
+    QStringList split = s.split(QLatin1Char(','), QString::SkipEmptyParts);
     if (split.size() != 2) {
         mError = tr("expected w,h but got '%1'").arg(s);
         return false;

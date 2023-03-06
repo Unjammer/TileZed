@@ -148,6 +148,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
             this, &PreferencesDialog::languageSelected);
 #endif
     connect(mUi->openGL, &QAbstractButton::toggled, this, &PreferencesDialog::useOpenGLToggled);
+    connect(mUi->enableDarkTheme, &QAbstractButton::toggled, this, &PreferencesDialog::enableDarkTheme);
     connect(mUi->gridColor, &ColorButton::colorChanged,
             Preferences::instance(), &Preferences::setGridColor);
 #ifdef ZOMBOID
@@ -157,6 +158,13 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
             Preferences::instance(), &Preferences::setBackgroundColor);
     connect(mUi->bgColorReset, &QAbstractButton::clicked,
             this, &PreferencesDialog::defaultBackgroundColor);
+    connect(mUi->gridOpacityReset, &QAbstractButton::clicked,
+        this, &PreferencesDialog::defaultGridOpacity);
+    connect(mUi->gridWidthReset, &QAbstractButton::clicked,
+        this, &PreferencesDialog::defaultGridWidth);
+    connect(mUi->gridOpacity, qOverload<int>(&QSpinBox::valueChanged), Preferences::instance(), &Preferences::setGridOpacity);
+    connect(mUi->gridWidth, qOverload<int>(&QSpinBox::valueChanged), Preferences::instance(), &Preferences::setGridWidth);
+
     connect(mUi->showAdjacent, &QAbstractButton::toggled,
             Preferences::instance(), &Preferences::setShowAdjacentMaps);
     connect(mUi->thumbnailButton, &QAbstractButton::clicked, this, &PreferencesDialog::browseThumbnailDirectory);
@@ -222,6 +230,11 @@ void PreferencesDialog::languageSelected(int index)
 void PreferencesDialog::useOpenGLToggled(bool useOpenGL)
 {
     Preferences::instance()->setUseOpenGL(useOpenGL);
+}
+
+void PreferencesDialog::enableDarkTheme(bool enableDarkTheme)
+{
+    Preferences::instance()->setenableDarkTheme(enableDarkTheme);
 }
 
 void PreferencesDialog::addObjectType()
@@ -324,6 +337,18 @@ void PreferencesDialog::defaultGridColor()
     mUi->gridColor->setColor(Preferences::instance()->gridColor());
 }
 
+void PreferencesDialog::defaultGridOpacity()
+{
+    Preferences::instance()->setGridOpacity(128);
+    mUi->gridOpacity->setValue(Preferences::instance()->gridOpacity());
+}
+
+void PreferencesDialog::defaultGridWidth()
+{
+    Preferences::instance()->setGridWidth(1);
+    mUi->gridWidth->setValue(Preferences::instance()->gridWidth());
+}
+
 void PreferencesDialog::defaultBackgroundColor()
 {
     Preferences::instance()->setBackgroundColor(Qt::darkGray);
@@ -390,6 +415,7 @@ void PreferencesDialog::fromPreferences()
     if (mUi->openGL->isEnabled())
         mUi->openGL->setChecked(prefs->useOpenGL());
 
+    mUi->enableDarkTheme->setChecked(prefs->enableDarkTheme());
     int formatIndex = 0;
     switch (prefs->layerDataFormat()) {
     case MapWriter::XML:
@@ -424,6 +450,9 @@ void PreferencesDialog::fromPreferences()
     mUi->bgColor->setColor(prefs->backgroundColor());
     mUi->configDirectory->setText(QDir::toNativeSeparators(prefs->configPath()));
     mUi->thumbnailEdit->setText(QDir::toNativeSeparators(prefs->thumbnailsDirectory()));
+    mUi->gridOpacity->setValue(prefs->gridOpacity());
+    mUi->gridWidth->setValue(prefs->gridWidth());
+
     foreach (QString fileName, prefs->worldedFiles())
         mUi->listPZW->addItem(QDir::toNativeSeparators(fileName));
     if (mUi->listPZW->count())

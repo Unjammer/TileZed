@@ -133,34 +133,24 @@
           </item>
           <item>
            <layout class="QGridLayout" name="gridLayout_2">
-            <item row="2" column="2">
+            <item row="3" column="2">
              <widget class="QToolButton" name="bgColorReset">
               <property name="text">
                <string>Default</string>
               </property>
              </widget>
             </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_3">
-              <property name="text">
-               <string>Grid color:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="Tiled::Internal::ColorButton" name="bgColor"/>
-            </item>
             <item row="2" column="0">
-             <widget class="QLabel" name="label_5">
+             <widget class="QLabel" name="label_9">
               <property name="text">
-               <string>Background color:</string>
+               <string>Grid Width</string>
               </property>
              </widget>
             </item>
             <item row="0" column="1">
              <widget class="Tiled::Internal::ColorButton" name="gridColor"/>
             </item>
-            <item row="2" column="3">
+            <item row="3" column="3">
              <spacer name="horizontalSpacer_4">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -173,8 +163,66 @@
               </property>
              </spacer>
             </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_5">
+              <property name="text">
+               <string>Background color:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>Grid color:</string>
+              </property>
+             </widget>
+            </item>
             <item row="0" column="2">
              <widget class="QToolButton" name="gridColorReset">
+              <property name="text">
+               <string>Default</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="Tiled::Internal::ColorButton" name="bgColor"/>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_8">
+              <property name="text">
+               <string>Grid Opacity</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QSpinBox" name="gridOpacity">
+              <property name="maximum">
+               <number>255</number>
+              </property>
+              <property name="value">
+               <number>128</number>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QSpinBox" name="gridWidth">
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>5</number>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2" colspan="2">
+             <widget class="QToolButton" name="gridOpacityReset">
+              <property name="text">
+               <string>Default</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="2">
+             <widget class="QToolButton" name="gridWidthReset">
               <property name="text">
                <string>Default</string>
               </property>
@@ -189,6 +237,13 @@
            <widget class="QCheckBox" name="openGL">
             <property name="text">
              <string>Hardware &amp;accelerated drawing (OpenGL)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="enableDarkTheme">
+            <property name="text">
+             <string>Enable Dark Theme</string>
             </property>
            </widget>
           </item>

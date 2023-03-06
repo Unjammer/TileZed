@@ -744,7 +744,8 @@ public:
             foreach (QString s, prop->knownPropertyNames())
                 ret.insert(s);
         }
-        return { ret.begin(), ret.end() };
+        //return { ret.begin(), ret.end() };
+        return { ret.toList() };
     }
 
     void copy(const UIProperties &other)

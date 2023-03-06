@@ -315,7 +315,7 @@ void SaveAsImageDialog::accept()
     if (drawTileGrid) {
         Preferences *prefs = Preferences::instance();
         renderer->drawGrid(&painter, QRectF(QPointF(), renderer->mapSize()),
-                           prefs->gridColor());
+                           prefs->gridColor(), prefs->gridOpacity(), prefs->gridWidth());
     }
 
 #ifdef ZOMBOID

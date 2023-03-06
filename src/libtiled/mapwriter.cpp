@@ -836,6 +836,7 @@ void MapWriter::setDtdEnabled(bool enabled)
     d->mDtdEnabled = enabled;
 }
 
+
 bool MapWriter::isDtdEnabled() const
 {
     return d->mDtdEnabled;

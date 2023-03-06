@@ -829,6 +829,10 @@ TilesetDock::TilesetDock(QWidget *parent):
     mActionPropertiesTileset(new QAction(this)),
     mActionDeleteTileset(new QAction(this)),
     mActionRenameTileset(new QAction(this)),
+    mActionBackgroundColorWhite(new QAction(this)),
+    mActionBackgroundColorBlack(new QAction(this)),
+    mActionBackgroundColorPink(new QAction(this)),
+    mActionBackgroundColorGreen(new QAction(this)),
     mActionSwitchLayer(new QAction(this)),
     mZoomable(new Zoomable(this)),
     mZoomComboBox(new QComboBox(this)),
@@ -865,6 +869,10 @@ TilesetDock::TilesetDock(QWidget *parent):
     mActionPropertiesTileset->setIcon(QIcon(QLatin1String(":images/16x16/document-properties.png")));
     mActionDeleteTileset->setIcon(QIcon(QLatin1String(":images/16x16/edit-delete.png")));
     mActionRenameTileset->setIcon(QIcon(QLatin1String(":images/16x16/edit-rename.png")));
+    mActionBackgroundColorWhite->setIcon(QIcon(QLatin1String(":/images/16x16/white.png")));
+    mActionBackgroundColorBlack->setIcon(QIcon(QLatin1String(":/images/16x16/black.png")));
+    mActionBackgroundColorPink->setIcon(QIcon(QLatin1String(":/images/16x16/pink.png")));
+    mActionBackgroundColorGreen->setIcon(QIcon(QLatin1String(":/images/16x16/green.png")));
 
     Utils::setThemeIcon(mActionNewTileset, "document-new");
     Utils::setThemeIcon(mActionImportTileset, "document-import");
@@ -872,6 +880,10 @@ TilesetDock::TilesetDock(QWidget *parent):
     Utils::setThemeIcon(mActionPropertiesTileset, "document-properties");
     Utils::setThemeIcon(mActionDeleteTileset, "edit-delete");
     Utils::setThemeIcon(mActionRenameTileset, "edit-rename");
+    Utils::setThemeIcon(mActionBackgroundColorWhite, "white");
+    Utils::setThemeIcon(mActionBackgroundColorBlack, "black");
+    Utils::setThemeIcon(mActionBackgroundColorPink, "pink");
+    Utils::setThemeIcon(mActionBackgroundColorGreen, "green");
 
     connect(mActionNewTileset, &QAction::triggered, this, &TilesetDock::newTileset);
     connect(mActionImportTileset, &QAction::triggered, this, &TilesetDock::importTileset);
@@ -879,6 +891,10 @@ TilesetDock::TilesetDock(QWidget *parent):
     connect(mActionPropertiesTileset, &QAction::triggered, this, &TilesetDock::editTilesetProperties);
     connect(mActionDeleteTileset, &QAction::triggered, this, qOverload<>(&TilesetDock::removeTileset));
     connect(mActionRenameTileset, &QAction::triggered, this, &TilesetDock::renameTileset);
+    connect(mActionBackgroundColorWhite, &QAction::triggered, this, &TilesetDock::changeTilesetBackgroundColorWhite);
+    connect(mActionBackgroundColorBlack, &QAction::triggered, this, &TilesetDock::changeTilesetBackgroundColorBlack);
+    connect(mActionBackgroundColorPink, &QAction::triggered, this, &TilesetDock::changeTilesetBackgroundColorPink);
+    connect(mActionBackgroundColorGreen, &QAction::triggered, this, &TilesetDock::changeTilesetBackgroundColorGreen);
 
     mIconTileLayer = QIcon(QLatin1String(":/images/16x16/layer-tile.png"));
     mIconTileLayerStop = QIcon(QLatin1String(":/images/16x16/layer-tile-stop.png"));
@@ -903,9 +919,22 @@ TilesetDock::TilesetDock(QWidget *parent):
 
     mToolBar->addWidget(mBackgroundColorButton = new Tiled::Internal::ColorButton(mToolBar));
     mBackgroundColorButton->setColor(Preferences::instance()->tilesetBackgroundColor());
+    mBackgroundColorButton->setToolTip(QLatin1String("Pick a tilset Background Color"));
     tilesetBackgroundColorChanged(Preferences::instance()->tilesetBackgroundColor());
     connect(mBackgroundColorButton, &ColorButton::colorChanged, Preferences::instance(), &Preferences::setTilesetBackgroundColor);
     connect(Preferences::instance(), &Preferences::tilesetBackgroundColorChanged, this, &TilesetDock::tilesetBackgroundColorChanged);
+
+    mToolBar->addSeparator();
+    mToolBar->addAction(mActionBackgroundColorWhite);
+    mActionBackgroundColorWhite->setToolTip(QLatin1String("Set tilset Background Color to White"));
+    mToolBar->addAction(mActionBackgroundColorBlack);
+    mActionBackgroundColorBlack->setToolTip(QLatin1String("Set tilset Background Color to Black"));
+    mToolBar->addAction(mActionBackgroundColorPink);
+    mActionBackgroundColorPink->setToolTip(QLatin1String("Set tilset Background Color to Pink"));
+    mToolBar->addAction(mActionBackgroundColorGreen);
+    mActionBackgroundColorGreen->setToolTip(QLatin1String("Set tilset Background Color to Green"));
+
+
 
     connect(mTilesetView->selectionModel(),
             &QItemSelectionModel::selectionChanged,
@@ -1175,7 +1204,13 @@ void TilesetDock::tilesetChanged(Tileset *tileset)
     if (mTilesets.contains(tileset)) {
         int row = mTilesets.indexOf(tileset);
         if (QListWidgetItem *item = mTilesetNamesView->item(row))
-            item->setForeground(tileset->isMissing() ? Qt::red : Qt::black);
+            if (Preferences::instance()->enableDarkTheme())
+            {
+                item->setForeground(tileset->isMissing() ? Qt::red : QColor("#DDDDDD"));
+            }
+            else {
+                item->setForeground(tileset->isMissing() ? Qt::red : Qt::black);
+            }
     }
 }
 
@@ -1498,6 +1533,23 @@ void TilesetDock::tilesetBackgroundColorChanged(const QColor &color)
     mTilesetView->setStyleSheet(QStringLiteral("QTableView { alternate-background-color: %1; background-color: %1; }").arg(color.name()));
 }
 
+void TilesetDock::changeTilesetBackgroundColorWhite()
+{
+    mTilesetView->setStyleSheet(QStringLiteral("QTableView { alternate-background-color: %1; background-color: %1; }").arg(QLatin1String("#FFFFFF")));
+}
+void TilesetDock::changeTilesetBackgroundColorBlack()
+{
+    mTilesetView->setStyleSheet(QStringLiteral("QTableView { alternate-background-color: %1; background-color: %1; }").arg(QLatin1String("#000000")));
+}
+void TilesetDock::changeTilesetBackgroundColorPink()
+{
+    mTilesetView->setStyleSheet(QStringLiteral("QTableView { alternate-background-color: %1; background-color: %1; }").arg(QLatin1String("#FF00FF")));
+}
+void TilesetDock::changeTilesetBackgroundColorGreen()
+{
+    mTilesetView->setStyleSheet(QStringLiteral("QTableView { alternate-background-color: %1; background-color: %1; }").arg(QLatin1String("#00FF00")));;
+}
+
 void TilesetDock::setTilesetNamesList()
 {
     mCurrentTileset = 0;
@@ -1521,8 +1573,10 @@ void TilesetDock::setTilesetNamesList()
         QFontMetrics fm = mTilesetNamesView->fontMetrics(); // FIXME: same font used by QPainter?
         foreach (Tileset *ts, mTilesets) {
             QListWidgetItem *item = new QListWidgetItem(ts->name());
-            if (ts->isMissing())
+            if (ts->isMissing()) {
                 item->setForeground(Qt::red);
+            }
+            
             item->setFlags(item->flags() | Qt::ItemIsEditable);
             mTilesetNamesView->addItem(item);
             maxWidth = qMax(maxWidth, fm.horizontalAdvance(ts->name()));

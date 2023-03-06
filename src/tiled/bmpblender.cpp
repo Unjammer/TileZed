@@ -481,7 +481,8 @@ void BmpBlender::initTiles()
     if (true/*mHack*/) {
         mKnownBlendTiles.clear();
         foreach (BlendWrapper *blendW, mBlendList) {
-            mKnownBlendTiles += QSet<Tile*>(blendW->mBlendTiles.begin(), blendW->mBlendTiles.end());
+            //mKnownBlendTiles += QSet<Tile*>(blendW->mBlendTiles.begin(), blendW->mBlendTiles.end());
+            mKnownBlendTiles += QSet<Tile*>(blendW->mBlendTiles.toList().toSet());
         }
     }
 }
@@ -1164,7 +1165,7 @@ void BmpRulesFile::AddRule(const QString &label, int bitmapIndex, QRgb col,
 
 QRgb BmpRulesFile::rgbFromString(const QString &string, bool &ok)
 {
-    QStringList rgb = string.split(QLatin1Char(' '), Qt::SkipEmptyParts);
+    QStringList rgb = string.split(QLatin1Char(' '), QString::SkipEmptyParts);
     return rgbFromStringList(rgb, ok);
 }
 

@@ -83,7 +83,7 @@ public:
 
 #ifdef ZOMBOID
     void drawGrid(QPainter *painter, const QRectF &rect,
-                  QColor gridColor, int level = 0,
+                  QColor gridColor, int level = 0, int opacity = 128, int width = 1,
                   const QRect &tileBounds = QRect()) const;
 #else
     void drawGrid(QPainter *painter, const QRectF &rect,

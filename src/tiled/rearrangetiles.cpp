@@ -880,7 +880,7 @@ bool RearrangeFile::write(const QString &fileName, const QList<RearrangeTileset*
 
 bool RearrangeFile::parse2Ints(const QString &s, int *pa, int *pb)
 {
-    QStringList coords = s.split(QLatin1Char(','), Qt::SkipEmptyParts);
+    QStringList coords = s.split(QLatin1Char(','), QString::SkipEmptyParts);
     if (coords.size() != 2)
         return false;
     bool ok;
@@ -993,7 +993,7 @@ BuildingEditor::FloorTileGrid *RearrangeGridFile::readGrid(const SimpleFileBlock
 
 bool RearrangeGridFile::parse2Ints(const QString &s, int *pa, int *pb)
 {
-    QStringList coords = s.split(QLatin1Char(','), Qt::SkipEmptyParts);
+    QStringList coords = s.split(QLatin1Char(','), QString::SkipEmptyParts);
     if (coords.size() != 2)
         return false;
     bool ok;

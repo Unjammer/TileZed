@@ -16,7 +16,8 @@
  */
 
 #include "buildingeditorwindow.h"
-#include "ui_buildingeditorwindow.h"
+#include "../../tiled/ui_buildingeditorwindow.h"
+
 
 #include "building.h"
 #include "buildingdocument.h"
@@ -338,7 +339,7 @@ BuildingEditorWindow::BuildingEditorWindow(QWidget *parent) :
     ui->actionOpen->setIcon(openIcon);
     ui->actionSave->setIcon(saveIcon);
 
-    ui->actionExportNewBinary->setVisible(false);
+    ui->actionExportNewBinary->setVisible(true);
 
     ui->actionCut->setShortcuts(QKeySequence::Cut);
     ui->actionCopy->setShortcuts(QKeySequence::Copy);
@@ -363,7 +364,7 @@ BuildingEditorWindow::BuildingEditorWindow(QWidget *parent) :
     connect(ui->actionSaveAs, &QAction::triggered, this, &BuildingEditorWindow::saveBuildingAs);
 
     connect(ui->actionExportTMX, &QAction::triggered, this, &BuildingEditorWindow::exportTMX);
-    ui->actionExportTMX->setVisible(false);
+    ui->actionExportTMX->setVisible(true);
     connect(ui->actionExportNewBinary, &QAction::triggered, this, &BuildingEditorWindow::exportNewBinary);
 
     ui->actionNewBuilding->setShortcuts(QKeySequence::New);
@@ -1427,7 +1428,8 @@ void BuildingEditorWindow::selectAll()
                     new ChangeRoomSelection(mCurrentDocument, currentFloor()->bounds()));
         return;
     }
-    QSet<BuildingObject*> objects(currentFloor()->objects().begin(), currentFloor()->objects().end());
+    //QSet<BuildingObject*> objects(currentFloor()->objects().begin(), currentFloor()->objects().end());
+    QSet<BuildingObject*> objects(currentFloor()->objects().toSet());
     mCurrentDocument->setSelectedObjects(objects);
 }
 

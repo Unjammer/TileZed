@@ -167,7 +167,7 @@
         <item>
          <widget class="QSpinBox" name="jumboX">
           <property name="maximum">
-           <number>512</number>
+           <number>4096</number>
           </property>
           <property name="value">
            <number>128</number>
@@ -177,10 +177,17 @@
         <item>
          <widget class="QSpinBox" name="jumboY">
           <property name="maximum">
-           <number>512</number>
+           <number>4096</number>
           </property>
           <property name="value">
            <number>256</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>(Jumbo default: 384 x 512)</string>
           </property>
          </widget>
         </item>

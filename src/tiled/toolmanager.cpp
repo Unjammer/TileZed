@@ -257,4 +257,4 @@ void ToolManager::setSelectedTool(AbstractTool *tool)
     }
 }
 
-#include "toolmanager.moc"
+#include "release/toolmanager.moc"

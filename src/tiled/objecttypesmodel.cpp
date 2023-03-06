@@ -23,26 +23,26 @@
 using namespace Tiled;
 using namespace Tiled::Internal;
 
-void ObjectTypesModel::setObjectTypes(const ObjectTypes &objectTypes)
+void ObjectTypesModel::setObjectTypes(const ObjectTypes& objectTypes)
 {
     beginResetModel();
     mObjectTypes = objectTypes;
     endResetModel();
 }
 
-int ObjectTypesModel::rowCount(const QModelIndex &parent) const
+int ObjectTypesModel::rowCount(const QModelIndex& parent) const
 {
     return parent.isValid() ? 0 : mObjectTypes.size();
 }
 
-int ObjectTypesModel::columnCount(const QModelIndex &parent) const
+int ObjectTypesModel::columnCount(const QModelIndex& parent) const
 {
     return parent.isValid() ? 0 : 2;
 }
 
 QVariant ObjectTypesModel::headerData(int section,
-                                      Qt::Orientation orientation,
-                                      int role) const
+    Qt::Orientation orientation,
+    int role) const
 {
     if (orientation == Qt::Horizontal) {
         if (role == Qt::DisplayRole) {
@@ -52,7 +52,8 @@ QVariant ObjectTypesModel::headerData(int section,
             case 1:
                 return tr("Color");
             }
-        } else if (role == Qt::TextAlignmentRole) {
+        }
+        else if (role == Qt::TextAlignmentRole) {
             return Qt::AlignLeft;
         }
     }
@@ -60,13 +61,13 @@ QVariant ObjectTypesModel::headerData(int section,
     return QVariant();
 }
 
-QVariant ObjectTypesModel::data(const QModelIndex &index, int role) const
+QVariant ObjectTypesModel::data(const QModelIndex& index, int role) const
 {
     // QComboBox requests data for an invalid index when the model is empty
     if (!index.isValid())
         return QVariant();
 
-    const ObjectType &objectType = mObjectTypes.at(index.row());
+    const ObjectType& objectType = mObjectTypes.at(index.row());
 
     if (role == Qt::DisplayRole || role == Qt::EditRole)
         if (index.column() == 0)
@@ -78,9 +79,9 @@ QVariant ObjectTypesModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-bool ObjectTypesModel::setData(const QModelIndex &index,
-                               const QVariant &value,
-                               int role)
+bool ObjectTypesModel::setData(const QModelIndex& index,
+    const QVariant& value,
+    int role)
 {
     if (role == Qt::EditRole && index.column() == 0) {
         mObjectTypes[index.row()].name = value.toString().trimmed();
@@ -90,7 +91,7 @@ bool ObjectTypesModel::setData(const QModelIndex &index,
     return false;
 }
 
-Qt::ItemFlags ObjectTypesModel::flags(const QModelIndex &index) const
+Qt::ItemFlags ObjectTypesModel::flags(const QModelIndex& index) const
 {
     Qt::ItemFlags f = QAbstractTableModel::flags(index);
     if (index.column() == 0)
@@ -98,7 +99,7 @@ Qt::ItemFlags ObjectTypesModel::flags(const QModelIndex &index) const
     return f;
 }
 
-void ObjectTypesModel::setObjectTypeColor(int objectIndex, const QColor &color)
+void ObjectTypesModel::setObjectTypeColor(int objectIndex, const QColor& color)
 {
     mObjectTypes[objectIndex].color = color;
 
@@ -106,10 +107,10 @@ void ObjectTypesModel::setObjectTypeColor(int objectIndex, const QColor &color)
     emit dataChanged(mi, mi);
 }
 
-void ObjectTypesModel::removeObjectTypes(const QModelIndexList &indexes)
+void ObjectTypesModel::removeObjectTypes(const QModelIndexList& indexes)
 {
     QVector<int> rows;
-    foreach (const QModelIndex &index, indexes)
+    foreach(const QModelIndex & index, indexes)
         rows.append(index.row());
 
     std::sort(rows.begin(), rows.end());

@@ -24,7 +24,7 @@
 #include <QObject>
 #include <QColor>
 
-#include "mapwriter.h"
+#include "../../libtiled/mapwriter.h"
 #include "objecttypes.h"
 
 class QSettings;
@@ -65,6 +65,9 @@ public:
 
     bool useOpenGL() const { return mUseOpenGL; }
     void setUseOpenGL(bool useOpenGL);
+
+    bool enableDarkTheme() const { return menableDarkTheme; }
+    void setenableDarkTheme(bool enableDarkTheme);
 
     const ObjectTypes &objectTypes() const { return mObjectTypes; }
     void setObjectTypes(const ObjectTypes &objectTypes);
@@ -134,6 +137,16 @@ public:
     int eraserBrushSize() const
     { return mEraserBrushSize; }
 
+    int gridOpacity() const
+    {
+        return mGridOpacity;
+    }
+
+    int gridWidth() const
+    {
+        return mGridWidth;
+    }
+
     QColor tilesetBackgroundColor() const
     { return mTilesetBackgroundColor; }
 
@@ -166,6 +179,8 @@ public slots:
     void setWorldEdFiles(const QStringList &fileNames);
     void setHighlightRoomUnderPointer(bool highlight);
     void setEraserBrushSize(int newSize);
+    void setGridOpacity(int newOpacity);
+    void setGridWidth(int newWidth);
     void setTilesetBackgroundColor(const QColor& color);
     void setThumbnailsDirectory(const QString &path);
 #endif
@@ -178,6 +193,8 @@ signals:
     void showTilesetGridChanged(bool showTilesetGrid);
 
     void useOpenGLChanged(bool useOpenGL);
+
+    void enableDarkTheme(bool _t1);
 
     void objectTypesChanged();
 
@@ -198,6 +215,10 @@ signals:
     void eraserBrushSizeChanged(int newSize);
     void tilesetBackgroundColorChanged(const QColor &color);
     void thumbnailsDirectoryChanged(const QString &dir);
+    void gridOpacityChanged(int newOpacity);
+
+    void gridWidthChanged(int newWidth);
+
 #endif
 
 private:
@@ -217,6 +238,7 @@ private:
     QString mLanguage;
     bool mReloadTilesetsOnChange;
     bool mUseOpenGL;
+    bool menableDarkTheme;
     ObjectTypes mObjectTypes;
 
     bool mAutoMapDrawing;
@@ -237,6 +259,8 @@ private:
     QStringList mWorldEdFiles;
     bool mHighlightRoomUnderPointer;
     int mEraserBrushSize;
+    int mGridOpacity;
+    int mGridWidth;
     QColor mTilesetBackgroundColor;
     QString mThumbnailsDirectory;
 #endif

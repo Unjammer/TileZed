@@ -54,6 +54,7 @@ protected:
 private slots:
     void languageSelected(int index);
     void useOpenGLToggled(bool useOpenGL);
+    void enableDarkTheme(bool enableDarkTheme);
     void useAutomappingDrawingToggled(bool enabled);
 
     void addObjectType();
@@ -66,6 +67,8 @@ private slots:
 
 #ifdef ZOMBOID
     void defaultGridColor();
+    void defaultGridOpacity();
+    void defaultGridWidth();
     void defaultBackgroundColor();
     void browseThumbnailDirectory();
     void browseWorlded();

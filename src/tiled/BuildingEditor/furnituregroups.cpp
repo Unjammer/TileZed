@@ -122,7 +122,7 @@ FurnitureTiles *FurnitureGroups::furnitureTilesFromSFB(SimpleFileBlock &furnitur
                 if (!kv.name.contains(QLatin1Char(',')))
                     continue;
                 QStringList values = kv.name.split(QLatin1Char(','),
-                                                   Qt::SkipEmptyParts);
+                                                   QString::SkipEmptyParts);
                 int x = values[0].toInt();
                 int y = values[1].toInt();
                 if (x < 0 || x >= 50 || y < 0 || y >= 50) {

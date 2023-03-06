@@ -44,6 +44,7 @@
 extern "C" {
 #include "lualib.h"
 #include "lauxlib.h"
+#include <preferences.h>
 }
 
 using namespace Tiled;
@@ -168,7 +169,7 @@ lua_State *LuaScript::init()
 {
     L = luaL_newstate();
     luaL_openlibs(L);
-    tolua_tiled_open(L);
+   tolua_tiled_open(L);
 
     tolua_beginmodule(L,NULL);
 #if 0
@@ -233,10 +234,24 @@ bool LuaScript::dofile(const QString &f, QString &output)
     }
     if (status != LUA_OK) {
         output = QString::fromLatin1(lua_tostring(L, -1));
-        LuaConsole::instance()->write(output, (status == LUA_OK) ? Qt::black : Qt::red);
+        if (Tiled::Internal::Preferences::instance()->enableDarkTheme())
+        {
+            LuaConsole::instance()->write(output, (status == LUA_OK) ? QColor("#DDDDDD") : Qt::red);
+        }
+        else {
+            LuaConsole::instance()->write(output, (status == LUA_OK) ? Qt::black : Qt::red);
+        }
     }
-    LuaConsole::instance()->write(qApp->tr("---------- script completed in %1s ----------")
-                                  .arg(elapsed.elapsed()/1000.0));
+    if (Tiled::Internal::Preferences::instance()->enableDarkTheme())
+    {
+        LuaConsole::instance()->write(qApp->tr("---------- script completed in %1s ----------")
+            .arg(elapsed.elapsed() / 1000.0), QColor("#DDDDDD"));
+    }
+    else {
+        LuaConsole::instance()->write(qApp->tr("---------- script completed in %1s ----------")
+            .arg(elapsed.elapsed() / 1000.0));
+    }
+    
     qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
     return status == LUA_OK;
 }
@@ -404,15 +419,31 @@ void LuaTileLayer::fill(Tile *tile)
 
 bool LuaTileLayer::replaceTile(Tile *oldTile, Tile *newTile)
 {
+    
+
     if (newTile == LuaMap::noneTile()) newTile = 0;
     initClone();
-    bool replaced = false;
-    for (int y = 0; y < mClone->width(); y++) {
-        for (int x = 0; x < mClone->width(); x++) {
-            if (mCloneTileLayer->cellAt(x, y).tile == oldTile) {
-                mCloneTileLayer->setCell(x, y, Cell(newTile));
-                mAltered += QRect(x, y, 1, 1);
-                replaced = true;
+    bool replaced = false; 
+    if (oldTile == LuaMap::noneTile())
+    {
+        for (int y = 0; y < mClone->width(); y++) {
+            for (int x = 0; x < mClone->width(); x++) {
+                if (mCloneTileLayer->cellAt(x, y).isEmpty()) {
+                    mCloneTileLayer->setCell(x, y, Cell(newTile));
+                    mAltered += QRect(x, y, 1, 1);
+                    replaced = true;
+                }
+            }
+        }
+    }
+    else {
+        for (int y = 0; y < mClone->width(); y++) {
+            for (int x = 0; x < mClone->width(); x++) {
+                if (mCloneTileLayer->cellAt(x, y).tile == oldTile) {
+                    mCloneTileLayer->setCell(x, y, Cell(newTile));
+                    mAltered += QRect(x, y, 1, 1);
+                    replaced = true;
+                }
             }
         }
     }
@@ -571,11 +602,14 @@ LuaTileLayer *LuaMap::tileLayer(const char *name)
     return 0;
 }
 
+
+
 LuaTileLayer *LuaMap::newTileLayer(const char *name)
 {
     LuaTileLayer *tl = new LuaTileLayer(name, 0, 0, width(), height());
     return tl;
 }
+
 
 void LuaMap::addLayer(LuaLayer *layer)
 {
@@ -591,6 +625,7 @@ void LuaMap::addLayer(LuaLayer *layer)
     foreach (LuaLayer *ll, mLayers)
         mLayerByName[ll->mName] = ll;
 }
+
 
 void LuaMap::insertLayer(int index, LuaLayer *layer)
 {
@@ -701,7 +736,7 @@ Tileset *LuaMap::tilesetAt(int index)
 void LuaMap::replaceTilesByName(const char *names)
 {
     QString ss = QString::fromLatin1(names);
-    QStringList _names = ss.split(QLatin1Char(';'), Qt::SkipEmptyParts);
+    QStringList _names = ss.split(QLatin1Char(';'), QString::SkipEmptyParts);
     if (_names.size() % 2)
         return; // error
 
@@ -908,7 +943,8 @@ QList<QString> LuaMap::blendLayers()
     QSet<QString> ret;
     foreach (LuaBmpBlend *blend, mBlends)
         ret += blend->mBlend->targetLayer;
-    return { ret.begin(), ret.end() };
+    //return { ret.begin(), ret.end() };
+    return { ret.toList() };
 }
 
 LuaMapNoBlend *LuaMap::noBlend(const char *layerName)
@@ -1108,6 +1144,21 @@ QRect LuaMapObject::bounds()
 
 /////
 
+LuaObjectGroup* LuaMap::newObjectLayer(const char* name)
+{
+    LuaObjectGroup* tl = new LuaObjectGroup(name, 0, 0, width(), height());
+    return tl;
+}
+
+
+
+LuaObjectGroup *LuaMap::objectLayer(const char* name)
+{
+    if (LuaLayer* layer = this->layer(name))
+        return layer->asObjectGroup();
+    return 0;
+}
+
 LuaObjectGroup::LuaObjectGroup(ObjectGroup *orig) :
     LuaLayer(orig),
     mCloneObjectGroup(0),
@@ -1150,10 +1201,16 @@ LuaColor LuaObjectGroup::color()
 void LuaObjectGroup::addObject(LuaMapObject *object)
 {
     initClone();
+
+    //if (mObjects.contains(object))
+    //    return; // error!
     // FIXME: MainWindow::LuaScript must use these
-//    mCloneObjectGroup->addObject(object->mClone ? object->mClone : object->mOrig);
+    //mCloneObjectGroup->addObject(object->mClone ? object->mClone : object->mOrig);
     mObjects += object;
+
+
 }
+
 
 QList<LuaMapObject *> LuaObjectGroup::objects()
 {

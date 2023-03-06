@@ -136,7 +136,7 @@ static void __cdecl invalid_parameter_handler(
 
 #endif
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 #if !defined(QT_NO_DEBUG) && defined(ZOMBOID) && defined(_MSC_VER)
     _set_invalid_parameter_handler(invalid_parameter_handler);
@@ -169,7 +169,7 @@ int main(int argc, char *argv[])
     a.setAttribute(Qt::AA_DontShowIconsInMenus);
 #endif
 
-    LanguageManager *languageManager = LanguageManager::instance();
+    LanguageManager* languageManager = LanguageManager::instance();
     languageManager->installTranslators();
 
     CommandLineHandler commandLine;
@@ -184,13 +184,23 @@ int main(int argc, char *argv[])
 #ifdef ZOMBOID
     if (a.isRunning()) {
         if (!commandLine.filesToOpen().isEmpty()) {
-            foreach (const QString &fileName, commandLine.filesToOpen())
+            foreach(const QString & fileName, commandLine.filesToOpen())
                 a.sendMessage(fileName);
             return 0;
         }
     }
 #endif
+    if (Preferences::instance()->enableDarkTheme())
+    {
+    
+    QString fileName = QCoreApplication::applicationDirPath() + QLatin1String("/theme/dark.qss");
+    QFile file(fileName);
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
+    QTextStream in(&file);
+    QString stylesheet = in.readAll();
 
+    a.setStyleSheet(stylesheet);
+}
     MainWindow w;
 #ifdef ZOMBOID
     ZProgressManager::instance()->setMainWindow(&w);
