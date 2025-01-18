@@ -30,7 +30,7 @@
 #include "tilesetmanager.h"
 #include "utils.h"
 #include "zoomable.h"
-
+#include "preferences.h"
 #include "tile.h"
 #include "tileset.h"
 
@@ -49,8 +49,6 @@
 #include <QUndoCommand>
 #include <QUndoGroup>
 #include <QUndoStack>
-
-#include "preferences.h"
 
 using namespace BuildingEditor;
 using namespace Tiled;
@@ -1783,7 +1781,7 @@ void BuildingTilesDialog::tilesetChanged(Tileset *tileset)
             item->setForeground(tileset->isMissing() ? Qt::red : Qt::black);
         }
     }
-        
+
 }
 
 void BuildingTilesDialog::undoTextChanged(const QString &text)

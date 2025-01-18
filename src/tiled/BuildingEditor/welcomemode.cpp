@@ -24,10 +24,12 @@
 #include "buildingwriter.h"
 #include "ui_buildingeditorwindow.h"
 #include "buildingpreferences.h"
+#include "simplefile.h"
 
 #include "mainwindow.h"
 #include "mapmanager.h"
 #include "mapimagemanager.h"
+#include "preferences.h"
 
 #include <QCompleter>
 #include <QDebug>
@@ -39,7 +41,6 @@
 #include <QHeaderView>
 #include <QLabel>
 #include <QMessageBox>
-#include <preferences.h>
 
 using namespace BuildingEditor;
 
@@ -72,7 +73,7 @@ LinkItem::LinkItem(const QString &text1, const QString &text2, QGraphicsItem *pa
     }
     else {
         item1->setDefaultTextColor(Qt::blue);
-    }
+    };
 
     mBoundingRect = sceneRectOfItem(item1);
 
@@ -185,7 +186,6 @@ WelcomeMode::WelcomeMode(QObject *parent) :
     pitem->setPos(x, y + 4);
     QGraphicsTextItem *item = scene->addText(tr("BuildingEd"), QFont(QLatin1String("Helvetica"), 16, 1));
     item->setPos(x + 24 + 6, y);
-    item->setDefaultTextColor(QColor("#D0D0D0"));
     QRectF r = sceneRectOfItem(item) | sceneRectOfItem(pitem);
     r.translate(0, 12);
     QGraphicsLineItem *line = scene->addLine(r.left(), r.bottom(), 400, r.bottom());
@@ -212,7 +212,7 @@ WelcomeMode::WelcomeMode(QObject *parent) :
 //    y += 36;
     item = scene->addText(tr("Recent Buildings"), QFont(QLatin1String("Helvetica"), 16, 1));
     item->setPos(x, y);
-    item->setDefaultTextColor(QColor("#D0D0D0"));
+
     y += item->boundingRect().height() + 12;
     mRecentItemsY = y;
     setRecentFiles();
@@ -288,6 +288,11 @@ WelcomeMode::WelcomeMode(QObject *parent) :
     connect(ui->legendCombo, &QComboBox::editTextChanged,
             this, &WelcomeMode::legendTextChanged);
 
+    connect(ui->roomToneCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &WelcomeMode::roomToneIndexChanged);
+    connect(ui->roomToneCombo, &QComboBox::editTextChanged,
+            this, &WelcomeMode::roomToneTextChanged);
+
     // TODO: set valid Legend values from a .txt file
     mLegendStrings += QStringLiteral("<NONE>");
     mLegendStrings += QStringLiteral("CommunityServices");
@@ -300,6 +305,13 @@ WelcomeMode::WelcomeMode(QObject *parent) :
     ui->legendCombo->lineEdit()->setPlaceholderText(QStringLiteral("<NONE>"));
     ui->legendCombo->setDuplicatesEnabled(false);
     ui->legendCombo->addItems(mLegendStrings);
+
+    // TODO: set valid RoomTone values from a .txt file
+    mRoomToneStrings += QStringLiteral("<NONE>");
+    readRoomToneTxt();
+    ui->roomToneCombo->lineEdit()->setPlaceholderText(QStringLiteral("<NONE>"));
+    ui->roomToneCombo->setDuplicatesEnabled(false);
+    ui->roomToneCombo->addItems(mRoomToneStrings);
 
     setWidget(mWidget);
 
@@ -364,6 +376,7 @@ void WelcomeMode::onMapsDirectoryChanged()
 void WelcomeMode::selectionChanged()
 {
     synchLegendCombo();
+    synchRoomToneCombo();
 
     QString path = currentFilePath();
     if (path.isEmpty()) {
@@ -414,6 +427,66 @@ void WelcomeMode::synchLegendCombo()
     mSynchLegend = false;
 }
 
+void WelcomeMode::synchRoomToneCombo()
+{
+    mSynchRoomTone = true;
+    ui->roomToneCombo->setCurrentIndex(-1);
+    ui->roomToneCombo->setEnabled(false);
+
+    QString path = currentFilePath();
+    if (path.isEmpty()) {
+        mSynchRoomTone = false;
+        return;
+    }
+    if (MapInfo *mapInfo = MapManager::instance()->mapInfo(path)) {
+        ui->roomToneCombo->setEnabled(true);
+        if (mapInfo->properties().contains(QStringLiteral("RoomTone"))) {
+            QString roomTone = mapInfo->properties()[QStringLiteral("RoomTone")].trimmed();
+            if (roomTone.isEmpty() == false) {
+                int index = ui->roomToneCombo->findText(roomTone); // mRoomToneStrings.indexOf(roomTone);
+                if (index == -1) {
+                    ui->roomToneCombo->addItem(roomTone);
+                    //mRoomToneStrings += roomTone;
+                    //index = mRoomToneStrings.size() - 1;
+                    index = ui->roomToneCombo->count() - 1;
+                }
+                ui->roomToneCombo->setCurrentIndex(index);
+            }
+        }
+    }
+    mSynchRoomTone = false;
+}
+
+bool WelcomeMode::readRoomToneTxt()
+{
+    QString mError;
+
+    QString txtPath = Tiled::Internal::Preferences::instance()->appConfigPath(QLatin1String("RoomTone.txt"));
+    QFileInfo info(txtPath);
+    if (!info.exists()) {
+        mError = tr("The RoomTone.txt file doesn't exist.");
+        return false;
+    }
+
+    QString path = info.absoluteFilePath();
+    SimpleFile simple;
+    if (!simple.read(path)) {
+        mError = tr("Error reading %1.").arg(path);
+        return false;
+    }
+
+    for (const SimpleFileKeyValue &kv : simple.values) {
+        QString str = kv.name.trimmed();
+        if (str.compare(QLatin1String("version"), Qt::CaseInsensitive) == 0)
+            continue;
+        if (str.isEmpty())
+            continue;
+        mRoomToneStrings += str;
+    }
+
+    return true;
+}
+
 void WelcomeMode::onMapImageChanged(MapImage *mapImage)
 {
     if ((mapImage == mPreviewMapImage) && mapImage->isLoaded()) {
@@ -422,6 +495,7 @@ void WelcomeMode::onMapImageChanged(MapImage *mapImage)
         ui->label->setPixmap(QPixmap::fromImage(image));
 
         synchLegendCombo();
+        synchRoomToneCombo();
     }
 }
 
@@ -582,6 +656,67 @@ void WelcomeMode::legendTextChanged(const QString &text)
     // Called when typing text.
 #if !defined(QT_NO_DEBUG)
     qDebug() << "legendTextChanged" << text;
+#endif
+}
+
+void WelcomeMode::roomToneIndexChanged(int index)
+{
+    // Called after ENTERing new text, after adding it to the combobox items.
+#if !defined(QT_NO_DEBUG)
+    qDebug() << "roomToneIndexChanged" << index;
+#endif
+    if (mSynchRoomTone)
+        return;
+
+    QString roomTone = (index < 1) ? QString() : ui->roomToneCombo->itemText(index).trimmed();
+
+    QString path = currentFilePath();
+    if (path.isEmpty())
+        return;
+
+    MapInfo *mapInfo = MapManager::instance()->mapInfo(path);
+    if (mapInfo == nullptr)
+        return;
+
+    QString ROOMTONE = QStringLiteral("RoomTone");
+    QString current = mapInfo->properties().value(ROOMTONE, QString());
+    if (roomTone.isEmpty()) {
+        if (current.isEmpty()) {
+            return;
+        }
+    } else {
+        if (current == roomTone) {
+            return;
+        }
+    }
+
+    qDebug() << "Updating RoomTone property in" << path;
+
+    // 1) Read the TBX
+    // 2) Set the RoomTone= property
+    // 3) Save the TBX
+    BuildingReader reader;
+    if (Building *building = reader.read(path)) {
+        reader.fix(building);
+        if (roomTone.isEmpty()) {
+            building->properties().remove(ROOMTONE);
+        } else {
+            building->properties().insert(ROOMTONE, roomTone);
+        }
+        BuildingWriter w;
+        if (!w.write(building, path)) {
+            QString error = w.errorString();
+            QMessageBox::warning(BuildingEditorWindow::instance(), tr("Error saving building"), error);
+        }
+        delete building;
+    }
+}
+
+void WelcomeMode::roomToneTextChanged(const QString &text)
+{
+    // Called when typing text.
+#if !defined(QT_NO_DEBUG)
+    qDebug() << "roomToneTextChanged" << text;
 #endif
 }
 

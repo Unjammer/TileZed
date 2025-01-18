@@ -303,7 +303,7 @@ void BuildingTilesetDock::tilesetChanged(Tileset *tileset)
 
     int row = TileMetaInfoMgr::instance()->indexOf(tileset);
     if (QListWidgetItem* item = ui->tilesets->item(row))
-    {   
+    {
         if (Tiled::Internal::Preferences::instance()->enableDarkTheme())
         {
             item->setForeground(tileset->isMissing() ? Qt::red : QColor("#DDDDDD"));
@@ -388,8 +388,7 @@ void BuildingTilesetView::contextMenuEvent(QContextMenuEvent *event)
     if (tile) {
         // Get a list of layer names from the current map
         QStringList layerNames0 = BuildingMap::layerNames(0);
-        //QSet<QString> set(layerNames0.constBegin(), layerNames0.constEnd());
-        QSet<QString> set(layerNames0.toSet());
+        QSet<QString> set(layerNames0.constBegin(), layerNames0.constEnd());
 
         // Get a list of layer names for the current tileset
         for (int i = 0; i < tile->tileset()->tileCount(); i++) {
@@ -398,8 +397,7 @@ void BuildingTilesetView::contextMenuEvent(QContextMenuEvent *event)
             if (!layerName.isEmpty())
                 set.insert(layerName);
         }
-        //layerNames = QStringList(set.constBegin(), set.constEnd());
-        layerNames = QStringList(set.toList());
+        layerNames = QStringList(set.constBegin(), set.constEnd());
         layerNames.sort();
 
         QMenu *layersMenu = menu.addMenu(QLatin1String("Default Layer"));

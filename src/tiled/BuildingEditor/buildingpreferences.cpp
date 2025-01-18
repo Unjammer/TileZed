@@ -30,7 +30,9 @@ static const char *KEY_HIGHLIGHT_FLOOR = "PreviewWindow/HighlightFloor";
 static const char *KEY_HIGHLIGHT_ROOM = "HighlightRoom";
 static const char *KEY_SHOW_WALLS = "PreviewWindow/ShowWalls";
 static const char *KEY_SHOW_LOWER_FLOORS = "PreviewWindow/ShowLowerFloors";
+static const char *KEY_SHOW_ONLY_FLOORS = "PreviewWindow/ShowOnlyFloors";
 static const char *KEY_SHOW_OBJECTS = "PreviewWindow/ShowObjects";
+static const char *KEY_HIGHLIGHT_UNLIT_ROOMS = "HighlightUnlitRooms";
 static const char *KEY_OPENGL = "OpenGL";
 static const char *KEY_LEVEL_ISO = "LevelIsomettric";
 
@@ -49,6 +51,7 @@ void BuildingPreferences::deleteInstance()
     mInstance = 0;
 }
 
+/*
 BuildingPreferences::BuildingPreferences(QObject *parent) :
     QObject(parent),
     mSettings(QLatin1String("TheIndieStone"), QLatin1String("BuildingEd"))
@@ -67,8 +70,38 @@ BuildingPreferences::BuildingPreferences(QObject *parent) :
                                  true).toBool();
     mShowLowerFloors = mSettings.value(QLatin1String(KEY_SHOW_LOWER_FLOORS),
                                  true).toBool();
+    mShowOnlyFloors = mSettings.value(QLatin1String(KEY_SHOW_ONLY_FLOORS),
+                                 false).toBool();
+    mHighlightUnlitRooms = mSettings.value(QLatin1String(KEY_HIGHLIGHT_UNLIT_ROOMS),
+                                 false).toBool();
     mTileScale = mSettings.value(QLatin1String(KEY_TILE_SCALE),
                                  0.5).toReal();
+    mUseOpenGL = mSettings.value(QLatin1String(KEY_OPENGL), false).toBool();
+    mLevelIsometric = mSettings.value(QLatin1String(KEY_LEVEL_ISO), false).toBool();
+}
+*/
+
+BuildingPreferences::BuildingPreferences(QObject *parent) :
+    QObject(parent),
+    mSettings(QDir::currentPath() + QLatin1String("/settings.ini"), QSettings::IniFormat)
+{
+    // Synchronisation des préférences avec des valeurs par défaut
+    if (!mSettings.contains(QLatin1String(KEY_MAPS_DIRECTORY))) {
+        mSettings.setValue(QLatin1String(KEY_MAPS_DIRECTORY),
+                           Tiled::Internal::Preferences::instance()->mapsDirectory());
+    }
+
+    mMapsDirectory = mSettings.value(QLatin1String(KEY_MAPS_DIRECTORY)).toString();
+    mShowGrid = mSettings.value(QLatin1String(KEY_SHOW_GRID), true).toBool();
+    mGridColor = QColor(mSettings.value(QLatin1String(KEY_GRID_COLOR), QColor(Qt::black).name()).toString());
+    mHighlightFloor = mSettings.value(QLatin1String(KEY_HIGHLIGHT_FLOOR), true).toBool();
+    mHighlightRoom = mSettings.value(QLatin1String(KEY_HIGHLIGHT_ROOM), true).toBool();
+    mShowWalls = mSettings.value(QLatin1String(KEY_SHOW_WALLS), true).toBool();
+    mShowObjects = mSettings.value(QLatin1String(KEY_SHOW_OBJECTS), true).toBool();
+    mShowLowerFloors = mSettings.value(QLatin1String(KEY_SHOW_LOWER_FLOORS), true).toBool();
+    mShowOnlyFloors = mSettings.value(QLatin1String(KEY_SHOW_ONLY_FLOORS), false).toBool();
+    mHighlightUnlitRooms = mSettings.value(QLatin1String(KEY_HIGHLIGHT_UNLIT_ROOMS), false).toBool();
+    mTileScale = mSettings.value(QLatin1String(KEY_TILE_SCALE), 0.5).toReal();
     mUseOpenGL = mSettings.value(QLatin1String(KEY_OPENGL), false).toBool();
     mLevelIsometric = mSettings.value(QLatin1String(KEY_LEVEL_ISO), false).toBool();
 }
@@ -146,6 +179,15 @@ void BuildingPreferences::setShowLowerFloors(bool show)
     emit showLowerFloorsChanged(mShowLowerFloors);
 }
 
+void BuildingPreferences::setShowOnlyFloors(bool show)
+{
+    if (show == mShowOnlyFloors)
+        return;
+    mShowOnlyFloors = show;
+    mSettings.setValue(QLatin1String(KEY_SHOW_ONLY_FLOORS), mShowOnlyFloors);
+    emit showOnlyFloorsChanged(mShowOnlyFloors);
+}
+
 void BuildingPreferences::setShowObjects(bool show)
 {
     if (show == mShowObjects)
@@ -153,6 +195,15 @@ void BuildingPreferences::setShowObjects(bool show)
     mShowObjects = show;
     mSettings.setValue(QLatin1String(KEY_SHOW_OBJECTS), mShowObjects);
     emit showObjectsChanged(mShowObjects);
+}
+
+void BuildingPreferences::setHighlightUnlitRooms(bool show)
+{
+    if (show == mHighlightUnlitRooms)
+        return;
+    mHighlightUnlitRooms = show;
+    mSettings.setValue(QLatin1String(KEY_HIGHLIGHT_UNLIT_ROOMS), mHighlightUnlitRooms);
+    emit highlightUnlitRoomsChanged(mHighlightUnlitRooms);
 }
 
 void BuildingPreferences::setTileScale(qreal scale)
