@@ -23,14 +23,13 @@
 #include "documentmanager.h"
 #include "languagemanager.h"
 #include "tilesetmanager.h"
-#ifdef ZOMBOID
+#include "logger.h"
 #include "zprogress.h"
-#endif
 
-#ifdef ZOMBOID
+
+
 #include <QCoreApplication>
 #include <QDir>
-#endif
 #include <QDesktopServices>
 #include <QFileInfo>
 #include <QSettings>
@@ -55,8 +54,15 @@ void Preferences::deleteInstance()
 }
 
 Preferences::Preferences()
-    : mSettings(new QSettings)
+: QObject()
+    , mSettings(new QSettings(QDir::currentPath() + QLatin1String("/settings.ini"), QSettings::IniFormat))
 {
+    Logger::instance().log(tr("Preferences - Loading : %1").arg(mSettings->fileName()), QLatin1String("INFO"));
+
+    if (!QFile::exists(mSettings->fileName())) {
+        Logger::instance().log(tr("Preferences - Creating new settings file: %1").arg(mSettings->fileName()), QLatin1String("INFO"));
+        mSettings->sync(); // Crée immédiatement le fichier
+    }
     // Retrieve storage settings
     mSettings->beginGroup(QLatin1String("Storage"));
     mLayerDataFormat = (MapWriter::LayerDataFormat)
@@ -81,6 +87,7 @@ Preferences::Preferences()
     mLanguage = mSettings->value(QLatin1String("Language"),
                                  QString()).toString();
     mUseOpenGL = mSettings->value(QLatin1String("OpenGL"), false).toBool();
+
     menableDarkTheme = mSettings->value(QLatin1String("EnableDarkTheme"), false).toBool();
 #ifdef ZOMBOID
     mAutoSwitchLayer = mSettings->value(QLatin1String("AutoSwitchLayer"), true).toBool();
@@ -90,18 +97,22 @@ Preferences::Preferences()
     mShowMiniMap = mSettings->value(QLatin1String("ShowMiniMap"), true).toBool();
     mMiniMapWidth = mSettings->value(QLatin1String("MiniMapWidth"), 256).toInt();
     mShowTileLayersPanel = mSettings->value(QLatin1String("ShowTileLayersPanel"), true).toBool();
+    mShowTileSelection = mSettings->value(QLatin1String("ShowTileSelection"), true).toBool();
+    mShowInvisibleTiles = mSettings->value(QLatin1String("ShowInvisibleTiles"), true).toBool();
     mBackgroundColor = QColor(mSettings->value(QLatin1String("BackgroundColor"),
                                                QColor(Qt::darkGray).name()).toString());
     mShowAdjacentMaps = mSettings->value(QLatin1String("ShowAdjacentMaps"), true).toBool();
     mHighlightRoomUnderPointer = mSettings->value(QLatin1String("HighlightRoomUnderPointer"), false).toBool();
     mTilesetBackgroundColor = QColor(mSettings->value(QLatin1String("TilesetBackgroundColor"), QColor(Qt::white).name()).toString());
+    mShowCellBorder = mSettings->value(QLatin1String("ShowCellBorder"), true).toBool();
+    mTheme = mSettings->value(QLatin1String("Theme"), QString()).toString();
+    mGridOpacity = mSettings->value(QLatin1String("GridOpacity"), 128).toInt();
+    mGridWidth = mSettings->value(QLatin1String("GridWidth"), 128).toInt();
 #endif
     mSettings->endGroup();
 #ifdef ZOMBOID
     mEraserBrushSize = mSettings->value(QLatin1String("Tools/Eraser/BrushSize"), 1).toInt();
 #endif
-    mGridOpacity = mSettings->value(QLatin1String("GridOpacity"), 128).toInt();
-    mGridWidth = mSettings->value(QLatin1String("GridWidth"), 128).toInt();
 
     // Retrieve defined object types
     mSettings->beginGroup(QLatin1String("ObjectTypes"));
@@ -122,8 +133,9 @@ Preferences::Preferences()
 
 #ifdef ZOMBOID
     QSettings settings(QLatin1String("TheIndieStone"), QLatin1String("BuildingEd"));
-    QString KEY_TILES_DIR = QLatin1String("TilesDirectory");
-    QString tilesDirectory = settings.value(KEY_TILES_DIR).toString();
+    //QString KEY_TILES_DIR = QLatin1String("TilesDirectory");
+    //QString tilesDirectory = settings.value(KEY_TILES_DIR).toString();
+    QString tilesDirectory = mSettings->value(QLatin1String("TilesDirectory")).toString();
     if (tilesDirectory.isEmpty() || !QDir(tilesDirectory).exists()) {
         tilesDirectory = QCoreApplication::applicationDirPath() +
                 QLatin1Char('/') + QLatin1String("../Tiles");
@@ -141,29 +153,47 @@ Preferences::Preferences()
     mSettings->endGroup();
     if (tilesDirectory.length()) {
         mSettings->setValue(QLatin1String("Tilesets/TilesDirectory"), mTilesDirectory);
-        mSettings->remove(KEY_TILES_DIR);
+        //mSettings->remove(KEY_TILES_DIR);
     }
 
     mSettings->beginGroup(QLatin1String("MapsDirectory"));
     mMapsDirectory = mSettings->value(QLatin1String("Current"), QString()).toString();
     mSettings->endGroup();
 
-    QString configPath = QDir::homePath() + QLatin1Char('/') + QLatin1String(".TileZed");
+    QString configPath = QDir::currentPath() + QLatin1String("/../") + QLatin1String(".TileZed");
     mConfigDirectory = mSettings->value(QLatin1String("ConfigDirectory"),
                                         configPath).toString();
 
     mThumbnailsDirectory = mSettings->value(QLatin1String("Thumbnails/Directory"), QString()).toString();
 
     mWorldEdFiles = mSettings->value(QLatin1String("WorldEd/ProjectFile")).toStringList();
+    mTilePropertiesFiles = mSettings->value(QLatin1String("TilePropertiesFiles")).toStringList();
+
+    bool bHasNewTileDefinitions = false;
+    for (const QString &f : mTilePropertiesFiles) {
+        if (f.isEmpty())
+            continue;
+        if (f.contains(QLatin1String("newtiledefinitions.tiles"), Qt::CaseInsensitive)) {
+            bHasNewTileDefinitions = true;
+        }
+    }
+    if ((bHasNewTileDefinitions == false) && (mTilesDirectory.isEmpty() == false)) {
+        QFileInfo fileInfo(mTilesDirectory + QLatin1String("/newtiledefinitions.tiles"));
+        mTilePropertiesFiles += QDir::toNativeSeparators(fileInfo.canonicalFilePath());
+        mSettings->setValue(QLatin1String("TilePropertiesFiles"), mTilePropertiesFiles);
+    }
 #endif
 #ifndef ZOMBOID // do this in TilesetManager constructor to avoid infinite loop
     TilesetManager *tilesetManager = TilesetManager::instance();
     tilesetManager->setReloadTilesetsOnChange(mReloadTilesetsOnChange);
 #endif
+    mSettings->sync();
+    Logger::instance().log(tr("Preferences - Settings : %1 synced").arg(mSettings->fileName()), QLatin1String("INFO"));
 }
 
 Preferences::~Preferences()
 {
+     mSettings->sync();
     delete mSettings;
 }
 
@@ -195,6 +225,24 @@ void Preferences::setGridColor(QColor gridColor)
     mGridColor = gridColor;
     mSettings->setValue(QLatin1String("Interface/GridColor"), mGridColor.name());
     emit gridColorChanged(mGridColor);
+}
+
+void Preferences::setGridOpacity(int newOpacity)
+{
+    if (mGridOpacity == newOpacity)
+        return;
+    mGridOpacity = newOpacity;
+    mSettings->setValue(QLatin1String("GridOpacity"), mGridOpacity);
+    emit gridOpacityChanged(mGridOpacity);
+}
+
+void Preferences::setGridWidth(int newWidth)
+{
+    if (mGridWidth == newWidth)
+        return;
+    mGridWidth = newWidth;
+    mSettings->setValue(QLatin1String("GridWidth"), mGridWidth);
+    emit gridWidthChanged(mGridWidth);
 }
 
 void Preferences::setHighlightCurrentLayer(bool highlight)
@@ -251,6 +299,17 @@ QString Preferences::language() const
     return mLanguage;
 }
 
+void Preferences::setTheme(QString theme)
+{
+
+    if (mTheme == theme)
+        return;
+
+    mTheme = theme;
+    mSettings->setValue(QLatin1String("Interface/Theme"), mTheme);
+
+}
+
 void Preferences::setLanguage(const QString &language)
 {
     if (mLanguage == language)
@@ -290,17 +349,6 @@ void Preferences::setUseOpenGL(bool useOpenGL)
     mSettings->setValue(QLatin1String("Interface/OpenGL"), mUseOpenGL);
 
     emit useOpenGLChanged(mUseOpenGL);
-}
-
-void Preferences::setenableDarkTheme(bool useDarkTheme)
-{
-    if (menableDarkTheme == useDarkTheme)
-        return;
-
-    menableDarkTheme = useDarkTheme;
-    mSettings->setValue(QLatin1String("Interface/EnableDarkTheme"), menableDarkTheme);
-
-    emit enableDarkTheme(menableDarkTheme);
 }
 
 void Preferences::setObjectTypes(const ObjectTypes &objectTypes)
@@ -583,6 +631,24 @@ void Preferences::setShowTileLayersPanel(bool show)
     emit showTileLayersPanelChanged(mShowTileLayersPanel);
 }
 
+void Preferences::setShowTileSelection(bool show)
+{
+    if (mShowTileSelection == show)
+        return;
+    mShowTileSelection = show;
+    mSettings->setValue(QLatin1String("Interface/ShowTileSelection"), show);
+    emit showTileSelectionChanged(mShowTileLayersPanel);
+}
+
+void Preferences::setShowInvisibleTiles(bool show)
+{
+    if (mShowInvisibleTiles == show)
+        return;
+    mShowInvisibleTiles = show;
+    mSettings->setValue(QLatin1String("Interface/ShowInvisibleTiles"), show);
+    emit showInvisibleTilesChanged(mShowInvisibleTiles);
+}
+
 void Preferences::setBackgroundColor(const QColor &bgColor)
 {
     if (mBackgroundColor == bgColor)
@@ -611,6 +677,15 @@ void Preferences::setWorldEdFiles(const QStringList &fileNames)
     emit worldEdFilesChanged(mWorldEdFiles);
 }
 
+void Preferences::setTilePropertiesFiles(const QStringList &fileNames)
+{
+    if (mTilePropertiesFiles == fileNames)
+        return;
+    mTilePropertiesFiles = fileNames;
+    mSettings->setValue(QLatin1String("TilePropertiesFiles"), mTilePropertiesFiles);
+    emit tilePropertiesFilesChanged(mTilePropertiesFiles);
+}
+
 void Preferences::setHighlightRoomUnderPointer(bool highlight)
 {
     if (mHighlightRoomUnderPointer == highlight)
@@ -627,24 +702,6 @@ void Preferences::setEraserBrushSize(int newSize)
     mEraserBrushSize = newSize;
     mSettings->setValue(QLatin1String("Tools/Eraser/BrushSize"), mEraserBrushSize);
     emit eraserBrushSizeChanged(mEraserBrushSize);
-}
-
-void Preferences::setGridOpacity(int newOpacity)
-{
-    if (mGridOpacity == newOpacity)
-        return;
-    mGridOpacity = newOpacity;
-    mSettings->setValue(QLatin1String("GridOpacity"), mGridOpacity);
-    emit gridOpacityChanged(mGridOpacity);
-}
-
-void Preferences::setGridWidth(int newWidth)
-{
-    if (mGridWidth == newWidth)
-        return;
-    mGridWidth = newWidth;
-    mSettings->setValue(QLatin1String("GridWidth"), mGridWidth);
-    emit gridWidthChanged(mGridWidth);
 }
 
 void Preferences::setTilesetBackgroundColor(const QColor &color)
@@ -664,4 +721,26 @@ void Preferences::setThumbnailsDirectory(const QString &path)
     emit thumbnailsDirectoryChanged(mThumbnailsDirectory);
 }
 
+void Preferences::setShowCellBorder(bool show)
+{
+    if (mShowCellBorder == show)
+        return;
+    mShowCellBorder = show;
+    mSettings->setValue(QLatin1String("Interface/ShowCellBorder"), mShowCellBorder);
+    emit showCellBorderChanged(mShowCellBorder);
+}
+
 #endif // ZOMBOID
+
+void Preferences::setenableDarkTheme(bool useDarkTheme)
+{
+    if (menableDarkTheme == useDarkTheme)
+        return;
+
+    menableDarkTheme = useDarkTheme;
+    mSettings->setValue(QLatin1String("Interface/EnableDarkTheme"), menableDarkTheme);
+
+    emit enableDarkTheme(menableDarkTheme);
+}
+
+

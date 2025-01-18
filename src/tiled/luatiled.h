@@ -95,8 +95,7 @@ public:
 
     QVector<QRect> rects() const
     {
-        //return QVector<QRect>(begin(), end());
-        return QVector<QRect>(this->rects());
+        return QVector<QRect>(begin(), end());
     }
 
     void unite(int x, int y, int w, int h) { *this += QRect(x, y, w, h); }
@@ -115,7 +114,11 @@ public:
     LuaLayer(Layer *orig);
     virtual ~LuaLayer();
 
-    const char *name();
+    const char *name() const;
+    const char *nameWithPrefix() const;
+    const QString nameWithPrefixQString() const;
+
+    int level() const { return mLevel; }
 
     virtual LuaTileLayer *asTileLayer() { return 0; }
     virtual LuaObjectGroup *asObjectGroup() { return 0; }
@@ -128,6 +131,7 @@ public:
     Layer *mClone;
     Layer *mOrig;
     QString mName;
+    int mLevel;
 };
 
 class LuaTileLayer : public LuaLayer
@@ -141,9 +145,7 @@ public:
     const char *type() const { return "tile"; }
 
     void cloned();
-
     int level();
-
     void setTile(int x, int y, Tile *tile);
     Tile *tileAt(int x, int y);
 
@@ -198,6 +200,7 @@ public:
     LuaColor color();
 
     void addObject(LuaMapObject *object);
+    void insertObject(int index, LuaMapObject* object);
     QList<LuaMapObject*> objects();
 
     ObjectGroup *mCloneObjectGroup;
@@ -343,6 +346,7 @@ public:
     LuaLayer *layerAt(int index) const;
     LuaLayer *layer(const char *name);
     LuaTileLayer *tileLayer(const char *name);
+
     LuaObjectGroup *objectLayer(const char *name);
 
     LuaTileLayer *newTileLayer(const char *name);

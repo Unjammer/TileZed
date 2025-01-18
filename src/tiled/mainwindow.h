@@ -43,6 +43,7 @@ class MainWindow;
 
 #ifdef ZOMBOID
 class ContainerOverlayDialog;
+class SnowEditor;
 class TileOverlayDialog;
 
 namespace BuildingEditor {
@@ -168,6 +169,9 @@ public slots:
     void copy();
     void paste();
     void delete_(); // delete is a reserved word
+#ifdef ZOMBOID
+    void deleteInAllLayers();
+#endif
     void openPreferences();
 
     void zoomIn();
@@ -177,6 +181,9 @@ public slots:
     bool newTileset(const QString &path = QString());
     void newTilesets(const QStringList &paths);
     void addExternalTileset();
+#ifdef ZOMBOID
+    void removeMissingTilesets();
+#endif
     void resizeMap();
     void offsetMap();
     void editMapProperties();
@@ -240,6 +247,7 @@ public slots:
     void containerOverlayDialog();
     void tileOverlayDialog();
     void enflatulator();
+    void snowEditor();
     void launchWorldEd();
 
     void brushSizeMinus();
@@ -353,6 +361,8 @@ private:
     TileDefDialog *mTileDefDialog;
     ContainerOverlayDialog *mContainerOverlayDialog;
     TileOverlayDialog *mTileOverlayDialog = nullptr;
+    SnowEditor *mSnowEditor = nullptr;
+
 #endif
 };
 

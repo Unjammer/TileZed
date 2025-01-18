@@ -108,6 +108,7 @@ ZomboidScene::ZomboidScene(QObject *parent)
     , mMapBuildings(new MapBuildings)
     , mMapBuildingsInvalid(true)
 {
+
     connect(&mLotManager, qOverload<MapComposite*,Tiled::MapObject*>(&ZLotManager::lotAdded),
         this, qOverload<MapComposite*,Tiled::MapObject*>(&ZomboidScene::onLotAdded));
     connect(&mLotManager, qOverload<MapComposite*,Tiled::MapObject*>(&ZLotManager::lotRemoved),
@@ -181,6 +182,8 @@ void ZomboidScene::setMapDocument(MapDocument *mapDoc)
         connect(Preferences::instance(), &Preferences::highlightRoomUnderPointerChanged,
                 this, &ZomboidScene::highlightRoomUnderPointerChanged);
         connect(Preferences::instance(), &Preferences::showLotFloorsOnlyChanged, this, &ZomboidScene::showLotFloorsOnlyChanged);
+        connect(Preferences::instance(), &Preferences::showInvisibleTilesChanged, this, &ZomboidScene::showInvisibleTilesChanged);
+        connect(Preferences::instance(), &Preferences::showCellBorderChanged, this, &ZomboidScene::showCellBorderChanged);
     }
 }
 
@@ -300,21 +303,28 @@ void ZomboidScene::updateCurrentLayerHighlight()
     if (!mMapDocument)
         return;
 
+    int currentLevel = mMapDocument->currentLevel();
+
     Layer *currentLayer = mMapDocument->currentLayer();
     int currentLayerIndex = mMapDocument->currentLayerIndex();
 
-    if (currentLayer) {
-        int level = currentLayer->level();
-        if (mTileLayerGroupItems.contains(level)) {
-            CompositeLayerGroup *layerGroup = mTileLayerGroupItems[level]->layerGroup();
+    if (currentLevel == INVALID_LEVEL) {
+        if (currentLayer != nullptr) {
+            currentLevel = currentLayer->level();
+        }
+    } else {
+        if (mTileLayerGroupItems.contains(currentLevel)) {
+            CompositeLayerGroup *layerGroup = mTileLayerGroupItems[currentLevel]->layerGroup();
             if (layerGroup->layerCount()) {
                 currentLayer = layerGroup->layers().first();
                 currentLayerIndex = mMapDocument->map()->layers().indexOf(currentLayer);
             }
+        } else {
+            currentLevel = INVALID_LEVEL;
         }
     }
 
-    if (!mHighlightCurrentLayer || !currentLayer) {
+    if (!mHighlightCurrentLayer || (currentLevel == INVALID_LEVEL)) {
         mDarkRectangle->setVisible(false);
 
         // Restore visibility for all non-ZTileLayerGroupItem layers
@@ -331,25 +341,29 @@ void ZomboidScene::updateCurrentLayerHighlight()
         return;
     }
 
-    QGraphicsItem *currentItem = mLayerItems[currentLayerIndex];
-    if (currentLayer->asTileLayer() && currentLayer->asTileLayer()->group()) {
-        Q_ASSERT(mTileLayerGroupItems.contains(currentLayer->level()));
-        if (mTileLayerGroupItems.contains(currentLayer->level()))
-            currentItem = mTileLayerGroupItems[currentLayer->level()];
+    QGraphicsItem *currentItem = nullptr;
+    if (currentLayer) {
+        currentItem = mLayerItems[currentLayerIndex];
+    } else {
+        Q_ASSERT(mTileLayerGroupItems.contains(currentLevel));
+        if (mTileLayerGroupItems.contains(currentLevel))
+            currentItem = mTileLayerGroupItems[currentLevel];
+        else
+            return;
     }
 
     // Hide items above the current item
     int index = 0;
     foreach (QGraphicsItem *item, mLayerItems) {
         Layer *layer = mMapDocument->map()->layerAt(index);
-        bool visible = layer->isVisible() && (layer->level() <= currentLayer->level());
-        if (layer->isObjectGroup() && (layer->level() != currentLayer->level()))
+        bool visible = layer->isVisible() && (layer->level() <= currentLevel);
+        if (layer->isObjectGroup() && (layer->level() != currentLevel))
             visible = false;
         item->setVisible(visible);
         ++index;
     }
     foreach (CompositeLayerGroupItem *item, mTileLayerGroupItems) {
-        bool visible = item->layerGroup()->isVisible() && (item->layerGroup()->level() <= currentLayer->level());
+        bool visible = item->layerGroup()->isVisible() && (item->layerGroup()->level() <= currentLevel);
         item->setVisible(visible);
     }
 
@@ -530,7 +544,7 @@ void ZomboidScene::layerLevelChanged(int index, int oldLevel)
                 MapComposite *lot = mMapObjectToLot[mapObject];
                 lot->setGroupVisible(og->isVisible());
                 lot->setLevel(og->level());
-                mMapDocument->mapComposite()->ensureMaxLevels(lot->levelOffset() + lot->maxLevel());
+                mMapDocument->mapComposite()->checkMinMaxLevels(lot->levelOffset() + lot->minLevel(), lot->levelOffset() + lot->maxLevel());
                 // Recalculate the MapObject bounds
                 onLotUpdated(lot, mapObject);
                 synch = true;
@@ -725,7 +739,7 @@ void ZomboidScene::synchNoBlendVisible()
 {
     QString layerName;
     if (mapDocument()->currentLayer() && mapDocument()->currentLayer()->asTileLayer()) {
-        layerName = mapDocument()->currentLayer()->name();
+        layerName = mapDocument()->currentLayer()->nameWithPrefix();
         if (!mapDocument()->mapComposite()->bmpBlender()->blendLayers().contains(layerName))
             layerName.clear();
     }
@@ -748,6 +762,17 @@ void ZomboidScene::showLotFloorsOnlyChanged(bool show)
     MapComposite *mc = mMapDocument->mapComposite();
     mc->setShowLotFloorsOnly(show);
     update();
+}
+
+void ZomboidScene::showInvisibleTilesChanged(bool show)
+{
+    mapDocument()->renderer()->setShowInvisibleTiles(show);
+    update();
+}
+
+void ZomboidScene::showCellBorderChanged(bool show)
+{
+    mMapBordersItem->setVisible(show && (mapDocument()->map()->size() == QSize(300, 300)));
 }
 
 void ZomboidScene::handlePendingUpdates()
@@ -781,6 +806,7 @@ void ZomboidScene::handlePendingUpdates()
             MapScene::mapChanged(); // must reposition items
 //            setSceneRect(sceneRect);
 //            mDarkRectangle->setRect(sceneRect);
+
         }
         QPolygonF polygon;
         QRectF rect(0 - 0.5, 0 - 0.5,
@@ -791,7 +817,7 @@ void ZomboidScene::handlePendingUpdates()
         polygon << QPointF(mapDocument()->renderer()->tileToPixelCoords(rect.bottomRight()));
         polygon << QPointF(mapDocument()->renderer()->tileToPixelCoords(rect.bottomLeft()));
         mMapBordersItem->setPolygon(polygon);
-        mMapBordersItem->setVisible(mapDocument()->map()->size() == QSize(300, 300));
+        mMapBordersItem->setVisible(Preferences::instance()->showCellBorder() && (mapDocument()->map()->size() == QSize(300, 300)));
 #if 0
         rect = QRect(0, 0,
                      mapDocument()->map()->width(),
@@ -898,8 +924,7 @@ void DnDItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget
 
     QRect tileBounds(mPositionInMap.x() - mHotSpot.x(), mPositionInMap.y() - mHotSpot.y(),
                      mMapImage->mapInfo()->width(), mMapImage->mapInfo()->height());
-    //mRenderer->drawFancyRectangle(painter, tileBounds, Qt::darkGray, mLevel);
-    mRenderer->drawFancyRectangle(painter, tileBounds, Qt::darkMagenta, mLevel);
+    mRenderer->drawFancyRectangle(painter, tileBounds, Qt::darkGray, mLevel);
 
 #ifdef _DEBUG
     painter->drawRect(mBoundingRect);

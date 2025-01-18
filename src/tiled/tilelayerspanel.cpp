@@ -127,12 +127,12 @@ void LayersPanelDelegate::paint(QPainter *painter,
 
         const int dw = option.rect.width() - tileWidth;
         QMargins margins = tile->drawMargins(mView->zoomable()->scale());
-        painter->drawPixmap(option.rect.adjusted(dw/2, extra + (labelHeight) + extra,
+        painter->drawPixmap(option.rect.adjusted(dw/2, extra + labelHeight + extra,
                                                  -(dw - dw/2), -extra)
                             .adjusted(margins.left(), margins.top(), -margins.right(), -margins.bottom()),
                             tileImage);
         painter->drawText(option.rect.left(), option.rect.top() + labelHeight,
-            option.rect.width(), labelHeight, Qt::AlignHCenter, tileName);
+                    option.rect.width(), labelHeight, Qt::AlignHCenter, tileName);
     }
 #if 0
     // Overlay with highlight color when selected
@@ -168,9 +168,6 @@ void LayersPanelDelegate::paint(QPainter *painter,
     }
 
     // Draw the layer name.  Underline it if the mouse is over it.
-    
-
-
     QString label = index.data(Qt::DecorationRole).toString();
     QString name = fm.elidedText(label, Qt::ElideRight, option.rect.width());
     const QFont oldFont = painter->font();
@@ -183,7 +180,6 @@ void LayersPanelDelegate::paint(QPainter *painter,
         painter->setPen(Qt::gray);
     painter->drawText(option.rect.left(), option.rect.top() + 2,
                       option.rect.width(), labelHeight, Qt::AlignHCenter, name);
-    
     if (!tile)
         painter->setPen(oldPen);
     if (mMouseOverIndex == index)
@@ -596,6 +592,7 @@ TileLayersPanel::TileLayersPanel(QWidget *parent) :
     mCurrentLevel(-1),
     mCurrentLayerIndex(-1)
 {
+    mView->setObjectName(QLatin1String("layersPanelView"));
     mView->zoomable()->setScale(0.25);
 
     QComboBox *scaleCombo = new QComboBox;
@@ -717,6 +714,42 @@ void TileLayersPanel::setList()
             tile = BuildingEditor::BuildingTilesMgr::instance()->noneTiledTile();
         int layerIndex = mDocument->map()->layers().indexOf(tl);
         mView->prependLayer(layerName, tile, layerIndex);
+
+        // Supprime toute logique de style ici
+        ++index;
+    }
+
+    mView->setAutoScroll(false);
+    mView->setCurrentIndex(mView->model()->index(mCurrentLayerIndex));
+    mView->setAutoScroll(true);
+}
+
+/*
+void TileLayersPanel::setList()
+{
+    mCurrentLevel = mDocument->currentLevel();
+
+    mView->clear();
+
+    CompositeLayerGroup *lg = mDocument->mapComposite()->layerGroupForLevel(mCurrentLevel);
+    if (!lg) return;
+
+    QStringList blendLayerNames = mDocument->mapComposite()->bmpBlender()->blendLayers();
+
+    int index = 0;
+    foreach (TileLayer *tl, lg->layers()) {
+        QString layerName = MapComposite::layerNameWithoutPrefix(tl);
+        Tile *tile = tl->contains(mTilePos) ? tl->cellAt(mTilePos).tile : 0;
+        TileLayer *blendLayer = lg->bmpBlendLayers().at(index);
+        if (blendLayer && blendLayer->contains(mTilePos))
+            if (!blendLayerNames.contains(tl->name()) ||
+                    !mDocument->map()->noBlend(tl->name())->get(mTilePos))
+                if (Tile *blendTile = blendLayer->cellAt(mTilePos).tile)
+                    tile = blendTile;
+        if (!tile)
+            tile = BuildingEditor::BuildingTilesMgr::instance()->noneTiledTile();
+        int layerIndex = mDocument->map()->layers().indexOf(tl);
+        mView->prependLayer(layerName, tile, layerIndex);
         if (Preferences::instance()->enableDarkTheme())
         {
             QBrush brush(tl->isVisible() ? QColor("#1F1F1F") : Qt::lightGray);
@@ -733,6 +766,7 @@ void TileLayersPanel::setList()
     mView->setCurrentIndex(mView->model()->index(mCurrentLayerIndex));
     mView->setAutoScroll(true);
 }
+*/
 
 void TileLayersPanel::activated(const QModelIndex &index)
 {
@@ -807,7 +841,7 @@ void TileLayersPanel::layerChanged(int index)
         if (mi.isValid()) {
             QString name = MapComposite::layerNameWithoutPrefix(layer);
             mView->model()->setData(mi, name, Qt::DecorationRole);
-            
+            /*
             if (Preferences::instance()->enableDarkTheme())
             {
                 QBrush brush(layer->isVisible() ? QColor("#1F1F1F") : Qt::lightGray);
@@ -817,7 +851,8 @@ void TileLayersPanel::layerChanged(int index)
                 QBrush brush(layer->isVisible() ? Qt::white : Qt::lightGray);
                 mView->model()->setData(mi, brush, Qt::BackgroundRole);
             }
-            
+            */
+
         }
     }
 }

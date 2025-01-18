@@ -25,14 +25,17 @@
 #include "languagemanager.h"
 #include "preferences.h"
 #include "tiledapplication.h"
+#include "logger.h"
 #ifdef ZOMBOID
 #include "worlded/worldedmgr.h"
 #include "zprogress.h"
 #include <QFileInfo>
+#include <QMessageBox>
 #endif
 
 #include <QDebug>
 #include <QtPlugin>
+#include <QDir>
 
 #ifdef STATIC_BUILD
 Q_IMPORT_PLUGIN(qgif)
@@ -136,7 +139,7 @@ static void __cdecl invalid_parameter_handler(
 
 #endif
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
 #if !defined(QT_NO_DEBUG) && defined(ZOMBOID) && defined(_MSC_VER)
     _set_invalid_parameter_handler(invalid_parameter_handler);
@@ -165,11 +168,14 @@ int main(int argc, char* argv[])
     a.setApplicationVersion(QLatin1String("0.8.1"));
 #endif
 
+    QDir::setCurrent(QDir::currentPath());
+    Preferences *prefs = Preferences::instance();
+
 #ifdef Q_WS_MAC
     a.setAttribute(Qt::AA_DontShowIconsInMenus);
 #endif
 
-    LanguageManager* languageManager = LanguageManager::instance();
+    LanguageManager *languageManager = LanguageManager::instance();
     languageManager->installTranslators();
 
     CommandLineHandler commandLine;
@@ -184,23 +190,27 @@ int main(int argc, char* argv[])
 #ifdef ZOMBOID
     if (a.isRunning()) {
         if (!commandLine.filesToOpen().isEmpty()) {
-            foreach(const QString & fileName, commandLine.filesToOpen())
+            foreach (const QString &fileName, commandLine.filesToOpen())
                 a.sendMessage(fileName);
             return 0;
         }
     }
 #endif
-    if (Preferences::instance()->enableDarkTheme())
-    {
-    
-    QString fileName = QCoreApplication::applicationDirPath() + QLatin1String("/theme/dark.qss");
-    QFile file(fileName);
-    file.open(QIODevice::ReadOnly | QIODevice::Text);
-    QTextStream in(&file);
-    QString stylesheet = in.readAll();
+    Logger::instance().log(QLatin1String("Main - Start : %1").arg(a.applicationName()), QLatin1String("INFO"));
 
-    a.setStyleSheet(stylesheet);
-}
+    if (prefs->enableDarkTheme())
+    {
+        QString fileName = QDir::currentPath() + QLatin1String("/theme/") + prefs->themes();
+        Logger::instance().log(QLatin1String("MainWindow - Theme : %1").arg(fileName), QLatin1String("INFO"));
+        QFile file(fileName);
+        file.open(QIODevice::ReadOnly | QIODevice::Text);
+        QTextStream in(&file);
+        QString stylesheet = in.readAll();
+
+        a.setStyleSheet(stylesheet);
+    }
+    Logger::instance().log(QLatin1String("Main - Start 2 : %1").arg(a.applicationName()), QLatin1String("INFO"));
+
     MainWindow w;
 #ifdef ZOMBOID
     ZProgressManager::instance()->setMainWindow(&w);
@@ -214,9 +224,24 @@ int main(int argc, char* argv[])
     if (!w.InitConfigFiles())
         return 0;
 
-    foreach (QString f, Preferences::instance()->worldedFiles())
-        if (!f.isEmpty() && QFileInfo(f).exists())
-            WorldEd::WorldEdMgr::instance()->addProject(f);
+    foreach (QString f, Preferences::instance()->worldedFiles()) {
+        if (f.isEmpty())
+            continue;
+        if (QFileInfo::exists(f) == false) {
+            QMessageBox::warning(&w, QLatin1String("Missing PZW"), QLatin1String("WorldEd project not found:\n%1").arg(f));
+            continue;
+        }
+        WorldEd::WorldEdMgr::instance()->addProject(f);
+    }
+
+    for (const QString &f : Preferences::instance()->tilePropertiesFiles()) {
+        if (f.isEmpty())
+            continue;
+        if (QFileInfo::exists(f) == false) {
+            QMessageBox::warning(&w, QLatin1String("File Not Found"), QLatin1String("Tile properties file not found.\nChange this in the Preferences.\n%1").arg(f));
+            continue;
+        }
+    }
 #endif // ZOMBOID
 
     QObject::connect(&a, &TiledApplication::fileOpenRequest,

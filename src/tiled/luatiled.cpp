@@ -23,7 +23,7 @@
 #include "tilemetainfomgr.h"
 #include "tilesetmanager.h"
 #include "tmxmapwriter.h"
-
+#include "preferences.h"
 #include "BuildingEditor/buildingtiles.h"
 
 #include "map.h"
@@ -44,7 +44,6 @@
 extern "C" {
 #include "lualib.h"
 #include "lauxlib.h"
-#include <preferences.h>
 }
 
 using namespace Tiled;
@@ -169,7 +168,7 @@ lua_State *LuaScript::init()
 {
     L = luaL_newstate();
     luaL_openlibs(L);
-   tolua_tiled_open(L);
+    tolua_tiled_open(L);
 
     tolua_beginmodule(L,NULL);
 #if 0
@@ -251,7 +250,7 @@ bool LuaScript::dofile(const QString &f, QString &output)
         LuaConsole::instance()->write(qApp->tr("---------- script completed in %1s ----------")
             .arg(elapsed.elapsed() / 1000.0));
     }
-    
+
     qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
     return status == LUA_OK;
 }
@@ -259,15 +258,17 @@ bool LuaScript::dofile(const QString &f, QString &output)
 /////
 
 LuaLayer::LuaLayer() :
-    mClone(0),
-    mOrig(0)
+    mClone(nullptr),
+    mOrig(nullptr),
+    mLevel(0)
 {
 }
 
 LuaLayer::LuaLayer(Layer *orig) :
-    mClone(0),
+    mClone(nullptr),
     mOrig(orig),
-    mName(orig->name())
+    mName(orig->name()),
+    mLevel(orig->level())
 {
 }
 
@@ -276,9 +277,19 @@ LuaLayer::~LuaLayer()
     delete mClone;
 }
 
-const char *LuaLayer::name()
+const char *LuaLayer::name() const
 {
     return cstring(mName);
+}
+
+const char *LuaLayer::nameWithPrefix() const
+{
+    return cstring(nameWithPrefixQString());
+}
+
+const QString LuaLayer::nameWithPrefixQString() const
+{
+    return QLatin1String("%1_%2").arg(QString::number(mLevel)).arg(mName);
 }
 
 void LuaLayer::initClone()
@@ -297,21 +308,34 @@ void LuaLayer::cloned()
 
 }
 
+
+int LuaTileLayer::level()
+{
+    int level;
+    MapComposite::levelForLayer(mName, &level);
+    return level;
+}
 /////
 
 LuaTileLayer::LuaTileLayer(TileLayer *orig) :
     LuaLayer(orig),
-    mCloneTileLayer(0),
-    mMap(0)
+    mCloneTileLayer(nullptr),
+    mMap(nullptr)
 {
 }
 
 LuaTileLayer::LuaTileLayer(const char *name, int x, int y, int width, int height) :
     LuaLayer(),
-    mCloneTileLayer(new TileLayer(QString::fromLatin1(name), x, y, width, height)),
-    mMap(0)
+    mCloneTileLayer(nullptr),
+    mMap(nullptr)
 {
-    mName = mCloneTileLayer->name();
+    mName = QString::fromLatin1(name);
+    mLevel = 0;
+    if (MapComposite::levelForLayer(mName, &mLevel)) {
+        mName = MapComposite::layerNameWithoutPrefix(mName);
+    }
+    mCloneTileLayer = new TileLayer(mName, x, y, width, height);
+    mCloneTileLayer->setLevel(mLevel);
     mClone = mCloneTileLayer;
 }
 
@@ -323,13 +347,6 @@ void LuaTileLayer::cloned()
 {
     LuaLayer::cloned();
     mCloneTileLayer = mClone->asTileLayer();
-}
-
-int LuaTileLayer::level()
-{
-    int level;
-    MapComposite::levelForLayer(mName, &level);
-    return level;
 }
 
 void LuaTileLayer::setTile(int x, int y, Tile *tile)
@@ -417,13 +434,12 @@ void LuaTileLayer::fill(Tile *tile)
     fill(mClone ? mClone->bounds() : mOrig->bounds(), tile);
 }
 
+
 bool LuaTileLayer::replaceTile(Tile *oldTile, Tile *newTile)
 {
-    
-
     if (newTile == LuaMap::noneTile()) newTile = 0;
     initClone();
-    bool replaced = false; 
+    bool replaced = false;
     if (oldTile == LuaMap::noneTile())
     {
         for (int y = 0; y < mClone->width(); y++) {
@@ -495,7 +511,7 @@ LuaMap::LuaMap(Map *orig, int cellX, int cellY) :
             mLayers+= new LuaObjectGroup(og);
         else
             mLayers += new LuaLayer(layer);
-        mLayerByName[layer->name()] = mLayers.last(); // could be duplicates & empty names
+        mLayerByName[layer->nameWithPrefix()] = mLayers.last(); // could be duplicates & empty names
 //        mClone->addLayer(layer);
     }
 
@@ -592,24 +608,21 @@ LuaLayer *LuaMap::layer(const char *name)
     QString _name = QString::fromLatin1(name);
     if (mLayerByName.contains(_name))
         return mLayerByName[_name];
-    return 0;
+    return nullptr;
 }
 
 LuaTileLayer *LuaMap::tileLayer(const char *name)
 {
     if (LuaLayer *layer = this->layer(name))
         return layer->asTileLayer();
-    return 0;
+    return nullptr;
 }
-
-
 
 LuaTileLayer *LuaMap::newTileLayer(const char *name)
 {
     LuaTileLayer *tl = new LuaTileLayer(name, 0, 0, width(), height());
     return tl;
 }
-
 
 void LuaMap::addLayer(LuaLayer *layer)
 {
@@ -623,9 +636,8 @@ void LuaMap::addLayer(LuaLayer *layer)
 
     mLayerByName.clear(); // FIXME: make more efficient
     foreach (LuaLayer *ll, mLayers)
-        mLayerByName[ll->mName] = ll;
+        mLayerByName[ll->nameWithPrefixQString()] = ll;
 }
-
 
 void LuaMap::insertLayer(int index, LuaLayer *layer)
 {
@@ -641,7 +653,7 @@ void LuaMap::insertLayer(int index, LuaLayer *layer)
 
     mLayerByName.clear(); // FIXME: make more efficient
     foreach (LuaLayer *ll, mLayers)
-        mLayerByName[ll->mName] = ll;
+        mLayerByName[ll->nameWithPrefixQString()] = ll;
 }
 
 void LuaMap::removeLayer(int index)
@@ -654,7 +666,7 @@ void LuaMap::removeLayer(int index)
 
     mLayerByName.clear(); // FIXME: make more efficient
     foreach (LuaLayer *ll, mLayers)
-        mLayerByName[layer->mName] = ll;
+        mLayerByName[layer->nameWithPrefixQString()] = ll;
 }
 
 static bool parseTileName(const QString &tileName, QString &tilesetName, int &index)
@@ -736,7 +748,7 @@ Tileset *LuaMap::tilesetAt(int index)
 void LuaMap::replaceTilesByName(const char *names)
 {
     QString ss = QString::fromLatin1(names);
-    QStringList _names = ss.split(QLatin1Char(';'), QString::SkipEmptyParts);
+    QStringList _names = ss.split(QLatin1Char(';'), Qt::SkipEmptyParts);
     if (_names.size() % 2)
         return; // error
 
@@ -943,8 +955,7 @@ QList<QString> LuaMap::blendLayers()
     QSet<QString> ret;
     foreach (LuaBmpBlend *blend, mBlends)
         ret += blend->mBlend->targetLayer;
-    //return { ret.begin(), ret.end() };
-    return { ret.toList() };
+    return { ret.begin(), ret.end() };
 }
 
 LuaMapNoBlend *LuaMap::noBlend(const char *layerName)
@@ -1144,21 +1155,6 @@ QRect LuaMapObject::bounds()
 
 /////
 
-LuaObjectGroup* LuaMap::newObjectLayer(const char* name)
-{
-    LuaObjectGroup* tl = new LuaObjectGroup(name, 0, 0, width(), height());
-    return tl;
-}
-
-
-
-LuaObjectGroup *LuaMap::objectLayer(const char* name)
-{
-    if (LuaLayer* layer = this->layer(name))
-        return layer->asObjectGroup();
-    return 0;
-}
-
 LuaObjectGroup::LuaObjectGroup(ObjectGroup *orig) :
     LuaLayer(orig),
     mCloneObjectGroup(0),
@@ -1171,9 +1167,14 @@ LuaObjectGroup::LuaObjectGroup(ObjectGroup *orig) :
 
 LuaObjectGroup::LuaObjectGroup(const char *name, int x, int y, int width, int height) :
     LuaLayer(),
-    mCloneObjectGroup(new ObjectGroup(QString::fromLatin1(name), x, y, width, height))
+    mCloneObjectGroup(nullptr)
 {
-    mName = mCloneObjectGroup->name();
+    mName = QString::fromLatin1(name);
+    mLevel = 0;
+    if (MapComposite::levelForLayer(mName, &mLevel)) {
+        mName = MapComposite::layerNameWithoutPrefix(mName);
+    }
+    mCloneObjectGroup = new ObjectGroup(mName, x, y, width, height);
     mClone = mCloneObjectGroup;
 }
 
@@ -1186,6 +1187,27 @@ void LuaObjectGroup::cloned()
 {
     LuaLayer::cloned();
     mCloneObjectGroup = mClone->asObjectGroup();
+}
+
+//// LuaMap additions ////
+
+LuaObjectGroup* LuaMap::newObjectLayer(const char* name)
+{
+    LuaObjectGroup* layer = new LuaObjectGroup(name, 0, 0, width(), height());
+    addLayer(layer);
+    return layer;
+}
+
+LuaObjectGroup* LuaMap::objectLayer(const char* name)
+{
+    if (LuaLayer* layer = this->layer(name))
+        return layer->asObjectGroup();
+    return nullptr;
+}
+
+void LuaObjectGroup::insertObject(int index, LuaMapObject* object)
+{
+    mObjects.insert(index, object);
 }
 
 void LuaObjectGroup::setColor(LuaColor &color)
@@ -1201,16 +1223,10 @@ LuaColor LuaObjectGroup::color()
 void LuaObjectGroup::addObject(LuaMapObject *object)
 {
     initClone();
-
-    //if (mObjects.contains(object))
-    //    return; // error!
     // FIXME: MainWindow::LuaScript must use these
-    //mCloneObjectGroup->addObject(object->mClone ? object->mClone : object->mOrig);
+//    mCloneObjectGroup->addObject(object->mClone ? object->mClone : object->mOrig);
     mObjects += object;
-
-
 }
-
 
 QList<LuaMapObject *> LuaObjectGroup::objects()
 {

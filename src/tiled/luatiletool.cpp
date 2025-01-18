@@ -110,7 +110,6 @@ LuaTileTool::~LuaTileTool()
     // qDeleteAll(mDistanceIndicators)
 }
 
-
 void LuaTileTool::loadScript()
 {
     MapScene *scene = mScene;
@@ -120,8 +119,7 @@ void LuaTileTool::loadScript()
         lua_close(L);
     L = luaL_newstate();
     luaL_openlibs(L);
-
-    tolua_tiled_open(L); //TOLUA FIX ME
+    tolua_tiled_open(L);
 
     tolua_pushusertype(L, this, "LuaTileTool");
     lua_setglobal(L, "self");
@@ -217,13 +215,7 @@ void LuaTileTool::activate(MapScene *scene)
         mMapChanged = true; // discard any changes before the error occurred
         QString output = QString::fromLatin1(lua_tostring(L, -1));
         lua_pop(L, -1); // pop error
-        if (Tiled::Internal::Preferences::instance()->enableDarkTheme())
-        {
-            LuaConsole::instance()->write(output, (status == LUA_OK) ? QColor("#DDDDDD") : Qt::red);
-        }
-        else {
-            LuaConsole::instance()->write(output, (status == LUA_OK) ? Qt::black : Qt::red);
-        }
+        LuaConsole::instance()->write(output, (status == LUA_OK) ? Qt::black : Qt::red);
     }
 }
 
@@ -256,13 +248,7 @@ void LuaTileTool::deactivate(MapScene *scene)
         if (status != LUA_OK) {
             QString output = QString::fromLatin1(lua_tostring(L, -1));
             lua_pop(L, -1); // pop error
-            if (Tiled::Internal::Preferences::instance()->enableDarkTheme())
-            {
-                LuaConsole::instance()->write(output, (status == LUA_OK) ? QColor("#DDDDDD") : Qt::red);
-            }
-            else {
-                LuaConsole::instance()->write(output, (status == LUA_OK) ? Qt::black : Qt::red);
-            }
+            LuaConsole::instance()->write(output, (status == LUA_OK) ? Qt::black : Qt::red);
         }
     } else
         lua_pop(L, 1); // function deactivate()
@@ -365,13 +351,7 @@ void LuaTileTool::modifiersChanged(Qt::KeyboardModifiers modifiers)
         mMapChanged = true; // discard any changes before the error occurred
         QString output = QString::fromLatin1(lua_tostring(L, -1));
         lua_pop(L, -1); // pop error
-        if (Tiled::Internal::Preferences::instance()->enableDarkTheme())
-        {
-            LuaConsole::instance()->write(output, (status == LUA_OK) ? QColor("#DDDDDD") : Qt::red);
-        }
-        else {
-            LuaConsole::instance()->write(output, (status == LUA_OK) ? Qt::black : Qt::red);
-        }
+        LuaConsole::instance()->write(output, (status == LUA_OK) ? Qt::black : Qt::red);
     }
 }
 
@@ -439,13 +419,7 @@ void LuaTileTool::setOption(LuaToolOption *option, const QVariant &value)
         mMapChanged = true; // discard any changes before the error occurred
         QString output = QString::fromLatin1(lua_tostring(L, -1));
         lua_pop(L, -1); // pop error
-        if (Tiled::Internal::Preferences::instance()->enableDarkTheme())
-        {
-            LuaConsole::instance()->write(output, (status == LUA_OK) ? QColor("#DDDDDD") : Qt::red);
-        }
-        else {
-            LuaConsole::instance()->write(output, (status == LUA_OK) ? Qt::black : Qt::red);
-        }
+        LuaConsole::instance()->write(output, (status == LUA_OK) ? Qt::black : Qt::red);
     }
 }
 
@@ -519,13 +493,7 @@ void LuaTileTool::mouseEvent(const char *func, Qt::MouseButtons buttons,
         mMapChanged = true; // discard any changes before the error occurred
         QString output = QString::fromLatin1(lua_tostring(L, -1));
         lua_pop(L, -1); // pop error
-        if (Tiled::Internal::Preferences::instance()->enableDarkTheme())
-        {
-            LuaConsole::instance()->write(output, (status == LUA_OK) ? QColor("#DDDDDD") : Qt::red);
-        }
-        else {
-            LuaConsole::instance()->write(output, (status == LUA_OK) ? Qt::black : Qt::red);
-        }
+        LuaConsole::instance()->write(output, (status == LUA_OK) ? Qt::black : Qt::red);
     }
 }
 
@@ -646,14 +614,7 @@ void LuaTileTool::setToolOptions()
     if (status != LUA_OK) {
         QString output = QString::fromLatin1(lua_tostring(L, -1));
         lua_pop(L, -1); // pop error
-        if (Tiled::Internal::Preferences::instance()->enableDarkTheme())
-        {
-            LuaConsole::instance()->write(output, (status == LUA_OK) ? QColor("#DDDDDD") : Qt::red);
-        }
-        else {
-            LuaConsole::instance()->write(output, (status == LUA_OK) ? Qt::black : Qt::red);
-        }
-        
+        LuaConsole::instance()->write(output, (status == LUA_OK) ? Qt::black : Qt::red);
     }
 
     if (status == LUA_OK) {

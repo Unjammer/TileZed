@@ -24,7 +24,7 @@
 #include <QObject>
 #include <QColor>
 
-#include "../../libtiled/mapwriter.h"
+#include "mapwriter.h"
 #include "objecttypes.h"
 
 class QSettings;
@@ -84,6 +84,14 @@ public:
     bool automappingDrawing() const { return mAutoMapDrawing; }
     void setAutomappingDrawing(bool enabled);
 
+
+    QString WorldEddPath() const;
+    void setWorldEdPath(const QString &path);
+
+    QString themes() const { return mTheme; }
+    void setTheme(QString theme);
+
+
 #ifdef ZOMBOID
     QString configPath() const;
     QString configPath(const QString &fileName) const;
@@ -119,6 +127,12 @@ public:
     bool showTileLayersPanel() const
     { return mShowTileLayersPanel; }
 
+    bool showTileSelection() const
+    { return mShowTileSelection; }
+
+    bool showInvisibleTiles() const
+    { return mShowInvisibleTiles; }
+
     QColor backgroundColor() const
     { return mBackgroundColor; }
 
@@ -127,6 +141,9 @@ public:
 
     QStringList worldedFiles() const
     { return mWorldEdFiles; }
+
+    QStringList tilePropertiesFiles() const
+    { return mTilePropertiesFiles; }
 
     bool highlightRoomUnderPointer() const
     { return mHighlightRoomUnderPointer; }
@@ -137,6 +154,15 @@ public:
     int eraserBrushSize() const
     { return mEraserBrushSize; }
 
+    QColor tilesetBackgroundColor() const
+    { return mTilesetBackgroundColor; }
+
+    QString thumbnailsDirectory() const
+    { return mThumbnailsDirectory; }
+
+    bool showCellBorder() const
+    { return mShowCellBorder; }
+
     int gridOpacity() const
     {
         return mGridOpacity;
@@ -146,12 +172,6 @@ public:
     {
         return mGridWidth;
     }
-
-    QColor tilesetBackgroundColor() const
-    { return mTilesetBackgroundColor; }
-
-    QString thumbnailsDirectory() const
-    { return mThumbnailsDirectory; }
 
 #endif // ZOMBOID
 
@@ -167,23 +187,27 @@ public slots:
     void setGridColor(QColor gridColor);
     void setHighlightCurrentLayer(bool highlight);
     void setShowTilesetGrid(bool showTilesetGrid);
-#ifdef ZOMBOID
+
     void setTilesDirectory(const QString &path);
     void setTilesetScale(qreal scale);
     void setSortTilesets(bool sort);
     void setShowLotFloorsOnly(bool show);
     void setShowMiniMap(bool show);
     void setShowTileLayersPanel(bool show);
+    void setShowTileSelection(bool show);
+    void setShowInvisibleTiles(bool show);
     void setBackgroundColor(const QColor &bgColor);
     void setShowAdjacentMaps(bool show);
     void setWorldEdFiles(const QStringList &fileNames);
+    void setTilePropertiesFiles(const QStringList &fileNames);
     void setHighlightRoomUnderPointer(bool highlight);
     void setEraserBrushSize(int newSize);
-    void setGridOpacity(int newOpacity);
-    void setGridWidth(int newWidth);
     void setTilesetBackgroundColor(const QColor& color);
     void setThumbnailsDirectory(const QString &path);
-#endif
+    void setShowCellBorder(bool show);
+    void setGridOpacity(int newOpacity);
+    void setGridWidth(int newWidth);
+
 
 signals:
     void showGridChanged(bool showGrid);
@@ -198,7 +222,7 @@ signals:
 
     void objectTypesChanged();
 
-#ifdef ZOMBOID
+
     void mapsDirectoryChanged();
     void autoSwitchLayerChanged(bool enabled);
     void tilesDirectoryChanged();
@@ -208,18 +232,20 @@ signals:
     void showMiniMapChanged(bool show);
     void miniMapWidthChanged(int width);
     void showTileLayersPanelChanged(bool show);
+    void showTileSelectionChanged(bool show);
+    void showInvisibleTilesChanged(bool show);
     void backgroundColorChanged(const QColor &color);
     void showAdjacentMapsChanged(bool show);
     void worldEdFilesChanged(const QStringList &fileNames);
+    void tilePropertiesFilesChanged(const QStringList &fileNames);
     void highlightRoomUnderPointerChanged(bool highlight);
     void eraserBrushSizeChanged(int newSize);
     void tilesetBackgroundColorChanged(const QColor &color);
     void thumbnailsDirectoryChanged(const QString &dir);
+    void showCellBorderChanged(bool show);
     void gridOpacityChanged(int newOpacity);
 
     void gridWidthChanged(int newWidth);
-
-#endif
 
 private:
     Preferences();
@@ -257,14 +283,19 @@ private:
     QColor mBackgroundColor;
     bool mShowAdjacentMaps;
     QStringList mWorldEdFiles;
+    QStringList mTilePropertiesFiles;
     bool mHighlightRoomUnderPointer;
     int mEraserBrushSize;
-    int mGridOpacity;
-    int mGridWidth;
     QColor mTilesetBackgroundColor;
     QString mThumbnailsDirectory;
+    bool mShowTileSelection;
+    bool mShowInvisibleTiles;
+    bool mShowCellBorder;
 #endif
-
+    QString mWorldEdPath;
+    QString mTheme;
+    int mGridOpacity;
+    int mGridWidth;
     static Preferences *mInstance;
 };
 

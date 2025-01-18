@@ -6,16 +6,31 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>462</width>
+    <width>656</width>
     <height>491</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>656</width>
+    <height>491</height>
+   </size>
+  </property>
+  <property name="focusPolicy">
+   <enum>Qt::StrongFocus</enum>
   </property>
   <property name="windowTitle">
    <string>Preferences</string>
   </property>
+  <property name="sizeGripEnabled">
+   <bool>false</bool>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="sizeConstraint">
-    <enum>QLayout::SetFixedSize</enum>
+    <enum>QLayout::SetMinimumSize</enum>
    </property>
    <item>
     <widget class="QTabWidget" name="tabWidget">
@@ -133,24 +148,34 @@
           </item>
           <item>
            <layout class="QGridLayout" name="gridLayout_2">
-            <item row="3" column="2">
+            <item row="2" column="2">
              <widget class="QToolButton" name="bgColorReset">
               <property name="text">
                <string>Default</string>
               </property>
              </widget>
             </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="label_9">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_3">
               <property name="text">
-               <string>Grid Width</string>
+               <string>Grid color:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="Tiled::Internal::ColorButton" name="bgColor"/>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_5">
+              <property name="text">
+               <string>Background color:</string>
               </property>
              </widget>
             </item>
             <item row="0" column="1">
              <widget class="Tiled::Internal::ColorButton" name="gridColor"/>
             </item>
-            <item row="3" column="3">
+            <item row="2" column="3">
              <spacer name="horizontalSpacer_4">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -163,66 +188,8 @@
               </property>
              </spacer>
             </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="label_5">
-              <property name="text">
-               <string>Background color:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_3">
-              <property name="text">
-               <string>Grid color:</string>
-              </property>
-             </widget>
-            </item>
             <item row="0" column="2">
              <widget class="QToolButton" name="gridColorReset">
-              <property name="text">
-               <string>Default</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="1">
-             <widget class="Tiled::Internal::ColorButton" name="bgColor"/>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_8">
-              <property name="text">
-               <string>Grid Opacity</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QSpinBox" name="gridOpacity">
-              <property name="maximum">
-               <number>255</number>
-              </property>
-              <property name="value">
-               <number>128</number>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QSpinBox" name="gridWidth">
-              <property name="minimum">
-               <number>1</number>
-              </property>
-              <property name="maximum">
-               <number>5</number>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="2" colspan="2">
-             <widget class="QToolButton" name="gridOpacityReset">
-              <property name="text">
-               <string>Default</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="2">
-             <widget class="QToolButton" name="gridWidthReset">
               <property name="text">
                <string>Default</string>
               </property>
@@ -237,13 +204,6 @@
            <widget class="QCheckBox" name="openGL">
             <property name="text">
              <string>Hardware &amp;accelerated drawing (OpenGL)</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="enableDarkTheme">
-            <property name="text">
-             <string>Enable Dark Theme</string>
             </property>
            </widget>
           </item>
@@ -264,6 +224,213 @@
         </spacer>
        </item>
       </layout>
+     </widget>
+     <widget class="QWidget" name="tab_6">
+      <attribute name="title">
+       <string>Unofficial Settings</string>
+      </attribute>
+      <widget class="QGroupBox" name="groupBox_5">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>210</y>
+         <width>611</width>
+         <height>191</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>Interface</string>
+       </property>
+       <widget class="QWidget" name="layoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>11</x>
+          <y>29</y>
+          <width>591</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <widget class="QCheckBox" name="enableDarkTheme">
+           <property name="text">
+            <string>Enable Theme</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="themeListbox"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="layoutWidget_2">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>60</y>
+          <width>591</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <item>
+          <widget class="QLabel" name="label_8">
+           <property name="text">
+            <string>Grid Width :</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="gridWidth">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>10</number>
+           </property>
+           <property name="singleStep">
+            <number>1</number>
+           </property>
+           <property name="value">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="gridWidthDefault">
+           <property name="text">
+            <string>Default</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="layoutWidget_3">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>94</y>
+          <width>591</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <item>
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>Grid Opacity :</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="gridOpacity">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>255</number>
+           </property>
+           <property name="singleStep">
+            <number>1</number>
+           </property>
+           <property name="value">
+            <number>255</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="gridOpacityDefault">
+           <property name="text">
+            <string>Default</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+      <widget class="QGroupBox" name="groupBox_9">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>110</y>
+         <width>611</width>
+         <height>91</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>WorldEd Path</string>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_12">
+        <item>
+         <widget class="QLabel" name="label_15">
+          <property name="text">
+           <string>This should point on the WorldEd executable folder.</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_15">
+          <item>
+           <widget class="QLineEdit" name="tileZedPath">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="browseWorldEdPath">
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QGroupBox" name="groupBox_10">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>611</width>
+         <height>91</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>Tiles Path</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_13">
+        <item>
+         <widget class="QLabel" name="label_16">
+          <property name="text">
+           <string>Tiles folder path.</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_16">
+          <item>
+           <widget class="QLineEdit" name="tilesDirectory">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="browseTilesDirectory">
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
      </widget>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
@@ -650,6 +817,151 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tab_5">
+      <attribute name="title">
+       <string>Zomboid2</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0">
+        <widget class="QGroupBox" name="tilePropertiesGroupBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="title">
+          <string>Tile Property Files (.tiles, .tiles.txt)</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_11">
+          <item>
+           <widget class="QListWidget" name="tilePropertiesListWidget">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>96</height>
+             </size>
+            </property>
+            <property name="selectionBehavior">
+             <enum>QAbstractItemView::SelectRows</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="tilePropertiesLayout">
+            <item>
+             <widget class="QToolButton" name="addPZPropertiesFile">
+              <property name="toolTip">
+               <string>Add Project</string>
+              </property>
+              <property name="text">
+               <string>Add</string>
+              </property>
+              <property name="icon">
+               <iconset resource="tiled.qrc">
+                <normaloff>:/images/22x22/add.png</normaloff>:/images/22x22/add.png</iconset>
+              </property>
+              <property name="autoRaise">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="removePZPropertiesFile">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="toolTip">
+               <string>Remove Selected Project</string>
+              </property>
+              <property name="text">
+               <string>Remove</string>
+              </property>
+              <property name="icon">
+               <iconset resource="tiled.qrc">
+                <normaloff>:/images/22x22/remove.png</normaloff>:/images/22x22/remove.png</iconset>
+              </property>
+              <property name="autoRaise">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="raisePZPropertiesFile">
+              <property name="toolTip">
+               <string>Raise Project</string>
+              </property>
+              <property name="text">
+               <string>...</string>
+              </property>
+              <property name="icon">
+               <iconset resource="tiled.qrc">
+                <normaloff>:/images/16x16/go-up.png</normaloff>:/images/16x16/go-up.png</iconset>
+              </property>
+              <property name="toolButtonStyle">
+               <enum>Qt::ToolButtonIconOnly</enum>
+              </property>
+              <property name="autoRaise">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="lowerPZPropertiesFile">
+              <property name="toolTip">
+               <string>Lower Project</string>
+              </property>
+              <property name="text">
+               <string>...</string>
+              </property>
+              <property name="icon">
+               <iconset resource="tiled.qrc">
+                <normaloff>:/images/16x16/go-down.png</normaloff>:/images/16x16/go-down.png</iconset>
+              </property>
+              <property name="toolButtonStyle">
+               <enum>Qt::ToolButtonIconOnly</enum>
+              </property>
+              <property name="autoRaise">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_5">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="tilePropertiesSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>
@@ -658,7 +970,10 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Close</set>
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+     <property name="centerButtons">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

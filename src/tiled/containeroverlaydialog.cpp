@@ -26,7 +26,7 @@
 #include "tilemetainfomgr.h"
 #include "tilesetmanager.h"
 #include "zoomable.h"
-
+#include "preferences.h"
 #include "BuildingEditor/buildingtiles.h"
 
 #include "tile.h"
@@ -39,7 +39,6 @@
 #include <QSettings>
 #include <QUndoGroup>
 #include <QUndoStack>
-#include <preferences.h>
 
 using namespace Tiled;
 using namespace Internal;
@@ -903,7 +902,7 @@ void AbstractOverlayDialog::tilesetChanged(Tileset *tileset)
 
     int row = TileMetaInfoMgr::instance()->indexOf(tileset);
     if (QListWidgetItem *item = ui->tilesetList->item(row))
-        
+
     if (Tiled::Internal::Preferences::instance()->enableDarkTheme())
     {
         item->setForeground(tileset->isMissing() ? Qt::red : QColor("#DDDDDD"));

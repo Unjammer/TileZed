@@ -73,7 +73,7 @@ void PackExtractDialog::accept()
         if (ui->radioMultiple->isChecked()) {
             foreach(PackPage page, mPackFile.pages()) {
                 foreach(PackSubTexInfo tex, page.mInfo) {
-                    if (prefix.isEmpty() || tex.name.startsWith(prefix, Qt::CaseInsensitive)) {
+                    if (prefix.isEmpty() || tex.name.startsWith(prefix.trimmed(), Qt::CaseInsensitive)) {
                         QImage image(tex.fx, tex.fy, QImage::Format_ARGB32);
                         image.fill(Qt::transparent);
                         QPainter painter(&image);
@@ -91,11 +91,12 @@ void PackExtractDialog::accept()
                 QImage tileImage;
                 QRect tileRect;
             };
-            QRect bounds(0, 0, 0, 0);
             QList<TileInfo> tiles;
             int TileScale = ui->checkBox2x->isChecked() ? 2 : 1;
             const int tileW = 64 * TileScale;
             const int tileH = 128 * TileScale;
+            QRect bounds(0, 0, tileW*8, 0);
+
             foreach(PackPage page, mPackFile.pages()) {
                 foreach(PackSubTexInfo tex, page.mInfo) {
                     if (ui->checkBoxWWO->isChecked())
@@ -130,7 +131,7 @@ void PackExtractDialog::accept()
                     }
                     else {
 
-                        if (tex.name.startsWith(prefix, Qt::CaseInsensitive)) {
+                        if (tex.name.startsWith(prefix.trimmed(), Qt::CaseInsensitive)) {
                             QString tileName;
                             int tileIndex;
                             if (BuildingEditor::BuildingTilesMgr::parseTileName(tex.name, tileName, tileIndex)) {

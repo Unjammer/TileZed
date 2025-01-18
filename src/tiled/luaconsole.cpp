@@ -118,7 +118,7 @@ void LuaConsole::writeline()
     ui->textEdit->insertPlainText(QLatin1String("\n"));
 }
 
-void LuaConsole::write(const QString& s, QColor color)
+void LuaConsole::write(const QString &s, QColor color)
 {
     if (s.isEmpty()) return;
 
@@ -126,7 +126,7 @@ void LuaConsole::write(const QString& s, QColor color)
     ui->textEdit->setTextColor(color);
     ui->textEdit->insertPlainText(s);
 
-    //    ui->textEdit->moveCursor(QTextCursor::End);
+//    ui->textEdit->moveCursor(QTextCursor::End);
     if (Tiled::Internal::Preferences::instance()->enableDarkTheme())
     {
        ui->textEdit->setTextColor(QColor("#DDDDDD"));

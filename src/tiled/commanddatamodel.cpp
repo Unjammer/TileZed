@@ -286,9 +286,9 @@ QMenu *CommandDataModel::contextMenu(QWidget *parent, const QModelIndex &index)
             QSignalMapper *mapper = new QSignalMapper(action);
             mapper->setMapping(action, row);
             connect(action, &QAction::triggered, mapper, qOverload<>(&QSignalMapper::map));
-
-            connect(mapper, QOverload<int>::of(&QSignalMapper::mapped), this, &CommandDataModel::moveUp);
             //connect(mapper, &QSignalMapper::mappedInt, this, &CommandDataModel::moveUp);
+            connect(mapper, QOverload<int>::of(&QSignalMapper::mapped), this, &CommandDataModel::moveUp);
+
         }
 
         if (row+1 < mCommands.size()) {
@@ -296,8 +296,9 @@ QMenu *CommandDataModel::contextMenu(QWidget *parent, const QModelIndex &index)
             QSignalMapper *mapper = new QSignalMapper(action);
             mapper->setMapping(action, row + 1);
             connect(action, &QAction::triggered, mapper, qOverload<>(&QSignalMapper::map));
-            connect(mapper, QOverload<int>::of(&QSignalMapper::mapped), this, &CommandDataModel::moveUp);
             //connect(mapper, &QSignalMapper::mappedInt, this, &CommandDataModel::moveUp);
+            connect(mapper, QOverload<int>::of(&QSignalMapper::mapped), this, &CommandDataModel::moveUp);
+
         }
 
         menu->addSeparator();
@@ -307,9 +308,9 @@ QMenu *CommandDataModel::contextMenu(QWidget *parent, const QModelIndex &index)
             QSignalMapper *mapper = new QSignalMapper(action);
             mapper->setMapping(action, row);
             connect(action, &QAction::triggered, mapper, qOverload<>(&QSignalMapper::map));
-
-            connect(mapper, QOverload<int>::of(&QSignalMapper::mapped), this, &CommandDataModel::execute);
             //connect(mapper, &QSignalMapper::mappedInt, this, &CommandDataModel::execute);
+            connect(mapper, QOverload<int>::of(&QSignalMapper::mapped), this, &CommandDataModel::execute);
+
         }
 
 #if defined(Q_WS_X11) || defined(Q_WS_MAC)
@@ -329,8 +330,8 @@ QMenu *CommandDataModel::contextMenu(QWidget *parent, const QModelIndex &index)
             QSignalMapper *mapper = new QSignalMapper(action);
             mapper->setMapping(action, row);
             connect(action, &QAction::triggered, mapper, qOverload<>(&QSignalMapper::map));
-            connect(mapper, QOverload<int>::of(&QSignalMapper::mapped), this, &CommandDataModel::remove);
             //connect(mapper, &QSignalMapper::mappedInt, this, &CommandDataModel::remove);
+            connect(mapper, QOverload<int>::of(&QSignalMapper::mapped), this, &CommandDataModel::remove);
         }
     }
 
@@ -447,8 +448,7 @@ bool CommandDataModel::move(int commandIndex, int newIndex)
 
     if (commandIndex - newIndex == 1 || newIndex - commandIndex == 1)
         // Swapping is probably more efficient than removing/inserting
-        //mCommands.swapItemsAt(commandIndex, newIndex);
-        mCommands.swap(commandIndex, newIndex);
+        mCommands.swapItemsAt(commandIndex, newIndex);
     else {
         const Command command = mCommands.at(commandIndex);
         mCommands.removeAt(commandIndex);

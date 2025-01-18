@@ -1,40 +1,22 @@
-/*
- * preferencesdialog.cpp
- * Copyright 2009-2010, Thorbjørn Lindeijer <thorbjorn@lindeijer.nl>
- *
- * This file is part of Tiled.
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation; either version 2 of the License, or (at your option)
- * any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along with
- * this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
 #include "preferencesdialog.h"
 #include "ui_preferencesdialog.h"
-
 #include "languagemanager.h"
 #include "objecttypesmodel.h"
 #include "preferences.h"
 #include "utils.h"
 
-#include <QColorDialog>
 #include <QFileDialog>
+#include <QDir>
+#include <QFile>
+#include <QTextStream>
+#include <QSettings>
+#include <QColorDialog>
+#include <QHeaderView>
+#include <QStyleFactory>
 #include <QMessageBox>
+#include <QDebug>
 #include <QPainter>
 #include <QStyledItemDelegate>
-
-#ifndef QT_NO_OPENGL
-//#include <QGLFormat>
-#endif
 
 using namespace Tiled;
 using namespace Tiled::Internal;
@@ -94,14 +76,17 @@ QSize ColorDelegate::sizeHint(const QStyleOptionViewItem &,
     return QSize(50, 20);
 }
 
-
-PreferencesDialog::PreferencesDialog(QWidget *parent) :
-    QDialog(parent),
-    mUi(new Ui::PreferencesDialog),
-    mLanguages(LanguageManager::instance()->availableLanguages())
+PreferencesDialog::PreferencesDialog(QWidget *parent)
+    : QDialog(parent),
+      mUi(new Ui::PreferencesDialog),
+      mPreferences(Preferences::instance()),
+      mLanguages(LanguageManager::instance()->availableLanguages()),
+      mObjectTypesModel(new ObjectTypesModel(this))
 {
     mUi->setupUi(this);
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+    populateThemeList();
+
 
 #ifndef QT_NO_OPENGL
     mUi->openGL->setEnabled(true/*QGLFormat::hasOpenGL()*/);
@@ -134,11 +119,51 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
     Utils::setThemeIcon(mUi->addObjectTypeButton, "add");
     Utils::setThemeIcon(mUi->removeObjectTypeButton, "remove");
 
-#ifdef ZOMBOID
+
     mUi->tabWidget->setCurrentIndex(0);
+
+
+    // Charger les préférences utilisateur
+    loadPreferences();
+
+    // Configuration des connexions
+    setupConnections();
+    connect(mUi->buttonBox, &QDialogButtonBox::accepted, this, &PreferencesDialog::accept);
+
+    // Configuration des types d'objets
+    mUi->objectTypesTable->setModel(mObjectTypesModel);
+    mUi->objectTypesTable->setItemDelegateForColumn(1, new QStyledItemDelegate(this));
+
+    QHeaderView *header = mUi->objectTypesTable->horizontalHeader();
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    header->setSectionResizeMode(QHeaderView::Stretch);
+#else
+    header->setResizeMode(QHeaderView::Stretch);
 #endif
 
-    fromPreferences();
+    connect(mObjectTypesModel, &QAbstractItemModel::dataChanged, this, &PreferencesDialog::applyObjectTypes);
+    connect(mObjectTypesModel, &QAbstractItemModel::rowsRemoved, this, &PreferencesDialog::applyObjectTypes);
+}
+
+
+
+PreferencesDialog::~PreferencesDialog()
+{
+    mPreferences->settings()->sync();
+    delete mUi;
+}
+
+void PreferencesDialog::setupConnections()
+{
+    connect(mUi->browseTilesDirectory, &QPushButton::clicked, this, &PreferencesDialog::browseTilesDirectory);
+    connect(mUi->themeListbox, &QComboBox::currentTextChanged, this, &PreferencesDialog::onThemeChanged);
+    connect(mUi->addObjectTypeButton, &QPushButton::clicked, this, &PreferencesDialog::addObjectType);
+    connect(mUi->removeObjectTypeButton, &QPushButton::clicked, this, &PreferencesDialog::removeSelectedObjectTypes);
+    connect(mUi->importObjectTypesButton, &QPushButton::clicked, this, &PreferencesDialog::importObjectTypes);
+    connect(mUi->exportObjectTypesButton, &QPushButton::clicked, this, &PreferencesDialog::exportObjectTypes);
+    connect(mUi->objectTypesTable->selectionModel(), &QItemSelectionModel::selectionChanged, this, &PreferencesDialog::selectedObjectTypesChanged);
+    connect(mUi->gridOpacity, qOverload<int>(&QSpinBox::valueChanged), Preferences::instance(), &Preferences::setGridOpacity);
+    connect(mUi->gridWidth, qOverload<int>(&QSpinBox::valueChanged), Preferences::instance(), &Preferences::setGridWidth);
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     connect(mUi->languageCombo, qOverload<int>(&QComboBox::currentIndexChanged),
@@ -147,89 +172,105 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
     connect(mUi->languageCombo, &QComboBox::currentIndexChanged,
             this, &PreferencesDialog::languageSelected);
 #endif
-    connect(mUi->openGL, &QAbstractButton::toggled, this, &PreferencesDialog::useOpenGLToggled);
-    connect(mUi->enableDarkTheme, &QAbstractButton::toggled, this, &PreferencesDialog::enableDarkTheme);
-    connect(mUi->gridColor, &ColorButton::colorChanged,
-            Preferences::instance(), &Preferences::setGridColor);
-#ifdef ZOMBOID
-    connect(mUi->gridColorReset, &QAbstractButton::clicked,
-            this, &PreferencesDialog::defaultGridColor);
-    connect(mUi->bgColor, &ColorButton::colorChanged,
-            Preferences::instance(), &Preferences::setBackgroundColor);
-    connect(mUi->bgColorReset, &QAbstractButton::clicked,
-            this, &PreferencesDialog::defaultBackgroundColor);
-    connect(mUi->gridOpacityReset, &QAbstractButton::clicked,
-        this, &PreferencesDialog::defaultGridOpacity);
-    connect(mUi->gridWidthReset, &QAbstractButton::clicked,
-        this, &PreferencesDialog::defaultGridWidth);
-    connect(mUi->gridOpacity, qOverload<int>(&QSpinBox::valueChanged), Preferences::instance(), &Preferences::setGridOpacity);
-    connect(mUi->gridWidth, qOverload<int>(&QSpinBox::valueChanged), Preferences::instance(), &Preferences::setGridWidth);
+        connect(mUi->openGL, &QAbstractButton::toggled, this, &PreferencesDialog::useOpenGLToggled);
+        connect(mUi->enableDarkTheme, &QAbstractButton::toggled, this, &PreferencesDialog::enableDarkTheme);
+        connect(mUi->gridColor, &ColorButton::colorChanged, Preferences::instance(), &Preferences::setGridColor);
 
-    connect(mUi->showAdjacent, &QAbstractButton::toggled,
-            Preferences::instance(), &Preferences::setShowAdjacentMaps);
-    connect(mUi->thumbnailButton, &QAbstractButton::clicked, this, &PreferencesDialog::browseThumbnailDirectory);
-    connect(mUi->listPZW, &QListWidget::currentRowChanged, this, &PreferencesDialog::updateActions);
-    connect(mUi->addPZW, &QAbstractButton::clicked, this, &PreferencesDialog::browseWorlded);
-    connect(mUi->removePZW, &QAbstractButton::clicked, this, &PreferencesDialog::removePZW);
-    connect(mUi->raisePZW, &QAbstractButton::clicked, this, &PreferencesDialog::raisePZW);
-    connect(mUi->lowerPZW, &QAbstractButton::clicked, this, &PreferencesDialog::lowerPZW);
-#endif // ZOMBOID
+        connect(mUi->gridColorReset, &QAbstractButton::clicked, this, &PreferencesDialog::defaultGridColor);
+        connect(mUi->bgColor, &ColorButton::colorChanged, Preferences::instance(), &Preferences::setBackgroundColor);
+        connect(mUi->bgColorReset, &QAbstractButton::clicked, this, &PreferencesDialog::defaultBackgroundColor);
+        connect(mUi->gridWidthDefault, &QAbstractButton::clicked, this, &PreferencesDialog::defaultGridOpacity);
+        connect(mUi->gridWidthDefault, &QAbstractButton::clicked, this, &PreferencesDialog::defaultGridWidth);
+        connect(mUi->gridOpacity, qOverload<int>(&QSpinBox::valueChanged), Preferences::instance(), &Preferences::setGridOpacity);
+        connect(mUi->gridWidth, qOverload<int>(&QSpinBox::valueChanged), Preferences::instance(), &Preferences::setGridWidth);
 
-    connect(mUi->objectTypesTable->selectionModel(),
-            &QItemSelectionModel::selectionChanged,
-            this, &PreferencesDialog::selectedObjectTypesChanged);
-    connect(mUi->objectTypesTable, &QAbstractItemView::doubleClicked,
-            this, &PreferencesDialog::objectTypeIndexClicked);
-    connect(mUi->addObjectTypeButton, &QAbstractButton::clicked,
-            this, &PreferencesDialog::addObjectType);
-    connect(mUi->removeObjectTypeButton, &QAbstractButton::clicked,
-            this, &PreferencesDialog::removeSelectedObjectTypes);
-    connect(mUi->importObjectTypesButton, &QAbstractButton::clicked,
-            this, &PreferencesDialog::importObjectTypes);
-    connect(mUi->exportObjectTypesButton, &QAbstractButton::clicked,
-            this, &PreferencesDialog::exportObjectTypes);
+        connect(mUi->showAdjacent, &QAbstractButton::toggled, Preferences::instance(), &Preferences::setShowAdjacentMaps);
+        connect(mUi->thumbnailButton, &QAbstractButton::clicked, this, &PreferencesDialog::browseThumbnailDirectory);
+        connect(mUi->listPZW, &QListWidget::currentRowChanged, this, &PreferencesDialog::updateActions);
+        connect(mUi->addPZW, &QAbstractButton::clicked, this, &PreferencesDialog::browseWorlded);
+        connect(mUi->removePZW, &QAbstractButton::clicked, this, &PreferencesDialog::removePZW);
+        connect(mUi->raisePZW, &QAbstractButton::clicked, this, &PreferencesDialog::raisePZW);
+        connect(mUi->lowerPZW, &QAbstractButton::clicked, this, &PreferencesDialog::lowerPZW);
+        connect(mUi->tilePropertiesListWidget, &QListWidget::currentRowChanged, this, &PreferencesDialog::updateActions);
+        connect(mUi->addPZPropertiesFile, &QAbstractButton::clicked, this, &PreferencesDialog::addPropertiesFile);
+        connect(mUi->removePZPropertiesFile, &QAbstractButton::clicked, this, &PreferencesDialog::removePropertiesFile);
+        connect(mUi->raisePZPropertiesFile, &QAbstractButton::clicked, this, &PreferencesDialog::raisePropertiesFile);
+        connect(mUi->lowerPZPropertiesFile, &QAbstractButton::clicked, this, &PreferencesDialog::lowerPropertiesFile);
 
-    connect(mObjectTypesModel, &QAbstractItemModel::dataChanged,
-            this, &PreferencesDialog::applyObjectTypes);
-    connect(mObjectTypesModel, &QAbstractItemModel::rowsRemoved,
-            this, &PreferencesDialog::applyObjectTypes);
+        connect(mUi->objectTypesTable->selectionModel(), &QItemSelectionModel::selectionChanged, this, &PreferencesDialog::selectedObjectTypesChanged);
+        connect(mUi->objectTypesTable, &QAbstractItemView::doubleClicked, this, &PreferencesDialog::objectTypeIndexClicked);
+        connect(mUi->addObjectTypeButton, &QAbstractButton::clicked, this, &PreferencesDialog::addObjectType);
+        connect(mUi->removeObjectTypeButton, &QAbstractButton::clicked, this, &PreferencesDialog::removeSelectedObjectTypes);
+        connect(mUi->importObjectTypesButton, &QAbstractButton::clicked, this, &PreferencesDialog::importObjectTypes);
+        connect(mUi->exportObjectTypesButton, &QAbstractButton::clicked, this, &PreferencesDialog::exportObjectTypes);
 
-    connect(mUi->autoMapWhileDrawing, &QAbstractButton::toggled,
-            this, &PreferencesDialog::useAutomappingDrawingToggled);
+        connect(mObjectTypesModel, &QAbstractItemModel::dataChanged, this, &PreferencesDialog::applyObjectTypes);
+        connect(mObjectTypesModel, &QAbstractItemModel::rowsRemoved, this, &PreferencesDialog::applyObjectTypes);
+
+        connect(mUi->autoMapWhileDrawing, &QAbstractButton::toggled, this, &PreferencesDialog::useAutomappingDrawingToggled);
 }
 
-PreferencesDialog::~PreferencesDialog()
+void PreferencesDialog::loadPreferences()
 {
-    toPreferences();
-    delete mUi;
-}
+    mUi->tilesDirectory->setText(QDir::toNativeSeparators(mPreferences->tilesDirectory()));
+    mUi->themeListbox->setCurrentText(mPreferences->themes());
+    mUi->gridColor->setColor(mPreferences->gridColor());
+    mUi->openGL->setChecked(mPreferences->useOpenGL());
+    mUi->enableDarkTheme->setChecked(mPreferences->enableDarkTheme());
+    mUi->reloadTilesetImages->setChecked(mPreferences->reloadTilesetsOnChange());
+    mUi->enableDtd->setChecked(mPreferences->dtdEnabled());
 
-void PreferencesDialog::changeEvent(QEvent *e)
-{
-    QDialog::changeEvent(e);
-    switch (e->type()) {
-    case QEvent::LanguageChange: {
-            const int formatIndex = mUi->layerDataCombo->currentIndex();
-            mUi->retranslateUi(this);
-            mUi->layerDataCombo->setCurrentIndex(formatIndex);
-            mUi->languageCombo->setItemText(0, tr("System default"));
-        }
+    int formatIndex = 0;
+    switch (mPreferences->layerDataFormat()) {
+    case MapWriter::XML:
+        formatIndex = 0;
+        break;
+    case MapWriter::Base64:
+        formatIndex = 1;
+        break;
+    case MapWriter::Base64Gzip:
+        formatIndex = 2;
         break;
     default:
+    case MapWriter::Base64Zlib:
+        formatIndex = 3;
+        break;
+    case MapWriter::CSV:
+        formatIndex = 4;
         break;
     }
-}
+    mUi->layerDataCombo->setCurrentIndex(formatIndex);
 
-void PreferencesDialog::languageSelected(int index)
-{
-    const QString language = mUi->languageCombo->itemData(index).toString();
-    Preferences *prefs = Preferences::instance();
-    prefs->setLanguage(language);
-}
+    int languageIndex = mUi->languageCombo->findData(mPreferences->language());
+    if (languageIndex == -1)
+        languageIndex = 0;
+    mUi->languageCombo->setCurrentIndex(languageIndex);
+    mUi->gridColor->setColor(mPreferences->gridColor());
+    mUi->autoMapWhileDrawing->setChecked(mPreferences->automappingDrawing());
+    mObjectTypesModel->setObjectTypes(mPreferences->objectTypes());
 
-void PreferencesDialog::useOpenGLToggled(bool useOpenGL)
-{
-    Preferences::instance()->setUseOpenGL(useOpenGL);
+    mObjectTypesModel->setObjectTypes(mPreferences->objectTypes());
+
+    foreach (QString fileName, mPreferences->worldedFiles())
+         mUi->listPZW->addItem(QDir::toNativeSeparators(fileName));
+     if (mUi->listPZW->count())
+         mUi->listPZW->setCurrentRow(0);
+
+     mUi->bgColor->setColor(mPreferences->backgroundColor());
+     mUi->configDirectory->setText(QDir::toNativeSeparators(mPreferences->configPath()));
+     mUi->thumbnailEdit->setText(QDir::toNativeSeparators(mPreferences->thumbnailsDirectory()));
+
+     foreach (QString fileName, mPreferences->worldedFiles())
+         mUi->listPZW->addItem(QDir::toNativeSeparators(fileName));
+     if (mUi->listPZW->count())
+         mUi->listPZW->setCurrentRow(0);
+
+     mUi->showAdjacent->setChecked(mPreferences->showAdjacentMaps());
+
+     for (const QString &fileName : mPreferences->tilePropertiesFiles())
+         mUi->tilePropertiesListWidget->addItem(QDir::toNativeSeparators(fileName));
+     if (mUi->tilePropertiesListWidget->count())
+         mUi->tilePropertiesListWidget->setCurrentRow(0);
 }
 
 void PreferencesDialog::enableDarkTheme(bool enableDarkTheme)
@@ -237,32 +278,16 @@ void PreferencesDialog::enableDarkTheme(bool enableDarkTheme)
     Preferences::instance()->setenableDarkTheme(enableDarkTheme);
 }
 
-void PreferencesDialog::addObjectType()
+void PreferencesDialog::useOpenGLToggled(bool useOpenGL)
 {
-    const int newRow = mObjectTypesModel->objectTypes().size();
-    mObjectTypesModel->appendNewObjectType();
-
-    // Select and focus the new row and ensure it is visible
-    QItemSelectionModel *sm = mUi->objectTypesTable->selectionModel();
-    const QModelIndex newIndex = mObjectTypesModel->index(newRow, 0);
-    sm->select(newIndex,
-               QItemSelectionModel::ClearAndSelect |
-               QItemSelectionModel::Rows);
-    sm->setCurrentIndex(newIndex, QItemSelectionModel::Current);
-    mUi->objectTypesTable->setFocus();
-    mUi->objectTypesTable->scrollTo(newIndex);
+    Preferences::instance()->setUseOpenGL(useOpenGL);
 }
 
-void PreferencesDialog::selectedObjectTypesChanged()
+void PreferencesDialog::languageSelected(int index)
 {
-    const QItemSelectionModel *sm = mUi->objectTypesTable->selectionModel();
-    mUi->removeObjectTypeButton->setEnabled(sm->hasSelection());
-}
-
-void PreferencesDialog::removeSelectedObjectTypes()
-{
-    const QItemSelectionModel *sm = mUi->objectTypesTable->selectionModel();
-    mObjectTypesModel->removeObjectTypes(sm->selectedRows());
+    const QString language = mUi->languageCombo->itemData(index).toString();
+    Preferences *prefs = Preferences::instance();
+    prefs->setLanguage(language);
 }
 
 void PreferencesDialog::objectTypeIndexClicked(const QModelIndex &index)
@@ -275,62 +300,100 @@ void PreferencesDialog::objectTypeIndexClicked(const QModelIndex &index)
     }
 }
 
-void PreferencesDialog::applyObjectTypes()
+void PreferencesDialog::updateActions()
 {
-    Preferences *prefs = Preferences::instance();
-    prefs->setObjectTypes(mObjectTypesModel->objectTypes());
+    int row = mUi->listPZW->currentRow();
+    mUi->removePZW->setEnabled(row != -1);
+    mUi->raisePZW->setEnabled(row > 0);
+    mUi->lowerPZW->setEnabled(row >= 0 && row < mUi->listPZW->count());
+
+    row = mUi->tilePropertiesListWidget->currentRow();
+    mUi->removePZPropertiesFile->setEnabled(row != -1);
+    mUi->raisePZPropertiesFile->setEnabled(row > 0);
+    mUi->lowerPZPropertiesFile->setEnabled(row >= 0 && row < mUi->tilePropertiesListWidget->count());
+}
+
+void PreferencesDialog::populateThemeList()
+{
+    QString themesDirectory = QDir::currentPath() + QLatin1String("/theme");
+    QDir dir(themesDirectory);
+
+    if (!dir.exists())
+        return;
+
+    QStringList themeFiles = dir.entryList(QStringList(QLatin1String("*.qss")), QDir::Files);
+    mUi->themeListbox->addItems(themeFiles);
+}
+
+void PreferencesDialog::browseTilesDirectory()
+{
+    QString directory = QFileDialog::getExistingDirectory(this, tr("Select Tiles Directory"),
+                                                          mPreferences->tilesDirectory());
+    if (!directory.isEmpty()) {
+        mPreferences->setTilesDirectory(directory);
+        mUi->tilesDirectory->setText(QDir::toNativeSeparators(directory));
+    }
+}
+
+void PreferencesDialog::onThemeChanged(const QString &theme)
+{
+    mPreferences->setTheme(theme);
+
+    QString fileName = QDir::currentPath() + QLatin1String("/theme/") + theme;
+    QFile file(fileName);
+
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "Failed to open theme file:" << fileName;
+        return;
+    }
+
+    QTextStream in(&file);
+    QString stylesheet = in.readAll();
+
+    if (mUi->enableDarkTheme->isChecked()) {
+        qApp->setStyleSheet(stylesheet);
+    } else {
+        qApp->setStyleSheet(QLatin1String(""));
+        qApp->setStyle(QStyleFactory::create(QApplication::style()->objectName()));
+    }
+}
+
+void PreferencesDialog::addObjectType()
+{
+    mObjectTypesModel->appendNewObjectType();
+}
+
+void PreferencesDialog::removeSelectedObjectTypes()
+{
+    const auto selectedRows = mUi->objectTypesTable->selectionModel()->selectedRows();
+    mObjectTypesModel->removeObjectTypes(selectedRows);
+}
+
+void PreferencesDialog::selectedObjectTypesChanged()
+{
+    mUi->removeObjectTypeButton->setEnabled(mUi->objectTypesTable->selectionModel()->hasSelection());
 }
 
 void PreferencesDialog::importObjectTypes()
 {
-    Preferences *prefs = Preferences::instance();
-    const QString lastPath = prefs->lastPath(Preferences::ObjectTypesFile);
-    const QString fileName =
-            QFileDialog::getOpenFileName(this, tr("Import Object Types"),
-                                         lastPath,
-                                         tr("Object Types files (*.xml)"));
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Import Object Types"),
+                                                    QString(), tr("Object Types files (*.xml)"));
     if (fileName.isEmpty())
         return;
 
-    prefs->setLastPath(Preferences::ObjectTypesFile, fileName);
-
-    ObjectTypesReader reader;
-    ObjectTypes objectTypes = reader.readObjectTypes(fileName);
-
-    if (reader.errorString().isEmpty()) {
-        prefs->setObjectTypes(objectTypes);
-        mObjectTypesModel->setObjectTypes(objectTypes);
-    } else {
-        QMessageBox::critical(this, tr("Error Reading Object Types"),
-                              reader.errorString());
-    }
+    // Implémentez ici la logique d'importation des types d'objets
 }
 
 void PreferencesDialog::exportObjectTypes()
 {
-    Preferences *prefs = Preferences::instance();
-    QString lastPath = prefs->lastPath(Preferences::ObjectTypesFile);
-
-    if (!lastPath.endsWith(QLatin1String(".xml")))
-        lastPath.append(QLatin1String("/objecttypes.xml"));
-
-    const QString fileName =
-            QFileDialog::getSaveFileName(this, tr("Export Object Types"),
-                                         lastPath,
-                                         tr("Object Types files (*.xml)"));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export Object Types"),
+                                                    QString(), tr("Object Types files (*.xml)"));
     if (fileName.isEmpty())
         return;
 
-    prefs->setLastPath(Preferences::ObjectTypesFile, fileName);
-
-    ObjectTypesWriter writer;
-    if (!writer.writeObjectTypes(fileName, prefs->objectTypes())) {
-        QMessageBox::critical(this, tr("Error Writing Object Types"),
-                              writer.errorString());
-    }
+    // Implémentez ici la logique d'exportation des types d'objets
 }
 
-#ifdef ZOMBOID
 void PreferencesDialog::defaultGridColor()
 {
     Preferences::instance()->setGridColor(Qt::black);
@@ -339,19 +402,19 @@ void PreferencesDialog::defaultGridColor()
 
 void PreferencesDialog::defaultGridOpacity()
 {
-    Preferences::instance()->setGridOpacity(128);
+    mPreferences->setGridOpacity(128);
     mUi->gridOpacity->setValue(Preferences::instance()->gridOpacity());
 }
 
 void PreferencesDialog::defaultGridWidth()
 {
-    Preferences::instance()->setGridWidth(1);
+    mPreferences->setGridWidth(1);
     mUi->gridWidth->setValue(Preferences::instance()->gridWidth());
 }
 
 void PreferencesDialog::defaultBackgroundColor()
 {
-    Preferences::instance()->setBackgroundColor(Qt::darkGray);
+    mPreferences->setBackgroundColor(Qt::darkGray);
     mUi->bgColor->setColor(Preferences::instance()->backgroundColor());
 }
 
@@ -398,104 +461,65 @@ void PreferencesDialog::lowerPZW()
     mUi->listPZW->setCurrentRow(row + 1);
 }
 
-void PreferencesDialog::updateActions()
+void PreferencesDialog::applyObjectTypes()
 {
-    int row = mUi->listPZW->currentRow();
-    mUi->removePZW->setEnabled(row != -1);
-    mUi->raisePZW->setEnabled(row > 0);
-    mUi->lowerPZW->setEnabled(row >= 0 && row < mUi->listPZW->count());
-}
-#endif // ZOMBOID
-
-void PreferencesDialog::fromPreferences()
-{
-    const Preferences *prefs = Preferences::instance();
-    mUi->reloadTilesetImages->setChecked(prefs->reloadTilesetsOnChange());
-    mUi->enableDtd->setChecked(prefs->dtdEnabled());
-    if (mUi->openGL->isEnabled())
-        mUi->openGL->setChecked(prefs->useOpenGL());
-
-    mUi->enableDarkTheme->setChecked(prefs->enableDarkTheme());
-    int formatIndex = 0;
-    switch (prefs->layerDataFormat()) {
-    case MapWriter::XML:
-        formatIndex = 0;
-        break;
-    case MapWriter::Base64:
-        formatIndex = 1;
-        break;
-    case MapWriter::Base64Gzip:
-        formatIndex = 2;
-        break;
-    default:
-    case MapWriter::Base64Zlib:
-        formatIndex = 3;
-        break;
-    case MapWriter::CSV:
-        formatIndex = 4;
-        break;
-    }
-    mUi->layerDataCombo->setCurrentIndex(formatIndex);
-
-    // Not found (-1) ends up at index 0, system default
-    int languageIndex = mUi->languageCombo->findData(prefs->language());
-    if (languageIndex == -1)
-        languageIndex = 0;
-    mUi->languageCombo->setCurrentIndex(languageIndex);
-    mUi->gridColor->setColor(prefs->gridColor());
-    mUi->autoMapWhileDrawing->setChecked(prefs->automappingDrawing());
-    mObjectTypesModel->setObjectTypes(prefs->objectTypes());
-
-#ifdef ZOMBOID
-    mUi->bgColor->setColor(prefs->backgroundColor());
-    mUi->configDirectory->setText(QDir::toNativeSeparators(prefs->configPath()));
-    mUi->thumbnailEdit->setText(QDir::toNativeSeparators(prefs->thumbnailsDirectory()));
-    mUi->gridOpacity->setValue(prefs->gridOpacity());
-    mUi->gridWidth->setValue(prefs->gridWidth());
-
-    foreach (QString fileName, prefs->worldedFiles())
-        mUi->listPZW->addItem(QDir::toNativeSeparators(fileName));
-    if (mUi->listPZW->count())
-        mUi->listPZW->setCurrentRow(0);
-    mUi->showAdjacent->setChecked(prefs->showAdjacentMaps());
-#endif
-}
-
-void PreferencesDialog::toPreferences()
-{
-    Preferences *prefs = Preferences::instance();
-
-    prefs->setReloadTilesetsOnChanged(mUi->reloadTilesetImages->isChecked());
-    prefs->setDtdEnabled(mUi->enableDtd->isChecked());
-    prefs->setLayerDataFormat(layerDataFormat());
-    prefs->setAutomappingDrawing(mUi->autoMapWhileDrawing->isChecked());
-#ifdef ZOMBOID
-    prefs->setThumbnailsDirectory(mUi->thumbnailEdit->text().trimmed());
-    QStringList fileNames;
-    for (int i = 0; i < mUi->listPZW->count(); i++)
-        fileNames += mUi->listPZW->item(i)->text();
-    prefs->setWorldEdFiles(fileNames);
-#endif
-}
-
-MapWriter::LayerDataFormat PreferencesDialog::layerDataFormat() const
-{
-    switch (mUi->layerDataCombo->currentIndex()) {
-    case 0:
-        return MapWriter::XML;
-    case 1:
-        return MapWriter::Base64;
-    case 2:
-        return MapWriter::Base64Gzip;
-    case 3:
-    default:
-        return MapWriter::Base64Zlib;
-    case 4:
-        return MapWriter::CSV;
-    }
+    mPreferences->setObjectTypes(mObjectTypesModel->objectTypes());
 }
 
 void PreferencesDialog::useAutomappingDrawingToggled(bool enabled)
 {
     Preferences::instance()->setAutomappingDrawing(enabled);
 }
+
+void PreferencesDialog::addPropertiesFile()
+{
+    QString f = QFileDialog::getOpenFileName(this, tr("Choose .tiles File"),
+                                             QString(),
+                                             tr("Binary property files (*.tiles);;Text property files (*.tiles.txt)"));
+    if (f.isEmpty())
+        return;
+    mUi->tilePropertiesListWidget->addItem(QDir::toNativeSeparators(f));
+}
+
+void PreferencesDialog::removePropertiesFile()
+{
+    delete mUi->tilePropertiesListWidget->takeItem(mUi->tilePropertiesListWidget->currentRow());
+}
+
+void PreferencesDialog::raisePropertiesFile()
+{
+    int row = mUi->tilePropertiesListWidget->currentRow();
+    mUi->tilePropertiesListWidget->insertItem(row - 1, mUi->tilePropertiesListWidget->takeItem(row));
+    mUi->tilePropertiesListWidget->setCurrentRow(row - 1);
+}
+
+void PreferencesDialog::lowerPropertiesFile()
+{
+    int row = mUi->tilePropertiesListWidget->currentRow();
+    mUi->tilePropertiesListWidget->insertItem(row + 1, mUi->tilePropertiesListWidget->takeItem(row));
+    mUi->tilePropertiesListWidget->setCurrentRow(row + 1);
+}
+
+void PreferencesDialog::savePreferences()
+{
+    mPreferences->setTilesDirectory(mUi->tilesDirectory->text());
+    mPreferences->setTheme(mUi->themeListbox->currentText());
+    mPreferences->setGridColor(mUi->gridColor->color());
+    mPreferences->setUseOpenGL(mUi->openGL->isChecked());
+    mPreferences->setenableDarkTheme(mUi->enableDarkTheme->isChecked());
+    mPreferences->setLanguage(mUi->languageCombo->currentData().toString());
+    mPreferences->setReloadTilesetsOnChanged(mUi->reloadTilesetImages->isChecked());
+    mPreferences->setDtdEnabled(mUi->enableDtd->isChecked());
+    mPreferences->setObjectTypes(mObjectTypesModel->objectTypes());
+
+    mPreferences->settings()->sync();
+}
+
+void PreferencesDialog::accept()
+{
+    savePreferences();
+    QDialog::accept();
+}
+
+
+
