@@ -1,20 +1,36 @@
 Project Zomboid TileZed
 Forked From https://github.com/timbaker/tiled
 
-- fixed treeview branch view in dark theme
-- fixed "Show Grid" context menu (thanks to @BeeArr)
-- fixed Dark Theme in BuildingEd
-- new settings to set Grid opacity
-- new settings to set Grid Thickness
-- Create .pack file (Jumbo) textures up to 2048x2048 (was 512x512)
-- LUA Console: ability to replace a tile by map:noneTile()
-- LUA Console: fixed RoomDefs layer insert via newObjectLayer() (Azakaela request)
-- LUA Console: fixed addObject() in newObjectLayer() (_add_RoomDefs.lua example provided) (Azakaela request)
-- BuildingEd: Export to TMX enabled
-- BuildingEd: Export to NewBinary Format enabled
-- BuildingEd: Building up to 32 floors
-- BuildingEd: Colorized buttons (easiest to know if it's disabled or not)
-- Ability to see tiles ID and Name in main UI
-- TileSheets export new options (Whole Word Only, multiple tilesheets export)
-- Export tiles from main window (right click)
-- Fixed all deprecated Qt Function
+**Fully standalone:**
+The new version of the tools is entirely standalone. It no longer relies on the Windows registry or a folder in %userprofile%. This allows you to:
+    Maintain multiple versions of the tools on the same PC.
+    Back up your entire environment in one go.
+
+**Improved themes:**
+    A dark theme is included by default.
+    A new theme management system allows you to add your own themes. Simply search for "QSS themes" on your favorite search engine.
+
+**Enhanced tiles:**
+    Improved visibility of tiles and their names.
+    Tiles can still be exported via right-click.
+    The Tiles Unpacker now includes advanced options beyond just prefix handling.
+
+**Route generation for the InGameMap added.**
+
+**Full Buildings for the InGameMap added.**
+
+**Built-in LUA engine fixed for the InGameMap added.**
+
+**Thumbnail up to 8192 pixels, for a better map rendering**
+You can also use the pngs to show you map without externals apps
+(and the thumbnails generator is also fixed)
+
+**New Biomemap Generator:**
+    Based on two images (Main and _veg).
+    Includes automatic tile splitting.
+
+**Support for B42 features:**
+    Fully compatible with additions like basements, animals, WorldGen, etc.
+
+**Included tilesheets:**
+    All necessary tilesheets are provided by default.
