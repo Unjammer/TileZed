@@ -1,5 +1,5 @@
 version = 0
-revision = 129
+revision = 130
 meta-enums
 {
     DoorW = 1
@@ -66,7 +66,7 @@ tileset
 tileset
 {
     file = blends_natural_01
-    size = 8,10
+    size = 8,20
 }
 tileset
 {
@@ -267,6 +267,11 @@ tileset
 {
     file = e_yellowwood_1
     size = 4,8
+}
+tileset
+{
+    file = electricity_pylon
+    size = 8,23
 }
 tileset
 {
@@ -1077,6 +1082,11 @@ tileset
 {
     file = papernotices_01
     size = 8,8
+}
+tileset
+{
+    file = radio_tower
+    size = 8,16
 }
 tileset
 {

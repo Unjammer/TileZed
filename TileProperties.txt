@@ -59,6 +59,7 @@ property
         FloorTile = FloorTile
         FloorRug = FloorRug
         Vegitation = Vegitation
+        DoorObject = DoorObject
     }
     Default = Normal
     ValueAsPropertyName = false
@@ -67,6 +68,14 @@ property
 {
     Type = Boolean
     Name = WallObjectAllowDoorframe
+    ShortName =
+    Default = false
+    ReverseLogic = false
+}
+property
+{
+    Type = Boolean
+    Name = CanAttachAnimal
     ShortName =
     Default = false
     ReverseLogic = false
@@ -86,10 +95,12 @@ property
     Enums
     {
         None =
-        Hammer = Hammer
         Crowbar = Crowbar
-        Electrician = Electrician
         Cutter = Cutter
+        Door = Door
+        Electrician = Electrician
+        Hammer = Hammer
+        Screwdriver = Screwdriver
         Shovel = Shovel
         Wrench = Wrench
     }
@@ -104,10 +115,12 @@ property
     Enums
     {
         None =
-        Hammer = Hammer
         Crowbar = Crowbar
-        Electrician = Electrician
         Cutter = Cutter
+        Door = Door
+        Electrician = Electrician
+        Hammer = Hammer
+        Screwdriver = Screwdriver
         Shovel = Shovel
         Wrench = Wrench
     }
@@ -195,6 +208,22 @@ property
         3,1 = 3,1
         3,2 = 3,2
         3,3 = 3,3
+        0,0,1 = 0,0,1
+        0,1,1 = 0,1,1
+        0,2,1 = 0,2,1
+        0,3,1 = 0,3,1
+        1,0,1 = 1,0,1
+        1,1,1 = 1,1,1
+        1,2,1 = 1,2,1
+        1,3,1 = 1,3,1
+        2,0,1 = 2,0,1
+        2,1,1 = 2,1,1
+        2,2,1 = 2,2,1
+        2,3,1 = 2,3,1
+        3,0,1 = 3,0,1
+        3,1,1 = 3,1,1
+        3,2,1 = 3,2,1
+        3,3,1 = 3,3,1
     }
     Default = None
     ValueAsPropertyName = false
@@ -301,6 +330,20 @@ property
 property
 {
     Type = Enum
+    Name = GenericCraftingSurface
+    ShortName =
+    Enums
+    {
+        None = 
+        True = true
+        False = false
+    }
+    Default = None
+    ValueAsPropertyName = false
+}
+property
+{
+    Type = Enum
     Name = signal
     ShortName =
     Enums
@@ -328,6 +371,7 @@ property
         Foam = Foam
         Fridge = Fridge
         Glass = Glass
+        GoldBar = GoldBar
         Leather = Leather
         Log = Log
         Mechanical = Mechanical
@@ -346,7 +390,10 @@ property
         PlasticBag = PlasticBag
         PlasticHard = PlasticHard
         Plumbing = Plumbing
+        RailroadTie = RailroadTie,
+        RailroadTrack = RailroadTrack,
         Rubber = Rubber
+        Sandbag = Sandbag
         Screws = Screws
         Sink = Sink
         Steel = Steel
@@ -392,6 +439,8 @@ property
         PlasticBag = PlasticBag
         PlasticHard = PlasticHard
         Plumbing = Plumbing
+        RailroadTie = RailroadTie,
+        RailroadTrack = RailroadTrack,
         Rubber = Rubber
         Screws = Screws
         Sink = Sink
@@ -437,6 +486,8 @@ property
         PlasticBag = PlasticBag
         PlasticHard = PlasticHard
         Plumbing = Plumbing
+        RailroadTie = RailroadTie,
+        RailroadTrack = RailroadTrack,
         Rubber = Rubber
         Screws = Screws
         Sink = Sink
@@ -533,6 +584,14 @@ property
     Type = String
     Name = BurntTile
     ShortName = BurntTile
+    Default =
+}
+
+property
+{
+    Type = String
+    Name = SnowTile
+    ShortName = SnowTile
     Default =
 }
 
@@ -711,6 +770,22 @@ property
 }
 property
 {
+    Type = Boolean
+    Name = Double-Doorframe Left
+    ShortName = DoubleDoor1
+    Default = false
+    ReverseLogic = false
+}
+property
+{
+    Type = Boolean
+    Name = Double-Doorframe Right
+    ShortName = DoubleDoor2
+    Default = false
+    ReverseLogic = false
+}
+property
+{
     Type = Integer
     Name = DoubleDoor
     ShortName =
@@ -782,6 +857,14 @@ property
     Type = Boolean
     Name = Zac Diamond Floor
     ShortName = diamondFloor
+    Default = false
+    ReverseLogic = false
+}
+property
+{
+    Type = Boolean
+    Name = BlockRain
+    ShortName =
     Default = false
     ReverseLogic = false
 }
@@ -874,6 +957,14 @@ property
     }
     Default = NoEffect
     ValueAsPropertyName = false
+}
+property
+{
+    Type = Boolean
+    Name = Invisible
+    ShortName = invisible
+    Default = false
+    ReverseLogic = false
 }
 property
 {
@@ -1021,6 +1112,30 @@ property
     Default = None
     ValueAsPropertyName = true
 }
+property
+{
+    Name = FasciaEdge
+    Type = Enum
+    ShortName =
+    Enums
+    {
+        None =
+        North =
+        East =
+        South =
+        West =
+        NorthAndEast =
+        SouthAndEast =
+        SouthAndWest =
+        NorthAndWest =
+        NorthEastCorner =
+        SouthEastCorner =
+        SouthWestCorner =
+        NorthWestCorner =
+    }
+    Default = None
+    ValueAsPropertyName = false
+}
 separator
 {
 }
@@ -1112,9 +1227,29 @@ property
         None =
         cutW = cutW
         cutN = cutN
+        NeverCutaway = NeverCutaway
     }
     Default = None
     ValueAsPropertyName = true
+}
+property
+{
+    Type = Enum
+    Name = CutawayHint
+    ShortName =
+    Enums
+    {
+        None =
+        Double Door Left = DoubleDoorLeft
+        Double Door Right = DoubleDoorRight
+        Garage Door Left = GarageDoorLeft
+        Garage Door Middle = GarageDoorMiddle
+        Garage Door Right = GarageDoorRight
+        Double Window Left = DoubleWindowLeft
+        Double Window Right = DoubleWindowRight
+    }
+    Default = None
+    ValueAsPropertyName = false
 }
 property
 {
@@ -1561,6 +1696,47 @@ property
     Default = None
     ValueAsPropertyName = false
 }
+property
+{
+    Type = String
+    Name = PhysicsMesh
+    ShortName =
+    Default =
+}
+property
+{
+    Type = Enum
+    Name = SlopedSurfaceDirection
+    ShortName =
+    Enums
+    {
+        None = 
+        North = N
+        South = S
+        West = W
+        East = E
+    }
+    Default = None
+    ValueAsPropertyName = false
+}
+property
+{
+    Type = Integer
+    Name = SlopedSurfaceHeightMin
+    ShortName = 
+    Min = 0
+    Max = 100
+    Default = 0
+}
+property
+{
+    Type = Integer
+    Name = SlopedSurfaceHeightMax
+    ShortName = 
+    Min = 0
+    Max = 100
+    Default = 0
+}
 
 separator
 {
@@ -1613,11 +1789,16 @@ property
     Enums
     {
         None =
+        Farm Gate = FarmGate
         Garage Door = GarageDoor
         Metal Door = MetalDoor
         Metal Gate = MetalGate
+        Metal Pole Gate = MetalPoleGate
+        Metal Pole Gate (Double) = MetalPoleGateDouble
+        Metal Pole Gate (Small) = MetalPoleGateSmall
         Prison Metal Door = PrisonMetalDoor
         Sliding Glass Door = SlidingGlassDoor
+        Small Wood Gate = WoodGateSmall
         Wood Door = WoodDoor
         Wood Gate = WoodGate
         Wood Shack Door = WoodShackDoor
@@ -1688,6 +1869,45 @@ property
         Sand = Sand
         Ceramic = Ceramic
         Metal = Metal
+    }
+    Default = None
+    ValueAsPropertyName = false
+}
+
+property
+{
+    Type = Enum
+    Name = MaterialType
+    ShortName = 
+    Enums
+    {
+        None =
+        Flesh = Flesh
+        Flesh_Hollow = Flesh_Hollow
+        Concrete = Concrete
+        Plaster = Plaster
+        Stone = Stone
+        Wood = Wood
+        Wood_Solid = Wood_Solid
+        Brick = Brick
+        Metal = Metal
+        Metal_Large = Metal_Large
+        Metal_Light = Metal_Light
+        Metal_Solid = Metal_Solid
+        Glass = Glass
+        Glass_Light = Glass_Light
+        Glass_Solid = Glass_Solid
+        Cinderblock = Cinderblock
+        Plastic = Plastic
+        Ceramic = Ceramic
+        Rubber = Rubber
+        Fabric = Fabric
+        Carpet = Carpet
+        Dirt = Dirt
+        Grass = Grass
+        Gravel = Gravel
+        Sand = Sand
+        Snow = Snow
     }
     Default = None
     ValueAsPropertyName = false
